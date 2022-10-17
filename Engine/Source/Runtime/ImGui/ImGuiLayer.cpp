@@ -38,8 +38,8 @@ namespace X
         //io.ConfigViewportsNoTaskBarIcon = true;
 
 		float fontSize = 18.0f;
-        io.Fonts->AddFontFromFileTTF("D:/code/XEngine/Engine/Assets/Fonts/opensans/OpenSans-Bold.ttf", fontSize);
-        io.FontDefault = io.Fonts->AddFontFromFileTTF("D:/code/XEngine/Engine/Assets/Fonts/opensans/OpenSans-Regular.ttf", fontSize);
+        io.Fonts->AddFontFromFileTTF("D:/code/Xngine/Engine/Assets/Fonts/opensans/OpenSans-Bold.ttf", fontSize);
+        io.FontDefault = io.Fonts->AddFontFromFileTTF("D:/code/Xngine/Engine/Assets/Fonts/opensans/OpenSans-Regular.ttf", fontSize);
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();

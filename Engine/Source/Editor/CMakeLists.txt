@@ -11,6 +11,8 @@ source_group(TREE ${EngineEditorDir} FILES ${EditorHeaderFiles} ${EditorSourceFi
 
 add_executable(XngineEditor ${EditorHeaderFiles} ${EditorSourceFiles})
 
+add_compile_definitions("ENGINE_ROOT_DIR=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 target_link_libraries(XngineEditor PRIVATE XngineRuntime)
 
 target_include_directories(XngineEditor PRIVATE

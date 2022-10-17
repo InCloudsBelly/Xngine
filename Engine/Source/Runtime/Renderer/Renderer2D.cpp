@@ -169,9 +169,9 @@ namespace X
         for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
             samplers[i] = i;
 
-        s_Data.QuadShader = Shader::Create("D:/code/XEngine/Engine/Assets/shaders/Renderer2D_Quad.glsl");
-        s_Data.CircleShader = Shader::Create("D:/code/XEngine/Engine/Assets/shaders/Renderer2D_Circle.glsl");
-        s_Data.LineShader = Shader::Create("D:/code/XEngine/Engine/Assets/shaders/Renderer2D_Line.glsl");
+        s_Data.QuadShader = Shader::Create("D:/code/Xngine/Engine/Shaders/Renderer2D_Quad.glsl");
+        s_Data.CircleShader = Shader::Create("D:/code/Xngine/Engine/Shaders/Renderer2D_Circle.glsl");
+        s_Data.LineShader = Shader::Create("D:/code/Xngine/Engine/Shaders/Renderer2D_Line.glsl");
 
         s_Data.QuadShader->Bind();
         s_Data.QuadShader->SetIntArray("u_Textures", samplers, s_Data.MaxTextureSlots);

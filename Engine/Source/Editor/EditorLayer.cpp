@@ -27,7 +27,7 @@ namespace X
 
     void EditorLayer::OnAttach()
     {
-        m_CheckerboardTexture = Texture2D::Create("D:/code/XEngine/Engine/Assets/textures/Checkerboard.png");
+        m_CheckerboardTexture = Texture2D::Create("D:/code/Xngine/Engine/Assets/textures/Checkerboard.png");
         m_IconPlay = Texture2D::Create("Resources/Icons/PlayButton.png");
         m_IconStop = Texture2D::Create("Resources/Icons/StopButton.png");
 
@@ -409,8 +409,8 @@ namespace X
 
 	void EditorLayer::LoadDefaultEditorConfig()
 	{
-		const std::filesystem::path CurrentEditorConfigPath{ "imgui.ini" };
-		const std::filesystem::path DefaultEditorConfigPath{ "D:/code/XEngine/Engine/Assets/config/imgui.ini" };
+		const std::filesystem::path CurrentEditorConfigPath{ AssetManager::GetInstance().GetFullPath("imgui.ini") };
+		const std::filesystem::path DefaultEditorConfigPath{ AssetManager::GetInstance().GetFullPath("Assets/Config/imgui.ini") };
 		X_CORE_ASSERT(std::filesystem::exists(DefaultEditorConfigPath));
 		if (std::filesystem::exists(CurrentEditorConfigPath))
 			std::filesystem::remove(CurrentEditorConfigPath);

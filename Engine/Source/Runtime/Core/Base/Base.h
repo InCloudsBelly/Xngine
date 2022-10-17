@@ -74,6 +74,8 @@
 #endif
 
 #define X_EXPAND_MACRO(x) x
+// https://gcc.gnu.org/onlinedocs/cpp/Stringizing.html
+#define X_XSTRINGIFY_MACRO(x) X_STRINGIFY_MACRO(x)
 #define X_STRINGIFY_MACRO(x) #x
 
 #define BIT(x) (1 << x)

@@ -16,6 +16,7 @@ target_compile_definitions(XngineRuntime
     PRIVATE GLFW_INCLUDE_NONE
     PRIVATE IMGUI_IMPL_OPENGL_LOADER_CUSTOM
     PRIVATE X_DEBUG
+    "ENGINE_ROOT_DIR=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 )
 
 target_precompile_headers(XngineRuntime PUBLIC "Xpch.h")
