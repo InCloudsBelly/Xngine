@@ -51,6 +51,7 @@ namespace X
 	void Application::Init(const std::string& name)
 	{
 		Log::Init();
+		ConfigManager::GetInstance().Initialize();
 
 		m_Window = Window::Create(WindowProps(name));
 		m_Window->SetEventCallback(X_BIND_EVENT_FN(Application::OnEvent));
@@ -59,7 +60,6 @@ namespace X
 		PushOverlay(m_ImGuiLayer);
 
 		Renderer::Init();
-		ConfigManager::GetInstance().Initialize();
 	}
 
 	void Application::Run()
