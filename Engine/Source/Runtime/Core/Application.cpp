@@ -9,26 +9,6 @@
 
 namespace X
 {
-	Application* Application::s_Instance = nullptr;
-
-	Application::Application(const std::string& name)
-	{
-		X_PROFILE_FUNCTION();
-
-		X_CORE_ASSERT(!s_Instance, "Application already exists!");
-		s_Instance = this;
-
-		m_Window = Window::Create(WindowProps(name));
-		m_Window->SetEventCallback(X_BIND_EVENT_FN(Application::OnEvent));
-
-		m_ImGuiLayer = new ImGuiLayer();
-		PushOverlay(m_ImGuiLayer);
-	}
-
-	Application::~Application()
-	{
-		Renderer::Shutdown();
-	}
 
 	void Application::PushLayer(Layer* layer)
 	{
@@ -67,8 +47,16 @@ namespace X
 		}
 	}
 
-	void Application::Init()
+	void Application::Init(const std::string& name)
 	{
+		Log::Init();
+
+		m_Window = Window::Create(WindowProps(name));
+		m_Window->SetEventCallback(X_BIND_EVENT_FN(Application::OnEvent));
+
+		m_ImGuiLayer = new ImGuiLayer();
+		PushOverlay(m_ImGuiLayer);
+
 		Renderer::Init();
 	}
 
@@ -93,6 +81,11 @@ namespace X
 
 			m_Window->OnUpdate();
 		}
+	}
+
+	void Application::Clean()
+	{
+		Renderer::Shutdown();
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
