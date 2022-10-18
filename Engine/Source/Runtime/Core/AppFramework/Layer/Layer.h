@@ -19,9 +19,9 @@ namespace X
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& event) {}
 
-		inline const std::string& GetName() const { return m_DebugName; }
+		[[nodiscard]] inline const std::string& GetName() const { return mDebugName; }
 	protected:
-		std::string m_DebugName;
+		std::string mDebugName;
 	};
 
 }

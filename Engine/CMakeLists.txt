@@ -4,7 +4,7 @@ set(EngineShadersDir "${EngineRootDir}/Shaders")
 set(EngineSourceDir "${EngineRootDir}/Source")
 
 if (NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
-    message(FATAL_ERROR "HEngine only supports 64-bit platforms now")
+    message(FATAL_ERROR "XEngine only supports 64-bit platforms now")
 endif ()
 
 if (PROJECT_BINARY_DIR STREQUAL PROJECT_SOURCE_DIR)

@@ -14,7 +14,7 @@ namespace X
 
         static bool IsMouseButtonPressed(MouseCode button);
         static glm::vec2 GetMousePosition();
-        static float GetMouseX();
-        static float GetMouseY();
+        [[nodiscard]] static float GetMouseX();
+        [[nodiscard]] static float GetMouseY();
     };
 }

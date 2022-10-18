@@ -5,7 +5,7 @@ namespace X
 {
 
 	Layer::Layer(const std::string& debugName)
-		: m_DebugName(debugName)
+		: mDebugName(debugName)
 	{
 	}
 

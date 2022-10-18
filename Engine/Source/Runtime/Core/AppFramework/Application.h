@@ -27,13 +27,12 @@ namespace X
 		void PushOverlay(Layer* layer);
 		void PopLayer(Layer* layer);
 
-		Window& GetWindow() { return *m_Window; }
+		[[nodiscard]] Window& GetWindow() { return *mWindow; }
 
 		void Close();
 
-		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+		[[nodiscard]] ImGuiLayer* GetImGuiLayer() { return mImGuiLayer; }
 
-		//static Application& Get() { return *s_Instance; }
 	private:
 		void Init(const std::string& name);
 		void Run();
@@ -41,11 +40,11 @@ namespace X
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 	private:
-		Scope<Window> m_Window;
-		ImGuiLayer* m_ImGuiLayer;
-		bool m_Running = true;
-		bool m_Minimized = false;
-		LayerStack m_LayerStack;
+		Scope<Window> mWindow;
+		ImGuiLayer* mImGuiLayer;
+		bool bRunning = true;
+		bool bMinimized = false;
+		LayerStack mLayerStack;
 		float m_LastFrameTime = 0.0f;
 	private:
 		friend int ::main(int argc, char** argv);

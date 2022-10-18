@@ -8,34 +8,34 @@ namespace X
 	class XNGINE_API KeyEvent : public Event
 	{
 	public:
-		KeyCode GetKeyCode() const { return m_KeyCode; }
+		[[nodiscard]] KeyCode GetKeyCode() const { return mKeyCode; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	protected:
 		KeyEvent(const KeyCode keycode)
-			: m_KeyCode(keycode) {}
+			: mKeyCode(keycode) {}
 
-		KeyCode m_KeyCode;
+		KeyCode mKeyCode;
 	};
 
 	class XNGINE_API KeyPressedEvent : public KeyEvent
 	{
 	public:
 		KeyPressedEvent(const KeyCode keycode, const uint16_t repeatCount)
-			: KeyEvent(keycode), m_RepeatCount(repeatCount) {}
+			: KeyEvent(keycode), mRepeatCount(repeatCount) {}
 
-		uint16_t GetRepeatCount() const { return m_RepeatCount; }
+		uint16_t GetRepeatCount() const { return mRepeatCount; }
 
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "KeyPressedEvent: " << m_KeyCode << " (" << m_RepeatCount << " repeats)";
+			ss << "KeyPressedEvent: " << mKeyCode << " (" << mRepeatCount << " repeats)";
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(KeyPressed)
 	private:
-		uint16_t m_RepeatCount;
+		uint16_t mRepeatCount;
 	};
 
 	class XNGINE_API KeyReleasedEvent : public KeyEvent
@@ -47,7 +47,7 @@ namespace X
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "KeyReleasedEvent: " << m_KeyCode;
+			ss << "KeyReleasedEvent: " << mKeyCode;
 			return ss.str();
 		}
 
@@ -63,7 +63,7 @@ namespace X
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "KeyTypedEvent: " << m_KeyCode;
+			ss << "KeyTypedEvent: " << mKeyCode;
 			return ss.str();
 		}
 

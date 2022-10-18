@@ -10,7 +10,7 @@ namespace X
 		PublicSingleton() = default;
 
 	public:
-		static T& GetInstance() noexcept(std::is_nothrow_constructible<T>::value)
+		[[nodiscard]] static T& GetInstance() noexcept(std::is_nothrow_constructible<T>::value)
 		{
 			static T instance;
 			return instance;

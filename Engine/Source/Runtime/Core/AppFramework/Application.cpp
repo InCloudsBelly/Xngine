@@ -13,25 +13,25 @@ namespace X
 
 	void Application::PushLayer(Layer* layer)
 	{
-		m_LayerStack.PushLayer(layer);
+		mLayerStack.PushLayer(layer);
 		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* layer)
 	{
-		m_LayerStack.PushOverlay(layer);
+		mLayerStack.PushOverlay(layer);
 		layer->OnAttach();
 	}
 
 	void Application::PopLayer(Layer* layer)
 	{
-		m_LayerStack.PopLayer(layer);
+		mLayerStack.PopLayer(layer);
 		layer->OnDetach();
 	}
 
 	void Application::Close()
 	{
-		m_Running = false;
+		bRunning = false;
 	}
 
 	void Application::OnEvent(Event& e)
@@ -40,7 +40,7 @@ namespace X
 		dispatcher.Dispatch<WindowCloseEvent>(X_BIND_EVENT_FN(Application::OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(X_BIND_EVENT_FN(Application::OnWindowResize));
 
-		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+		for (auto it = mLayerStack.rbegin(); it != mLayerStack.rend(); ++it)
 		{
 			if (e.Handled)
 				break;
@@ -53,35 +53,35 @@ namespace X
 		Log::Init();
 		ConfigManager::GetInstance().Initialize();
 
-		m_Window = Window::Create(WindowProps(name));
-		m_Window->SetEventCallback(X_BIND_EVENT_FN(Application::OnEvent));
+		mWindow= Window::Create(WindowProps(name));
+		mWindow->SetEventCallback(X_BIND_EVENT_FN(Application::OnEvent));
 
-		m_ImGuiLayer = new ImGuiLayer();
-		PushOverlay(m_ImGuiLayer);
+		mImGuiLayer = new ImGuiLayer();
+		PushOverlay(mImGuiLayer);
 
 		Renderer::Init();
 	}
 
 	void Application::Run()
 	{
-		while (m_Running)
+		while (bRunning)
 		{
 			float time = (float)glfwGetTime();
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
-			if (!m_Minimized)
+			if (!bMinimized)
 			{
-				for (Layer* layer : m_LayerStack)
+				for (Layer* layer : mLayerStack)
 					layer->OnUpdate(timestep);
 
-				m_ImGuiLayer->Begin();
-				for (Layer* layer : m_LayerStack)
+				mImGuiLayer->Begin();
+				for (Layer* layer : mLayerStack)
 					layer->OnImGuiRender();
-				m_ImGuiLayer->End();
+				mImGuiLayer->End();
 			}
 
-			m_Window->OnUpdate();
+			mWindow->OnUpdate();
 		}
 	}
 
@@ -92,7 +92,7 @@ namespace X
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
-		m_Running = false;
+		bRunning = false;
 		return true;
 	}
 
@@ -100,11 +100,11 @@ namespace X
 	{
 		if (e.GetWidth() == 0 || e.GetHeight() == 0)
 		{
-			m_Minimized = true;
+			bMinimized = true;
 			return false;
 		}
 
-		m_Minimized = false;
+		bMinimized = false;
 		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 
 		return false;
