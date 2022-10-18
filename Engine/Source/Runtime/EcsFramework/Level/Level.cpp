@@ -6,6 +6,7 @@
 #include "Runtime/EcsFramework/System/SystemGroup.h"
 
 #include "Runtime/Renderer/Renderer2D.h"
+#include "Runtime/Renderer/Renderer3D.h"
 
 #include <glm/glm.hpp>
 #include <box2d/b2_world.h>
@@ -18,9 +19,9 @@ namespace X
 {
     Level::Level()
     {
-		mSystems.push_back(new PhysicSystem2D(this));
+		/*mSystems.push_back(new PhysicSystem2D(this));
 		mSystems.push_back(new NativeScriptSystem(this));
-		mSystems.push_back(new RenderSystem2D(this));
+		mSystems.push_back(new RenderSystem2D(this));*/
     }
 
     Level::~Level()
@@ -148,7 +149,22 @@ namespace X
 		{
 			system->OnUpdateEditor(ts, camera);
 		}
+
+		Renderer3D::BeginScene(camera);
+
+		auto group = mRegistry.group<TransformComponent>(entt::get<StaticMeshComponent>);
+
+		for (auto entity : group)
+		{
+			auto [transform, mesh] = group.get<TransformComponent, StaticMeshComponent>(entity);
+
+			Renderer3D::DrawModel(transform.GetTransform(), mesh, (int)entity);
+		}
+
+		Renderer3D::EndScene();
 	}
+
+	#include "Runtime/Renderer/Renderer3D.h"
 
     void Level::OnViewportResize(uint32_t width, uint32_t height)
     {
@@ -240,5 +256,11 @@ namespace X
 	void Level::OnComponentAdded<CircleCollider2DComponent>(Entity entity, CircleCollider2DComponent& component)
 	{
 
+	}
+
+	template<>
+	void Level::OnComponentAdded<StaticMeshComponent>(Entity entity, StaticMeshComponent& component)
+	{
+		component.mesh = Model(component.path);
 	}
 }
