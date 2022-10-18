@@ -27,6 +27,6 @@ namespace X
             glm::mat4 ViewProjectionMatrix;
         };
 
-        static SceneData* m_SceneData;
+        static SceneData* mSceneData;
     };
 }

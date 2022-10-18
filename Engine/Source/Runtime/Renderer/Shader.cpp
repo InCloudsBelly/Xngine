@@ -39,7 +39,7 @@ namespace X
     void ShaderLibrary::Add(const std::string& name, const Ref<Shader>& shader)
     {
         X_CORE_ASSERT(!Exists(name), "Shader already exists!");
-        m_Shaders[name] = shader;
+        mShaders[name] = shader;
     }
 
     void ShaderLibrary::Add(const Ref<Shader>& shader)
@@ -65,11 +65,11 @@ namespace X
     Ref<Shader> ShaderLibrary::Get(const std::string& name)
     {
         X_CORE_ASSERT(Exists(name), "Shader not found!");
-        return m_Shaders[name];
+        return mShaders[name];
     }
 
     bool ShaderLibrary::Exists(const std::string& name) const
     {
-        return m_Shaders.find(name) != m_Shaders.end();
+        return mShaders.find(name) != mShaders.end();
     }
 }
