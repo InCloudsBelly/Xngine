@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Runtime/EcsFramework/Component/ComponentBase.h"
 #include "Runtime/Renderer/Texture.h"
 
@@ -15,7 +16,7 @@ namespace X
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
-		SpriteRendererComponent(const glm::vec4& color)
+		SpriteRendererComponent(const glm::vec4 & color)
 			: Color(color) {}
 	};
 }

@@ -23,8 +23,8 @@ namespace X
     private:
         bool OnKeyPressed(KeyPressedEvent& e);
         bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
-		 
-		void OnOverlayRender();
+
+        void OnOverlayRender();
 
         void NewScene();
         void OpenScene();
@@ -32,17 +32,17 @@ namespace X
         void SaveScene();
         void SaveSceneAs();
 
-		void SerializeScene(Ref<Scene> scene, const std::filesystem::path& path);
+        void SerializeScene(Ref<Level> scene, const std::filesystem::path& path);
 
-		void OnScenePlay(); 
-		void OnSceneStop();
+        void OnScenePlay();
+        void OnSceneStop();
 
-		void OnDuplicateEntity();
+        void OnDuplicateEntity();
 
-		// UI Panels
-		void UI_Toolbar();
+        // UI Panels
+        void UI_Toolbar();
 
-		void LoadDefaultEditorConfig();
+        void LoadDefaultEditorConfig();
     private:
         OrthographicCameraController mCameraController;
 
@@ -51,37 +51,37 @@ namespace X
         Ref<Shader> mFlatColorShader;
         Ref<Framebuffer> mFramebuffer;
 
-        Ref<Scene> mActiveScene;
-        Ref<Scene> mEditorScene;
-		std::filesystem::path mEditorScenePath;
+        Ref<Level> mActiveScene;
+        Ref<Level> mEditorScene;
+        std::filesystem::path mEditorScenePath;
         Entity mSquareEntity;
         Entity mCameraEntity;
         Entity mSecondCamera;
 
-		Entity mHoveredEntity;
+        Entity mHoveredEntity;
 
         bool mPrimaryCamera = true;
 
-		EditorCamera mEditorCamera;
+        EditorCamera mEditorCamera;
 
         Ref<Texture2D> mCheckerboardTexture;
 
         bool mViewportFocused = false, mViewportHovered = false;
         glm::vec2 mViewportSize = { 0.0f, 0.0f };
-		glm::vec2 mViewportBounds[2];
+        glm::vec2 mViewportBounds[2];
 
         glm::vec4 mSquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 
-		int mGizmoType = -1;
+        int mGizmoType = -1;
 
-		bool mShowPhysicsColliders = false;
+        bool mShowPhysicsColliders = false;
 
         // Panels
         SceneHierarchyPanel mSceneHierarchyPanel;
-		ContentBrowserPanel mContentBrowserPanel;
+        ContentBrowserPanel mContentBrowserPanel;
 
-		// Editor resources
-		Ref<Texture2D> mIconPlay, mIconStop;
+        // Editor resources
+        Ref<Texture2D> mIconPlay, mIconStop;
     };
 }
 

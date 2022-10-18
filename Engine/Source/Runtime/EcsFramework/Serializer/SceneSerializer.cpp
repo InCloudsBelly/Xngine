@@ -1,6 +1,7 @@
 #include "Xpch.h"
-#include "SceneSerializer.h"
-#include "Entity.h"
+
+#include "Runtime/EcsFramework/Serializer/SceneSerializer.h"
+#include "Runtime/EcsFramework/Entity/Entity.h"
 #include "Runtime/EcsFramework/Component/ComponentGroup.h"
 
 #include <yaml-cpp/yaml.h>
@@ -129,8 +130,8 @@ namespace X
 		return Rigidbody2DComponent::BodyType::Static;
 	}
 
-	SceneSerializer::SceneSerializer(const Ref<Scene>& scene)
-		:mScene(scene)
+	SceneSerializer::SceneSerializer(const Ref<Level>& level)
+		:mLevel(level)
 	{
 
 	}
@@ -268,9 +269,9 @@ namespace X
 		out << YAML::BeginMap;
 		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
 		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-		mScene->mRegistry.each([&](auto entityID)
+		mLevel->mRegistry.each([&](auto entityID)
 			{
-				Entity entity = { entityID, mScene.get() };
+				Entity entity = { entityID, mLevel.get() };
 				if (!entity)
 					return;
 				//Serialize Entity
@@ -320,7 +321,7 @@ namespace X
 
 				X_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name);
 
-				Entity deserializedEntity = mScene->CreateEntityWithUUID(uuid, name);
+				Entity deserializedEntity = mLevel->CreateEntityWithUUID(uuid, name);
 
 				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent)

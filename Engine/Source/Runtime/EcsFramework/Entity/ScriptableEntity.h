@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Entity.h"
+#include "Runtime/EcsFramework/Entity/Entity.h"
 
 namespace X
 {
@@ -20,6 +20,6 @@ namespace X
         virtual void OnUpdate(Timestep ts) {}
     private:
         Entity mEntity;
-        friend class Scene;
+        friend class Level;
     };
 }

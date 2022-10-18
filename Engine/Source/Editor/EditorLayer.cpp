@@ -1,5 +1,5 @@
 #include "EditorLayer.h"
-#include "Runtime/Scene/SceneSerializer.h"
+#include "Runtime/EcsFramework/Serializer/SceneSerializer.h"
 #include "Runtime/Utils/PlatformUtils.h"
 #include "Runtime/Utils/MathUtils/MathUtils.h"
 #include "Runtime/Resource/ConfigManager/ConfigManager.h"
@@ -42,7 +42,7 @@ namespace X
         fbSpec.Height = 720;
         mFramebuffer = Framebuffer::Create(fbSpec);
 
-        mActiveScene = CreateRef<Scene>();
+		mActiveScene = CreateRef<Level>();
 
 		mEditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
@@ -425,7 +425,8 @@ namespace X
 		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
 		float size = ImGui::GetWindowHeight() - 4.0f;
-		Ref<Texture2D> icon = ModeManager::IsEditState() ? mIconPlay : mIconStop;		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+		Ref<Texture2D> icon = ModeManager::IsEditState() ? mIconPlay : mIconStop;
+		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
 		if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
 		{
 			if (ModeManager::IsEditState())
@@ -506,7 +507,7 @@ namespace X
                 break;
             }
 
-			// Scene Commands
+			// Level Commands
 			case Key::D:
 			{
 				if (control)
@@ -598,7 +599,7 @@ namespace X
 
     void EditorLayer::NewScene()
     {
-        mActiveScene = CreateRef<Scene>();
+        mActiveScene = CreateRef<Level>();
         mActiveScene->OnViewportResize((uint32_t)mViewportSize.x, (uint32_t)mViewportSize.y);
         mSceneHierarchyPanel.SetContext(mActiveScene);
 
@@ -607,7 +608,7 @@ namespace X
 
     void EditorLayer::OpenScene()
     {
-        std::string filepath = FileDialogs::OpenFile("X Scene (*.he)\0*.he\0");
+        std::string filepath = FileDialogs::OpenFile("X Level (*.he)\0*.he\0");
 		if (!filepath.empty())
 			OpenScene(filepath);
     }
@@ -626,7 +627,7 @@ namespace X
 			return;
 		}
 
-		Ref<Scene> newScene = CreateRef<Scene>();
+		Ref<Level> newScene = CreateRef<Level>();
 		SceneSerializer serializer(newScene);
 		if (serializer.Deserialize(path.string()))
 		{
@@ -649,7 +650,7 @@ namespace X
 
     void EditorLayer::SaveSceneAs()
     {
-        std::string filepath = FileDialogs::SaveFile("X Scene (*.he)\0*.he\0");
+        std::string filepath = FileDialogs::SaveFile("X Level (*.he)\0*.he\0");
         if (!filepath.empty())
         {
 			SerializeScene(mActiveScene, filepath);
@@ -657,7 +658,7 @@ namespace X
         }
     }
 
-	void EditorLayer::SerializeScene(Ref<Scene> scene, const std::filesystem::path& path)
+	void EditorLayer::SerializeScene(Ref<Level> scene, const std::filesystem::path& path)
 	{
 		SceneSerializer serializer(scene);
 		serializer.Serialize(path.string());
@@ -667,7 +668,7 @@ namespace X
 	{
 		ModeManager::ChangeState();
 
-		mActiveScene = Scene::Copy(mEditorScene);
+		mActiveScene = Level::Copy(mEditorScene);
 		mActiveScene->OnRuntimeStart();
 
 		mSceneHierarchyPanel.SetContext(mActiveScene);

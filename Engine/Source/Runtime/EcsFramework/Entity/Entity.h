@@ -1,10 +1,9 @@
 #pragma once
 
 #include "Runtime/Core/UUID.h"
-#include "Scene.h"
-#include "Runtime/EcsFramework/Component/ComponentGroup.h"
-#include "entt.hpp"
+#include "Runtime/EcsFramework/Level/Level.h"
 
+#include <entt.hpp>
 
 namespace X
 {
@@ -12,23 +11,23 @@ namespace X
     {
     public:
         Entity() = default;
-        Entity(entt::entity handle, Scene* scene);
+        Entity(entt::entity handle, Level* level);
         Entity(const Entity& other) = default;
 
         template<typename T, typename... Args>
         T& AddComponent(Args&&... args)
         {
             X_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
-            T& component = mScene->mRegistry.emplace<T>(mEntityHandle, std::forward<Args>(args)...);
-            mScene->OnComponentAdded<T>(*this, component);
+            T& component = mLevel->mRegistry.emplace<T>(mEntityHandle, std::forward<Args>(args)...);
+            mLevel->OnComponentAdded<T>(*this, component);
             return component;
         }
 
 		template<typename T, typename... Args>
 		T& AddOrReplaceComponent(Args&&... args)
 		{
-			T& component = mScene->mRegistry.emplace_or_replace<T>(mEntityHandle, std::forward<Args>(args)...);
-			mScene->OnComponentAdded<T>(*this, component);
+			T& component = mLevel->mRegistry.emplace_or_replace<T>(mEntityHandle, std::forward<Args>(args)...);
+			mLevel->OnComponentAdded<T>(*this, component);
 			return component;
 		}
 
@@ -36,32 +35,32 @@ namespace X
         T& GetComponent()
         {
             X_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
-            return mScene->mRegistry.get<T>(mEntityHandle);
+            return mLevel->mRegistry.get<T>(mEntityHandle);
         }
 
         template<typename T>
         bool HasComponent()
         {
-            return mScene->mRegistry.all_of<T>(mEntityHandle);
+            return mLevel->mRegistry.all_of<T>(mEntityHandle);
         }
 
         template<typename T>
         void RemoveComponent()
         {
             X_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
-            mScene->mRegistry.remove<T>(mEntityHandle);
+            mLevel->mRegistry.remove<T>(mEntityHandle);
         }
 
         operator bool() const { return mEntityHandle != entt::null; }
         operator entt::entity() const { return mEntityHandle; }
         operator uint32_t() const { return (uint32_t)mEntityHandle; }
 
-		UUID GetUUID() { return GetComponent<IDComponent>().ID; }
-		const std::string& GetName() { return GetComponent<TagComponent>().Tag; }
+        UUID GetUUID();
+        const std::string& GetName();
 
         bool operator==(const Entity& other) const 
         { 
-            return mEntityHandle == other.mEntityHandle && mScene == other.mScene; 
+            return mEntityHandle == other.mEntityHandle && mLevel == other.mLevel; 
         }
 
         bool operator!=(const Entity& other) const
@@ -70,6 +69,6 @@ namespace X
         }
     private:
         entt::entity mEntityHandle{ entt::null };
-        Scene* mScene = nullptr;
+        Level* mLevel = nullptr;
     };
 }
