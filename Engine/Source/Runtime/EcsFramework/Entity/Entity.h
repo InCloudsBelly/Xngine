@@ -4,6 +4,8 @@
 #include "Runtime/EcsFramework/Level/Level.h"
 
 #include <entt.hpp>
+#include <tuple>
+#include <type_traits>
 
 namespace X
 {
@@ -37,6 +39,22 @@ namespace X
             X_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
             return mLevel->mRegistry.get<T>(mEntityHandle);
         }
+
+        template<typename... T>
+        std::tuple<T*...>GetComponents()
+        {
+            X_CORE_ASSERT((HasComponent<T>() && ...), "Entity does not have component!");
+            return std::make_tuple<T*...>((&mLevel->mRegistry.get<T>(mEntityHandle))...);
+        }
+
+        template<typename... T>
+        std::tuple<const T* const...> GetConstComponents()
+        {
+            X_CORE_ASSERT((HasComponent<T>() && ...), "Entity does not have component!");
+            return std::make_tuple(((const T* const)&mLevel->mRegistry.get<T>(mEntityHandle))...);
+        }
+
+
 
         template<typename T>
         bool HasComponent()

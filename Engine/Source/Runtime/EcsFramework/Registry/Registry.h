@@ -6,6 +6,9 @@
 
 namespace X
 {
+    // TODO
+   // A wrapper of entt::registry
+
     class Registry final
     {
     public:
