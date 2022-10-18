@@ -2,6 +2,7 @@
 #include "Runtime/EcsFramework/Serializer/SceneSerializer.h"
 #include "Runtime/Utils/PlatformUtils.h"
 #include "Runtime/Utils/MathUtils/MathUtils.h"
+#include "Runtime/Resource/ModeManager/ModeManager.h"
 #include "Runtime/Resource/ConfigManager/ConfigManager.h"
 #include "Runtime/Resource/AssetManager/AssetManager.h"
 
@@ -24,6 +25,7 @@ namespace X
 	// Help
 	static bool bShowTutorial = false;
 	static bool bShowAboutMe = false;
+	static bool bShowDemoImGui = false;
 
     EditorLayer::EditorLayer()
 		: Layer("EditorLayer")
@@ -156,6 +158,8 @@ namespace X
 
     void EditorLayer::OnImGuiRender()
     {
+		static bool bChangeDim = false;
+
 		// ----DockSpace Begin----
         static bool dockspaceOpen = true;
         static bool opt_fullscreen = true;
@@ -204,8 +208,8 @@ namespace X
         ImGuiIO& io = ImGui::GetIO();
         ImGuiStyle& style = ImGui::GetStyle();
         float minWinSizeX = style.WindowMinSize.x;
-        style.WindowMinSize.x = 470.0f;
-        if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+		style.WindowMinSize.x = 110.0f;
+		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
         {
             ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
             ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
@@ -250,6 +254,7 @@ namespace X
 			{
 				ImGui::MenuItem("Tutorial", NULL, &bShowTutorial);
 				ImGui::MenuItem("About Me", NULL, &bShowAboutMe);
+				ImGui::MenuItem("Demo ImGui", NULL, &bShowDemoImGui);
 
 				ImGui::EndMenu();
 			}
@@ -289,6 +294,15 @@ namespace X
 		{
 			ImGui::Begin("Settings", &bShowSettings);
 			ImGui::Checkbox("Show physics colliders", &mShowPhysicsColliders);
+			const char* modes[] = { "2D", "3D" };
+			int lastMode = ModeManager::b3DMode;
+			if (ImGui::Combo("Mode", &ModeManager::b3DMode, modes, IM_ARRAYSIZE(modes)))
+			{
+				if (lastMode != ModeManager::b3DMode)
+				{
+					bChangeDim = true;
+				}
+			}
 			ImGui::End();
 		}
 		if (bShowViewport)
@@ -400,12 +414,22 @@ namespace X
 			ImGui::Text("My name is zxh!");
 			ImGui::End();
 		}
+		if (bShowDemoImGui)
+		{
+			ImGui::ShowDemoWindow(&bShowDemoImGui);
+		}
 		// ----Help End----
 
 		UI_Toolbar();
 
         ImGui::End(); 
 		// ----DockSpace End----
+
+		if (bChangeDim)
+		{
+			mActiveScene->ChangeDimMode();
+			bChangeDim = false;
+		}
     }
 
 	void EditorLayer::UI_Toolbar()

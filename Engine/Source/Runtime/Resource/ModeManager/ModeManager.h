@@ -22,6 +22,8 @@ namespace X
 	public:
 		static bool IsEditState() { return ModeManager::GetInstance().bEditState; }
 		static void ChangeState() { ModeManager::GetInstance().bEditState = !ModeManager::GetInstance().bEditState; }
+	public:
+		static int b3DMode;  // 0 for 2D, 1 for 3D
 	private:
 		static bool bEditState;
 		static EditMode mEditMode;

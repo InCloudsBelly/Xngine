@@ -3,6 +3,8 @@
 #include "Runtime/EcsFramework/Component/ComponentGroup.h"
 #include "Runtime/Renderer/Texture.h"
 #include "Runtime/Resource/ConfigManager/ConfigManager.h"
+#include "Runtime/Utils/PlatformUtils.h"
+#include "Editor/ImGuiWrapper/ImGuiWrapper.h"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
@@ -117,15 +119,17 @@ namespace X
 		ImGuiIO& io = ImGui::GetIO();
 		auto boldFont = io.Fonts->Fonts[0];
 
-		ImGui::PushID(label.c_str());
-
-		ImGui::Columns(2);
+		ImGui::Columns(2, nullptr, false);
 		ImGui::SetColumnWidth(0, columnWidth);
 		ImGui::Text(label.c_str());
 		ImGui::NextColumn();
 
-		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2{ 0, 0 });
+		ImGui::BeginTable("table_padding", 3, ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_NoPadInnerX);
+
+		ImGui::TableNextRow();
+		ImGui::TableSetColumnIndex(0);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
 
 		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
@@ -141,8 +145,9 @@ namespace X
 
 		ImGui::SameLine();
 		ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
 		ImGui::SameLine();
+
+			ImGui::TableSetColumnIndex(1);
 
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
@@ -155,8 +160,9 @@ namespace X
 
 		ImGui::SameLine();
 		ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
 		ImGui::SameLine();
+
+			ImGui::TableSetColumnIndex(2);
 
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
@@ -169,13 +175,12 @@ namespace X
 
 		ImGui::SameLine();
 		ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
 
 		ImGui::PopStyleVar();
 
-		ImGui::Columns(1);
+		ImGui::EndTable();
 
-		ImGui::PopID();
+		ImGui::EndColumns();
 	}
 
 	template<typename T, typename UIFunction>
@@ -454,11 +459,30 @@ namespace X
 
 		DrawComponent<StaticMeshComponent>("Static Mesh Renderer", entity, [](auto& component)
 			{
-				if (ImGui::InputText("Mesh Path", component.path, sizeof(component.path)))
+				ImGui::Text("Mesh Path");
+				ImGui::SameLine();
+
+				ImGui::Text(component.Path.string().c_str());
+
+				ImGui::SameLine();
+				if (ImGui::Button("..."))
 				{
-					component.mesh = Model(component.path);
+					std::string filepath = FileDialogs::OpenFile("Model (*.obj *.fbx)\0*.obj;*.fbx\0");
+					if (filepath.find("Assets") != std::string::npos)
+					{
+						filepath = filepath.substr(filepath.find("Assets"), filepath.length());
+					}
+					else
+					{
+						// TODO: Import Model
+						X_CORE_ASSERT(false, "Xngine Now Only support the model from Assets!");
+					}
+					if (!filepath.empty())
+					{
+						component.Mesh = Model(filepath);
+						component.Path = filepath;
+					}
 				}
 			});
-	}
 	}
 }
