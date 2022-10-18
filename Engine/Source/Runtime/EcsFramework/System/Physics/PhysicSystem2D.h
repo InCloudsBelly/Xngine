@@ -12,7 +12,7 @@ namespace X
 		virtual ~PhysicSystem2D() = default;
 	public:
 		void OnRuntimeStart() override;
-		void OnUpdate(Timestep ts) override;
+		void OnUpdateRuntime(Timestep ts) override;
 		void OnRuntimeStop() override;
 	private:
 		class b2World* mPhysicsWorld = nullptr;

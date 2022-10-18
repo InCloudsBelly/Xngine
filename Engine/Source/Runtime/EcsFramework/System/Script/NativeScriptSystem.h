@@ -12,7 +12,7 @@ namespace X
 		virtual ~NativeScriptSystem() = default;
 
 	public:
-		void OnUpdate(Timestep ts)override;
+		void OnUpdateRuntime(Timestep ts) override;
 
 	};
 }
