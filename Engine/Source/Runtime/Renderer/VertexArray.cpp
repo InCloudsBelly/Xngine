@@ -1,7 +1,7 @@
 #include "Xpch.h"
-#include "VertexArray.h"
+#include "Runtime/Renderer/VertexArray.h"
 
-#include "Renderer.h"
+#include "Runtime/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLVertexArray.h"
 
 namespace X

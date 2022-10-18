@@ -1,7 +1,7 @@
 #include "Xpch.h"
-#include "Texture.h"
+#include "Runtime/Renderer/Texture.h"
 
-#include "Renderer.h"
+#include "Runtime/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLTexture.h"
 
 namespace X

@@ -1,7 +1,7 @@
 #include "Xpch.h"
-#include "Shader.h"
+#include "Runtime/Renderer/Shader.h"
 
-#include "Renderer.h"
+#include "Runtime/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 
 namespace X
