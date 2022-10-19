@@ -1,9 +1,14 @@
 #include "Xpch.h"
-#include "OpenGLShader.h"
+#include "Runtime/Platform/OpenGL/OpenGLShader.h"
 
 #include <fstream>
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
+
+
+#include <shaderc/shaderc.hpp>
+#include <SPIRV-Cross/spirv_cross.hpp>
+#include <SPIRV-Cross/spirv_glsl.hpp>
 
 namespace X
 {
