@@ -30,7 +30,7 @@ namespace X
 	{
 		SetupMesh(entityID);
 		shader->Bind();
-		shader->SetMat4("u_Model", (transform));
+		shader->SetMat4("u_Model.Transform", (transform));
 		mVertexArray->Bind();
 		RenderCommand::DrawIndexed(mVertexArray, mIB->GetCount());
 	}
