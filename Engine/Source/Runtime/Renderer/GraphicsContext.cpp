@@ -8,10 +8,10 @@ namespace X
 {
 	Scope<GraphicsContext> GraphicsContext::Create(void* window)
 	{
-		switch (Renderer::GetAPI())
+		switch (RendererAPI::Current()) 
 		{
-		case RendererAPI::API::None:    X_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return CreateScope<OpenGLContext>(static_cast<GLFWwindow*>(window));
+		case RendererAPI::RendererAPIType::None:    X_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+		case RendererAPI::RendererAPIType::OpenGL:  return CreateScope<OpenGLContext>(static_cast<GLFWwindow*>(window));
 		}
 
 		X_CORE_ASSERT(false, "Unknown RendererAPI!");

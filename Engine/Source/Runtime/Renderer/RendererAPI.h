@@ -9,7 +9,7 @@ namespace X
     class RendererAPI
     {
     public:
-        enum class API
+        enum class RendererAPIType
         {
             None = 0, OpenGL = 1,
         };
@@ -24,8 +24,8 @@ namespace X
 
 		virtual void SetLineWidth(float width) = 0;
 
-        inline static API GetAPI() { return s_API; }
+        [[nodiscard]] static RendererAPIType Current() { return sCurrentRendererAPI; }
     private:
-        static API s_API;
+        static RendererAPIType sCurrentRendererAPI;
     };
 }

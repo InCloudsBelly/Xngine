@@ -8,10 +8,10 @@ namespace X
 {
     Ref<VertexArray> VertexArray::Create()
     {
-        switch (Renderer::GetAPI())
+        switch (RendererAPI::Current())
         {
-        case RendererAPI::API::None:    X_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-        case RendererAPI::API::OpenGL:  return std::make_shared<OpenGLVertexArray>();
+        case RendererAPI::RendererAPIType::None:    X_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+        case RendererAPI::RendererAPIType::OpenGL:  return std::make_shared<OpenGLVertexArray>();
         }
         X_CORE_ASSERT(false, "Unknown RendererAPI!");
         return nullptr;
