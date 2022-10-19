@@ -165,11 +165,16 @@ if(NOT TARGET shaderc)
     set_target_properties(shaderc_combined_genfile PROPERTIES EXCLUDE_FROM_ALL ON) # Problematic on M1 Macs
 endif()
 
+if(NOT TARGET bullet3)
+    add_subdirectory(bullet3)
+endif()
+
 if(NOT TARGET headers)
     add_library(headers INTERFACE)
     target_include_directories(headers INTERFACE "${ThirdPartyDir}")
     target_include_directories(headers INTERFACE "${ThirdPartyDir}/entt/include")
     target_include_directories(headers INTERFACE "${ThirdPartyDir}/assimp/include")
+    target_include_directories(headers INTERFACE "${ThirdPartyDir}/bullet3/src")
     target_include_directories(headers INTERFACE "${ThirdPartyDir}/SPIRV-Cross")
     NoWarningInterface(headers)
 endif()

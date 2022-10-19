@@ -24,6 +24,7 @@ namespace X
 		if (ModeManager::b3DMode)
 		{
 			mSystems.emplace_back(CreateScope<RenderSystem3D>(this));
+			mSystems.emplace_back(CreateScope<PhysicSystem3D>(this));
 		}
 		else
 		{
@@ -110,6 +111,7 @@ namespace X
 		{
 			mSystems.clear();
 			mSystems.emplace_back(CreateScope<RenderSystem3D>(this));
+			mSystems.emplace_back(CreateScope<PhysicSystem3D>(this));
 		}
 		else
 		{
