@@ -1,5 +1,5 @@
 #include "Xpch.h"
-#include "SceneCamera.h"
+#include "Runtime/Camera/SceneCamera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 

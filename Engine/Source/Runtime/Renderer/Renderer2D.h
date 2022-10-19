@@ -4,8 +4,8 @@
 #include "SubTexture2D.h"
 
 #include "Runtime/EcsFramework/Component/ComponentGroup.h"
-#include "Runtime/Renderer/Camera.h"
-#include "Runtime/Renderer/EditorCamera.h"
+#include "Runtime/Camera/Camera.h"
+#include "Runtime/Camera/EditorCamera.h"
 
 namespace X
 {
