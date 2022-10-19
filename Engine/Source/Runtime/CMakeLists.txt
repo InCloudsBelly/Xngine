@@ -8,6 +8,7 @@ add_library(XngineRuntime STATIC ${RuntimeHeaderFiles} ${RuntimeSourceFiles})
 target_include_directories(XngineRuntime 
     PRIVATE "${EngineSourceDir}"
     PRIVATE "${EngineRuntimeDir}" # make sure we can directly include "Xpch.h"
+    PUBLIC ${vulkan_include}
 )
 
 target_compile_definitions(XngineRuntime
@@ -43,6 +44,7 @@ target_link_libraries(XngineRuntime PUBLIC glfw
     PUBLIC spirv-cross-core
     PUBLIC spirv-cross-glsl
     PUBLIC headers
+    PUBLIC ${vulkan_lib}
 )
 
 

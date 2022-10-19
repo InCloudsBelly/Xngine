@@ -6,12 +6,9 @@
 
 #include "Runtime/Renderer/Renderer2D.h"
 
-// TEMP
-#include "Runtime/Renderer/RenderCommandQueue.h"
 
 namespace X
 {
-	static RenderCommandQueue sCommandQueue;
 
 	void RenderSystem2D::OnUpdateRuntime(Timestep ts)
 	{
@@ -35,8 +32,8 @@ namespace X
 
 		if (mainCamera)
 		{
-			sCommandQueue.Submit([&]() { Renderer2D::BeginScene(*mainCamera, cameraTransform); });
-			//Renderer2D::BeginScene(*mainCamera, cameraTransform);
+			Renderer2D::BeginScene(*mainCamera, cameraTransform);
+
 			
 			//Draw sprites
 			{
@@ -44,8 +41,7 @@ namespace X
 				for (auto entity : group)
 				{
 					auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-					//Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
-					sCommandQueue.Submit([=]()mutable { Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity); });
+					Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
 				}
 			}
 
@@ -56,13 +52,10 @@ namespace X
 				{
 					auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
 
-					//Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)entity);
-					sCommandQueue.Submit([=]() { Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)entity); });
+					Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)entity);
 				}
 			}
-			//Renderer2D::EndScene();
-			sCommandQueue.Submit([&]() { Renderer2D::EndScene(); });
-			sCommandQueue.Execute();
+			Renderer2D::EndScene();
 		}
 	}
 
