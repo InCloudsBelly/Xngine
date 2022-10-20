@@ -1,5 +1,6 @@
 #include "Xpch.h"
 
+#include "Runtime/Resource/AssetManager/AssetManager.h"
 #include "Runtime/Renderer/Model.h"
 
 namespace X
@@ -13,7 +14,7 @@ namespace X
 	void Model::LoadModel(const std::string& path)
 	{
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+		const aiScene* scene = importer.ReadFile(AssetManager::GetInstance().GetFullPath(path).string(), aiProcess_Triangulate | aiProcess_FlipUVs);
 
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{

@@ -59,7 +59,7 @@ namespace X
 		mImGuiLayer = ImGuiLayer::Create();
 		PushOverlay(mImGuiLayer);
 
-		/*Renderer::Init();*/
+		Renderer::Init();
 	}
 
 	void Application::Run()
@@ -87,7 +87,7 @@ namespace X
 
 	void Application::Clean()
 	{
-		/*Renderer::Shutdown();*/
+		Renderer::Shutdown();
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
