@@ -1,9 +1,11 @@
 #include "Xpch.h"
-#include "Renderer.h"
 
-#include "Platform/OpenGL/OpenGLShader.h"
+#include "Runtime/Renderer/Renderer.h"
 #include "Runtime/Renderer/Renderer2D.h"
 #include "Runtime/Renderer/Renderer3D.h"
+#include "Runtime/Platform/OpenGL/OpenGLShader.h"
+
+#include "Runtime/Core/AppFramework/Application.h"
 
 namespace X
 {
@@ -11,15 +13,15 @@ namespace X
 
     void Renderer::Init()
     {
-        RenderCommand::Init();
+      /*  RenderCommand::Init();
         Renderer3D::Init();
-        Renderer2D::Init();
+        Renderer2D::Init();*/
     }
 
 	void Renderer::Shutdown()
 	{
-		Renderer2D::Shutdown();
-        Renderer3D::Shutdown();
+		/*Renderer2D::Shutdown();
+        Renderer3D::Shutdown();*/
 	}
 
     void Renderer::OnWindowResize(uint32_t width, uint32_t height)
@@ -39,5 +41,10 @@ namespace X
 
         vertexArray->Bind();
         RenderCommand::DrawIndexed(vertexArray);
+    }
+
+    Ref<GraphicsContext> Renderer::GetContext()
+    {
+        return Application::GetInstance().GetWindow().GetGraphicsContext();
     }
 }

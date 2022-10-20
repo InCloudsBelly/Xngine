@@ -3,6 +3,7 @@
 #include "Runtime/Renderer/RenderCommand.h"
 
 #include "Runtime/Renderer/Shader.h"
+#include "Runtime/Renderer/GraphicsContext.h"
 
 namespace X
 {
@@ -18,6 +19,7 @@ namespace X
 
         static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
 
+        [[nodiscard]] static Ref<GraphicsContext> GetContext();
     private:
         struct SceneData
         {

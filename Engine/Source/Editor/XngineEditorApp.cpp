@@ -11,7 +11,7 @@ namespace X
 	void AppInitialize(Application& app)
 	{
 		app.Init("Xngine Editor");
-		app.PushLayer(new EditorLayer());
+		//app.PushLayer(new EditorLayer());
 	}
 
 }

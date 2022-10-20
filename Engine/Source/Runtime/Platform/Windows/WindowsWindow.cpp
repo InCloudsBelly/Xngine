@@ -1,11 +1,11 @@
 #include "Xpch.h"
-#include "WindowsWindow.h"
 
+#include "Runtime/Platform/Windows/WindowsWindow.h"
 #include "Runtime/Events/ApplicationEvent.h"
 #include "Runtime/Events/MouseEvent.h"
 #include "Runtime/Events/KeyEvent.h"
 
-#include "Platform/OpenGL/OpenGLContext.h"
+#include "Runtime/Platform/OpenGL/OpenGLContext.h"
 
 namespace X 
 {

@@ -13,6 +13,9 @@ namespace X
         {
         case RendererAPI::RendererAPIType::None:    X_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
         case RendererAPI::RendererAPIType::OpenGL:  return CreateRef<OpenGLVertexBuffer>(size, usage);
+        case RendererAPI::RendererAPIType::Vulkan:  return nullptr;
+        case RendererAPI::RendererAPIType::DX11:    return nullptr;
+        case RendererAPI::RendererAPIType::DX12:    return nullptr;
         }
         X_CORE_ASSERT(false, "Unknown RendererAPI!");
         return nullptr;
@@ -23,6 +26,9 @@ namespace X
         {
         case RendererAPI::RendererAPIType::None:    X_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
         case RendererAPI::RendererAPIType::OpenGL:  return CreateRef<OpenGLVertexBuffer>(vertices, size, usage);
+        case RendererAPI::RendererAPIType::Vulkan:  return nullptr;
+        case RendererAPI::RendererAPIType::DX11:    return nullptr;
+        case RendererAPI::RendererAPIType::DX12:    return nullptr;
         }
         X_CORE_ASSERT(false, "Unknown RendererAPI!");
         return nullptr;
