@@ -19,7 +19,7 @@ namespace X
 	static bool bShowContentBrowser = true;
 	static bool bShowSceneHierachy = true;
 	static bool bShowProperties = true;
-	static bool bShowStats = true;
+	static bool bShowStats = false;
 	static bool bShowSettings = true;
 
 	// Help
@@ -124,8 +124,8 @@ namespace X
         // Render
         Renderer2D::ResetStats();
         mFramebuffer->Bind();
-        RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
-        RenderCommand::Clear();
+		RenderCommand::SetClearColor({ 0.4f, 0.4f, 0.4f, 1 });
+		RenderCommand::Clear();
 
 		// Clear out entity ID attachment to -1
 		mFramebuffer->ClearAttachment(1, -1);

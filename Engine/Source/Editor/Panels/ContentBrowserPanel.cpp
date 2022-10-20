@@ -8,7 +8,7 @@ namespace X
 {
 	namespace Utils
 	{
-		static bool HaveDirectoryMember(std::filesystem::path currentPath)
+		static bool HaveDirectoryMember(const std::filesystem::path currentPath)
 		{
 			for (auto& directoryEntry : std::filesystem::directory_iterator(currentPath))
 			{
@@ -37,6 +37,14 @@ namespace X
 		}
 
 		ImGui::Columns(2);
+
+		static bool init = true;
+		if (init)
+		{
+			ImGui::SetColumnWidth(0, 200.0f);
+			init = false;
+		}
+
 
 		if (ImGui::BeginChild("CONTENT_BROWSER_TREE"))
 		{
@@ -80,7 +88,12 @@ namespace X
 			bNeedOpen = false;
 		}
 
+		//std::string label = "##" + currentPath.filename().string();
 		bool nodeOpen = ImGui::TreeNodeEx(currentPath.filename().string().c_str(), nodeFlags);
+		//ImGui::SameLine();
+		//ImGui::ImageButton((ImTextureID)mDirectoryIcon->GetRendererID(), { 20.0f, 20.0f }, { 0, 1 }, { 1, 0 });
+		//ImGui::SameLine();
+		//ImGui::Text(currentPath.filename().string().c_str());
 
 		if (ImGui::IsItemClicked())
 		{
@@ -89,9 +102,9 @@ namespace X
 
 		if (nodeOpen && bNeedOpen)
 		{
-			for (auto p : std::filesystem::directory_iterator(currentPath))
+			for (auto &p : std::filesystem::directory_iterator(currentPath))
 			{
-				auto path = p.path();
+				const auto& path = p.path();
 				if (!std::filesystem::is_directory(path))
 				{
 					continue;
@@ -112,7 +125,7 @@ namespace X
 
 		mCurrentDirectory = *mSelectedDirectory;
 
-		static float padding = 16.0f;
+		static float padding = 8.0f;
 		static float thumbnailSize = 128.0f;
 		float cellSize = thumbnailSize + padding;
 
@@ -125,6 +138,8 @@ namespace X
 
 		for (auto& directoryEntry : std::filesystem::directory_iterator(mCurrentDirectory))
 		{
+			ImGui::BeginGroup();
+
 			const auto& path = directoryEntry.path();
 			auto relativePath = std::filesystem::relative(path, ConfigManager::GetInstance().GetAssetsFolder());
 			std::string filenameString = relativePath.filename().string();
@@ -150,7 +165,15 @@ namespace X
 					mSelectedDirectory = mCurrentDirectory;
 				}
 			}
+
+			ImVec2 text_size = ImGui::CalcTextSize(filenameString.c_str());
+			ImVec2 pos = ImGui::GetCursorPos();
+			pos.x += (thumbnailSize - text_size.x) * 0.5f;
+			ImGui::SetCursorPos(pos);
+
 			ImGui::TextWrapped(filenameString.c_str());
+
+			ImGui::EndGroup();
 
 			ImGui::NextColumn();
 
@@ -159,8 +182,8 @@ namespace X
 
 		ImGui::Columns(1);
 
-		ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
-		ImGui::SliderFloat("Padding", &padding, 0, 32);
+		/*ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
+		ImGui::SliderFloat("Padding", &padding, 0, 32);*/
 
 	}
 }
