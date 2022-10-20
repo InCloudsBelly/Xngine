@@ -1,11 +1,14 @@
 #include "Xpch.h"
 
+#include "Runtime/Resource/AssetManager/AssetManager.h"
 #include "Runtime/Platform/Windows/WindowsWindow.h"
 #include "Runtime/Events/ApplicationEvent.h"
 #include "Runtime/Events/MouseEvent.h"
 #include "Runtime/Events/KeyEvent.h"
 
 #include "Runtime/Platform/OpenGL/OpenGLContext.h"
+
+#include <stb_image/stb_image.h>
 
 namespace X 
 {
@@ -52,6 +55,7 @@ namespace X
 		}
 
 		{
+			glfwWindowHint(GLFW_SAMPLES, 4);
 			mWindow= glfwCreateWindow((int)props.Width, (int)props.Height, mData.Title.c_str(), nullptr, nullptr);
 			++s_GLFWWindowCount;
 		}
@@ -61,6 +65,12 @@ namespace X
 
 		glfwSetWindowUserPointer(mWindow, &mData);
 		SetVSync(true);
+
+		GLFWimage images[1];
+		images[0].pixels = stbi_load(AssetManager::GetInstance().GetFullPath("Resources/Icons/Xngine.png").string().c_str(), &images[0].width, &images[0].height, 0, 4); //rgba channels 
+		glfwSetWindowIcon(mWindow, 1, images);
+		stbi_image_free(images[0].pixels);
+
 
 		// Set GLFW callbacks
 		glfwSetWindowSizeCallback(mWindow, [](GLFWwindow* window, int width, int height)

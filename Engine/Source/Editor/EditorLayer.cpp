@@ -42,9 +42,14 @@ namespace X
 		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
         fbSpec.Width = 1280;
         fbSpec.Height = 720;
-        mFramebuffer = Framebuffer::Create(fbSpec);
+		fbSpec.Samples = 4;
+		mFramebuffer = Framebuffer::Create(fbSpec);
 
 		mActiveScene = CreateRef<Level>();
+
+		RenderPassSpecification rpSpec = { mFramebuffer, "MainPass" };
+		mRenderPass = CreateRef<RenderPass>(rpSpec);
+		mRenderPass->AddPostProcessing(PostProcessingType::MSAA);
 
 		mEditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
@@ -323,7 +328,8 @@ namespace X
 			mViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
 			uint32_t textureID = mFramebuffer->GetColorAttachmentRendererID();
-			ImGui::Image((void*)textureID, ImVec2{ mViewportSize.x, mViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+			textureID = mRenderPass->ExcuteAndReturnFinalTex();
+			ImGui::Image((void*)(intptr_t)textureID, ImVec2{ mViewportSize.x, mViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
 			if (ImGui::BeginDragDropTarget())
 			{

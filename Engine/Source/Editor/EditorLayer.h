@@ -5,6 +5,7 @@
 #include "Panels/ContentBrowserPanel.h"
 
 #include "Runtime/Camera/EditorCamera.h"
+#include "Runtime/Renderer/RenderPass.h"
 
 namespace X
 {
@@ -48,6 +49,8 @@ namespace X
         Ref<VertexArray> mSquareVA;
         Ref<Shader> mFlatColorShader;
         Ref<Framebuffer> mFramebuffer;
+
+        Ref<RenderPass> mRenderPass;
 
         Ref<Level> mActiveScene;
         Ref<Level> mEditorScene;
