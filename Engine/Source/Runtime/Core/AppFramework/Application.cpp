@@ -56,10 +56,10 @@ namespace X
 		mWindow= Window::Create(WindowProps(name));
 		mWindow->SetEventCallback(X_BIND_EVENT_FN(Application::OnEvent));
 
-		mImGuiLayer = ImGuiLayer::Create();
-		PushOverlay(mImGuiLayer);
+		/*mImGuiLayer = ImGuiLayer::Create();
+		PushOverlay(mImGuiLayer);*/
 
-		Renderer::Init();
+		/*Renderer::Init();*/
 	}
 
 	void Application::Run()
@@ -75,10 +75,10 @@ namespace X
 				for (Layer* layer : mLayerStack)
 					layer->OnUpdate(timestep);
 
-				mImGuiLayer->Begin();
+				/*mImGuiLayer->Begin();
 				for (Layer* layer : mLayerStack)
 					layer->OnImGuiRender();
-				mImGuiLayer->End();
+				mImGuiLayer->End();*/
 			}
 
 			mWindow->OnUpdate();
@@ -87,7 +87,7 @@ namespace X
 
 	void Application::Clean()
 	{
-		Renderer::Shutdown();
+		/*Renderer::Shutdown();*/
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)

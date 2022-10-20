@@ -15,8 +15,6 @@
 # DirectX11_LIBRARIES
 
 if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
-	include(FindPkgMacros)
-	findpkg_begin(DirectX11)
 
 	if( MSVC AND NOT MSVC90 )
 		# Windows 10.x SDK
@@ -125,7 +123,5 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 						 DirectX11_DXGI_LIBRARY
 						 DirectX11_D3DCOMPILER_LIBRARY)
 	endif () # Legacy Direct X SDK
-
-	findpkg_finish(DirectX11)
 
 endif(WIN32)
