@@ -67,6 +67,10 @@ namespace X
         ImGui::DestroyContext();
     }
 
+    void OpenGLImGuiLayer::OnImGuiRender()
+    {
+    }
+
     void OpenGLImGuiLayer::Begin()
     {
         // Start the Dear ImGui frame
