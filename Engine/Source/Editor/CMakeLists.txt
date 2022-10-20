@@ -1,11 +1,5 @@
-file(COPY ${EngineEditorDir}/Resources
-DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-
-file(COPY ${EngineEditorDir}/imgui.ini
-DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-
-file(GLOB EditorHeaderFiles CONFIGUE_DEPENDS "*.h" "Panels/*.h" "ImGuiWrapper/*.h")
-file(GLOB EditorSourceFiles CONFIGUE_DEPENDS "*.cpp" "Panels/*.cpp" "ImGuiWrapper/*.cpp")
+file(GLOB EditorHeaderFiles CONFIGUE_DEPENDS "*.h" "Panels/*.h" "ImGuiWrapper/*.h" "IconManager/*.h")
+file(GLOB EditorSourceFiles CONFIGUE_DEPENDS "*.cpp" "Panels/*.cpp" "ImGuiWrapper/*.cpp" "IconManager/*.cpp")
 
 source_group(TREE ${EngineEditorDir} FILES ${EditorHeaderFiles} ${EditorSourceFiles})
 

@@ -37,5 +37,5 @@ add_subdirectory(Runtime)
 add_subdirectory(Editor)
 
 if(MSVC)
-    set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT HEngineEditor)
+    set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT XngineEditor)
 endif()

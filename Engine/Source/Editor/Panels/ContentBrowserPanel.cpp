@@ -1,6 +1,7 @@
 #include "ContentBrowserPanel.h"
 #include "Runtime/Resource/ConfigManager/ConfigManager.h"
 #include "Runtime/Resource/AssetManager/AssetManager.h"
+#include "Editor/IconManager/IconManager.h"
 
 #include <imgui/imgui.h>
 
@@ -17,14 +18,22 @@ namespace X
 			}
 			return false;
 		}
+		
+		static bool IsImageFormat(std::string filePath)
+		{
+			std::string extension = filePath.substr(filePath.find_last_of(".") + 1);
+			if (extension == "png" || extension == "jpg" || extension == "bmp")
+			{
+				return true;
+			}
+			return false;
+		}
+	
 	}
-
 
 	ContentBrowserPanel::ContentBrowserPanel()
 		: mCurrentDirectory(ConfigManager::GetInstance().GetAssetsFolder())
 	{
-		mDirectoryIcon = Texture2D::Create(AssetManager::GetInstance().GetFullPath("Resources/Icons/ContentBrowser/DirectoryIcon.png").string());
-		mFileIcon = Texture2D::Create(AssetManager::GetInstance().GetFullPath("Resources/Icons/ContentBrowser/FileIcon.png").string());
 	}
 
 	void ContentBrowserPanel::OnImGuiRender(bool* pOpen)
@@ -41,7 +50,7 @@ namespace X
 		static bool init = true;
 		if (init)
 		{
-			ImGui::SetColumnWidth(0, 200.0f);
+			ImGui::SetColumnWidth(0, 240.0f);
 			init = false;
 		}
 
@@ -88,17 +97,17 @@ namespace X
 			bNeedOpen = false;
 		}
 
-		//std::string label = "##" + currentPath.filename().string();
-		bool nodeOpen = ImGui::TreeNodeEx(currentPath.filename().string().c_str(), nodeFlags);
-		//ImGui::SameLine();
-		//ImGui::ImageButton((ImTextureID)mDirectoryIcon->GetRendererID(), { 20.0f, 20.0f }, { 0, 1 }, { 1, 0 });
-		//ImGui::SameLine();
-		//ImGui::Text(currentPath.filename().string().c_str());
+		std::string label = "##" + currentPath.filename().string();
+		bool nodeOpen = ImGui::TreeNodeEx(label.c_str(), nodeFlags);
 
 		if (ImGui::IsItemClicked())
 		{
 			mSelectedDirectory = currentPath;
 		}
+
+		ImGui::SameLine();
+		ImGui::Image((ImTextureID)IconManager::GetInstance().GetDirectoryIcon()->GetRendererID(), { 20.0f, 20.0f }, { 0, 1 }, { 1, 0 });		ImGui::SameLine();
+		ImGui::Text(currentPath.filename().string().c_str());
 
 		if (nodeOpen && bNeedOpen)
 		{
@@ -136,18 +145,44 @@ namespace X
 
 		ImGui::Columns(columnCount, 0, false);
 
+		std::vector<std::filesystem::path> sortedDirectory;
+		int directoryEndIndex = -1;
+
 		for (auto& directoryEntry : std::filesystem::directory_iterator(mCurrentDirectory))
+		{
+			if (!directoryEntry.is_directory())
+			{
+				sortedDirectory.push_back(directoryEntry.path());
+			}
+			else
+			{
+				sortedDirectory.insert(sortedDirectory.begin(), directoryEntry.path());
+				directoryEndIndex++;
+			}
+		}
+
+		for (int i = 0; i < sortedDirectory.size(); i++)
 		{
 			ImGui::BeginGroup();
 
-			const auto& path = directoryEntry.path();
+			const auto& path = sortedDirectory[i];
 			auto relativePath = std::filesystem::relative(path, ConfigManager::GetInstance().GetAssetsFolder());
 			std::string filenameString = relativePath.filename().string();
 
 			ImGui::PushID(filenameString.c_str());
-			Ref<Texture2D> icon = directoryEntry.is_directory() ? mDirectoryIcon : mFileIcon;
+			Ref<Texture2D> icon = i <= directoryEndIndex ? IconManager::GetInstance().GetDirectoryIcon() : IconManager::GetInstance().GetFileIcon();
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-			ImGui::ImageButton((ImTextureID)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+
+			if (Utils::IsImageFormat(path.string()))
+			{
+				std::string texturePath = "Assets\\" + relativePath.string();
+				Ref<Texture2D> img = IconManager::GetInstance().LoadOrFindTexture(texturePath);
+				ImGui::ImageButton((ImTextureID)img->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+			}
+			else
+			{
+				ImGui::ImageButton((ImTextureID)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+			}
 
 			if (ImGui::BeginDragDropSource())
 			{
@@ -159,7 +194,7 @@ namespace X
 			ImGui::PopStyleColor();
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 			{
-				if (directoryEntry.is_directory())
+				if (i <= directoryEndIndex)
 				{
 					mCurrentDirectory /= path.filename();
 					mSelectedDirectory = mCurrentDirectory;

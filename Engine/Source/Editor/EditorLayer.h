@@ -3,6 +3,7 @@
 #include "Xngine.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/ContentBrowserPanel.h"
+#include "Panels/SceneSettingsPanel.h"
 
 #include "Runtime/Camera/EditorCamera.h"
 #include "Runtime/Renderer/RenderPass.h"
@@ -80,6 +81,7 @@ namespace X
         // Panels
         SceneHierarchyPanel mSceneHierarchyPanel;
         ContentBrowserPanel mContentBrowserPanel;
+        SceneSettingsPanel mSceneSettingsPanel;
 
         // Editor resources
         Ref<Texture2D> mIconPlay, mIconStop;

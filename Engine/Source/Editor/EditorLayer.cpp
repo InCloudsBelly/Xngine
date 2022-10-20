@@ -20,7 +20,8 @@ namespace X
 	static bool bShowSceneHierachy = true;
 	static bool bShowProperties = true;
 	static bool bShowStats = false;
-	static bool bShowSettings = true;
+	static bool bShowEngineSettings = true;
+	static bool bShowSceneSettings = true;
 
 	// Help
 	static bool bShowTutorial = false;
@@ -248,7 +249,8 @@ namespace X
 				ImGui::MenuItem("Scene Hierachy", NULL, &bShowSceneHierachy);
 				ImGui::MenuItem("Properties", NULL, &bShowProperties);
 				ImGui::MenuItem("Stats", NULL, &bShowStats);
-				ImGui::MenuItem("Settings", NULL, &bShowSettings);
+				ImGui::MenuItem("Engine Settings", NULL, &bShowEngineSettings);
+				ImGui::MenuItem("Environment Settings", NULL, &bShowSceneSettings);
 
 				if (ImGui::MenuItem("Load Default Layout"))
 					LoadDefaultEditorConfig();
@@ -295,9 +297,9 @@ namespace X
 
 			ImGui::End();
 		}
-		if (bShowSettings)
+		if (bShowEngineSettings)
 		{
-			ImGui::Begin("Settings", &bShowSettings);
+			ImGui::Begin("Engine Settings", &bShowEngineSettings);
 			ImGui::Checkbox("Show physics colliders", &mShowPhysicsColliders);
 			const char* modes[] = { "2D", "3D" };
 			int lastMode = ModeManager::b3DMode;
@@ -308,6 +310,14 @@ namespace X
 					bChangeDim = true;
 				}
 			}
+			ImGui::End();
+		}
+		if (bShowSceneSettings)
+		{
+			mSceneSettingsPanel.OnImGuiRender(&bShowSceneSettings);
+
+			ImGui::Begin("Scene Settings", &bShowSceneSettings);
+
 			ImGui::End();
 		}
 		if (bShowViewport)
@@ -480,7 +490,8 @@ namespace X
 		bShowSceneHierachy = true;
 		bShowProperties = true;
 		bShowStats = true;
-		bShowSettings = true;
+		bShowEngineSettings = true;
+		bShowSceneSettings = true;
 		
 		// seems imgui docking branch has some bugs with load ini file?
 

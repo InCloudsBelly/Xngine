@@ -24,6 +24,7 @@ namespace X
 		StaticMesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t> indices);
 
 		void Draw(const glm::mat4& transform, const Ref<Shader>& shader, int entityID);
+		void Draw();
 
 	private:
 		void SetupMesh(int entityID);

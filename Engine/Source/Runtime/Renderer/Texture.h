@@ -17,11 +17,12 @@ namespace X
         [[nodiscard]] virtual uint32_t GetHeight() const = 0;
         [[nodiscard]] virtual uint32_t GetRendererID() const = 0;
 
-        virtual void SetData(void* data, uint32_t size) = 0;
+        virtual void SetData(void* data, uint32_t size) {};
 
         virtual void Bind(uint32_t slot = 0) const = 0;
+        virtual void UnBind() const = 0;
 
-		virtual bool IsLoaded() const = 0;
+        virtual bool IsLoaded() const { return false; };
 
         virtual bool operator==(const Texture& other) const = 0;
     };
@@ -33,6 +34,24 @@ namespace X
         static Ref<Texture2D> Create(const std::filesystem::path& path);
         static Ref<Texture2D> Create(const std::string& path);
     };
+
+    enum class FaceTarget : uint32_t
+    {
+        Right = 0,
+        Left,
+        Top,
+        Bottom,
+        Back,
+        Front
+    };
+
+    class CubeMapTexture : public Texture
+    {
+    public:
+        virtual void SetFace(FaceTarget faceIndex, const std::string& path) = 0;
+        static Ref<CubeMapTexture> Create(std::vector<std::string>& paths);
+    };
 }
+
 
 

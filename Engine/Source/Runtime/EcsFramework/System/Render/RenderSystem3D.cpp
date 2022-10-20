@@ -57,5 +57,6 @@ namespace X
 			Renderer3D::DrawModel(transform.GetTransform(), mesh, (int)entity);
 		}
 		Renderer3D::EndScene();
+		Renderer3D::DrawSkyBox(camera);
 	}
 }

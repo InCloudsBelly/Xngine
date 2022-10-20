@@ -1,6 +1,7 @@
 #pragma once
 #include "Runtime/Camera/EditorCamera.h"
 #include "Runtime/EcsFramework/Component/Mesh/StaticMeshComponent.h"
+#include "Runtime/Renderer/Texture.h"
 
 namespace X
 {
@@ -16,5 +17,11 @@ namespace X
         static void BeginScene(const EditorCamera& camera);
         static void EndScene();
 
+        // give to Editor SceneSettingsPanel to use
+        static Ref<CubeMapTexture> GetSkyBox();
+        static Ref<CubeMapTexture> GetDefaultSkyBox();
+
+        // TODO: Move to Environment System
+        static void DrawSkyBox(const EditorCamera& camera);
     };
 }
