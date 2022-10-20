@@ -6,6 +6,20 @@
 
 namespace X
 {
+	namespace Utils
+	{
+		static bool HaveDirectoryMember(std::filesystem::path currentPath)
+		{
+			for (auto& directoryEntry : std::filesystem::directory_iterator(currentPath))
+			{
+				if (directoryEntry.is_directory())
+					return true;
+			}
+			return false;
+		}
+	}
+
+
 	ContentBrowserPanel::ContentBrowserPanel()
 		: mCurrentDirectory(ConfigManager::GetInstance().GetAssetsFolder())
 	{
@@ -26,23 +40,77 @@ namespace X
 
 		if (ImGui::BeginChild("CONTENT_BROWSER_TREE"))
 		{
-
+			DrawTree();
 		}
 		ImGui::EndChild();
 
 		ImGui::NextColumn();
-		ImGui::Separator();
-
-		ImGui::BeginChild("CONTENT_BROWSER_CONTENT");
-
-
-		if (mCurrentDirectory != std::filesystem::path(ConfigManager::GetInstance().GetAssetsFolder()))
+		if (ImGui::BeginChild("CONTENT_BROWSER_CONTENT"))
 		{
-			if (ImGui::Button("<-"))
-			{
-				mCurrentDirectory = mCurrentDirectory.parent_path();
-			}
+			DrawContent();
 		}
+		ImGui::EndChild();
+
+
+		ImGui::Columns(1);
+
+		ImGui::End();
+	}
+	void ContentBrowserPanel::DrawTree()
+	{
+		DrawTreeRecursive(ConfigManager::GetInstance().GetAssetsFolder());
+	}
+
+	void ContentBrowserPanel::DrawTreeRecursive(std::filesystem::path currentPath)
+	{
+		const ImGuiTreeNodeFlags baseFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick |
+			ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
+
+		ImGuiTreeNodeFlags nodeFlags = baseFlags;
+
+		if (mSelectedDirectory && *mSelectedDirectory == currentPath)
+		{
+			nodeFlags |= ImGuiTreeNodeFlags_Selected;
+		}
+
+		bool bNeedOpen = true;
+		if (!Utils::HaveDirectoryMember(currentPath))
+		{
+			nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+			bNeedOpen = false;
+		}
+
+		bool nodeOpen = ImGui::TreeNodeEx(currentPath.filename().string().c_str(), nodeFlags);
+
+		if (ImGui::IsItemClicked())
+		{
+			mSelectedDirectory = currentPath;
+		}
+
+		if (nodeOpen && bNeedOpen)
+		{
+			for (auto p : std::filesystem::directory_iterator(currentPath))
+			{
+				auto path = p.path();
+				if (!std::filesystem::is_directory(path))
+				{
+					continue;
+				}
+
+				DrawTreeRecursive(path);
+			}
+			ImGui::TreePop();
+		}
+	}
+
+	void ContentBrowserPanel::DrawContent()
+	{
+		if (!mSelectedDirectory)
+		{
+			return;
+		}
+
+		mCurrentDirectory = *mSelectedDirectory;
 
 		static float padding = 16.0f;
 		static float thumbnailSize = 128.0f;
@@ -77,8 +145,10 @@ namespace X
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 			{
 				if (directoryEntry.is_directory())
+				{
 					mCurrentDirectory /= path.filename();
-
+					mSelectedDirectory = mCurrentDirectory;
+				}
 			}
 			ImGui::TextWrapped(filenameString.c_str());
 
@@ -92,11 +162,5 @@ namespace X
 		ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
 		ImGui::SliderFloat("Padding", &padding, 0, 32);
 
-		ImGui::EndChild();
-
-		ImGui::Columns(1);
-
-		// TODO: status bar
-		ImGui::End();
 	}
 }
