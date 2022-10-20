@@ -43,19 +43,17 @@ namespace X
 		MeshComponent.Mesh.Draw(transform, mShader, EntityID);
 	}
 
-
 	void Renderer3D::BeginScene(const Camera& camera, const glm::mat4& transform)
 	{
 		sData.CameraBuffer.ViewProjection = camera.GetProjection() * glm::inverse(transform);
 		sData.CameraUniformBuffer->SetData(&sData.CameraBuffer, sizeof(Renderer3DData::CameraData));
 	}
-	
+
 	void Renderer3D::BeginScene(const EditorCamera& camera)
 	{
 		sData.CameraBuffer.ViewProjection = camera.GetViewProjection();
 		sData.CameraUniformBuffer->SetData(&sData.CameraBuffer, sizeof(Renderer3DData::CameraData));
 	}
-
 
 	void Renderer3D::EndScene()
 	{
