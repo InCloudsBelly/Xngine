@@ -3,7 +3,7 @@
 
 namespace X
 {
-    void ConfigManager::Initialize()
+    ConfigManager::ConfigManager()
     {
         mRootFolder = { X_XSTRINGIFY_MACRO(ENGINE_ROOT_DIR) };
         mAssetsFolder = mRootFolder / "Assets";

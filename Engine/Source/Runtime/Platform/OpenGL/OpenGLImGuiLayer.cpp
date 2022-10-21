@@ -34,8 +34,8 @@ namespace X
         //io.ConfigViewportsNoTaskBarIcon = true;
 
         float fontSize = 18.0f;
-        io.Fonts->AddFontFromFileTTF(AssetManager::GetInstance().GetFullPath("Assets/fonts/opensans/OpenSans-Bold.ttf").string().c_str(), fontSize);
-        io.FontDefault = io.Fonts->AddFontFromFileTTF(AssetManager::GetInstance().GetFullPath("Assets/fonts/opensans/OpenSans-Regular.ttf").string().c_str(), fontSize);
+        io.Fonts->AddFontFromFileTTF(AssetManager::GetFullPath("Assets/fonts/opensans/OpenSans-Bold.ttf").string().c_str(), fontSize);
+        io.FontDefault = io.Fonts->AddFontFromFileTTF(AssetManager::GetFullPath("Assets/fonts/opensans/OpenSans-Regular.ttf").string().c_str(), fontSize);
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();

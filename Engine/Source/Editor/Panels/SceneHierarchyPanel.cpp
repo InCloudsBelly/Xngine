@@ -309,7 +309,23 @@ namespace X
 					ImGui::CloseCurrentPopup();
 				}
 			}
+			if (!mSelectionContext.HasComponent<Rigidbody3DComponent>())
+			{
+				if (ImGui::MenuItem("Rigidbody 3D"))
+				{
+					mSelectionContext.AddComponent<Rigidbody3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
 
+			if (!mSelectionContext.HasComponent<BoxCollider3DComponent>())
+			{
+				if (ImGui::MenuItem("Box Collider 3D"))
+				{
+					mSelectionContext.AddComponent<BoxCollider3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
 			ImGui::EndPopup();
 		}
 
@@ -458,12 +474,41 @@ namespace X
 				ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
 			});
 
+		DrawComponent<Rigidbody3DComponent>("Rigidbody 3D", entity, [](auto& component)
+			{
+				const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
+				const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
+				if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
+				{
+					for (int i = 0; i < 2; i++)
+					{
+						bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
+						if (ImGui::Selectable(bodyTypeStrings[i], isSelected))
+						{
+							currentBodyTypeString = bodyTypeStrings[i];
+							component.Type = (Rigidbody3DComponent::Body3DType)i;
+						}
+
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+
+					ImGui::EndCombo();
+				}
+			});
+
+		DrawComponent<BoxCollider3DComponent>("Box Collider 3D", entity, [](auto& component)
+			{
+
+			});
+
+
 		DrawComponent<StaticMeshComponent>("Static Mesh Renderer", entity, [](auto& component)
 			{
 				ImGui::Text("Mesh Path");
 				ImGui::SameLine();
 
-				ImGui::Text(component.Path.string().c_str());
+				ImGui::Text(component.Path.c_str());
 
 				ImGui::SameLine();
 				if (ImGui::Button("..."))

@@ -52,6 +52,9 @@ namespace X
         virtual void Bind(uint32_t slot = 0) const override;
         virtual void UnBind() const override;
 
+        virtual void Generate() override;
+        [[nodiscard]] virtual std::vector<std::string> GetPaths() override { return mPaths; }
+
         virtual bool operator==(const Texture& other) const override
         {
             return mRendererID == ((OpenGLCubeMapTexture&)other).mRendererID;

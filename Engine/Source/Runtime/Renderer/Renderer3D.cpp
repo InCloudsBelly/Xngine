@@ -6,7 +6,7 @@
 #include "Runtime/Renderer/Shader.h"
 #include "Runtime/Renderer/RenderCommand.h"
 #include "Runtime/Renderer/UniformBuffer.h"
-
+#include "Runtime/Renderer/ShaderLibrary.h"
 
 #include "Runtime/Resource/AssetManager/AssetManager.h"
 
@@ -14,7 +14,6 @@
 
 namespace X
 {
-	static Ref<Shader> sShader;
 
 	struct Renderer3DData
 	{
@@ -38,17 +37,16 @@ namespace X
 		"Assets/Textures/Skybox/top.jpg",
 		"Assets/Textures/Skybox/bottom.jpg",
 		"Assets/Textures/Skybox/front.jpg",
-		"Assets/Textures/Skybox/back.jpg"
+		"Assets/Textures/Skybox/back.jpg",
 	};
 
 	void Renderer3D::Init()
 	{
-		sShader = Shader::Create(AssetManager::GetInstance().GetFullPath("Shaders/Common.glsl"));
 		sData.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::CameraData), 1);
 
-		sSkyBoxShader = Shader::Create(AssetManager::GetInstance().GetFullPath("Shaders/SkyBox.glsl"));
+		sSkyBoxShader = Shader::Create(AssetManager::GetFullPath("Shaders/SkyBox.glsl"));
 		sSkyBox = CubeMapTexture::Create(sPaths);
-		sBox = Model(AssetManager::GetInstance().GetFullPath("Assets/Models/Box.obj").string());
+		sBox = Model(AssetManager::GetFullPath("Assets/Models/Box.obj").string());
 	}
 
 	void Renderer3D::Shutdown()
@@ -57,7 +55,7 @@ namespace X
 
 	void Renderer3D::DrawModel(const glm::mat4& transform, StaticMeshComponent& MeshComponent, int EntityID)
 	{
-		MeshComponent.Mesh.Draw(transform, sShader, EntityID);
+		MeshComponent.Mesh.Draw(transform, EntityID);
 	}
 
 	void Renderer3D::BeginScene(const Camera& camera, const glm::mat4& transform)
@@ -74,7 +72,6 @@ namespace X
 
 	void Renderer3D::EndScene()
 	{
-		sShader->Unbind();
 	}
 
 	Ref<CubeMapTexture> Renderer3D::GetSkyBox()
@@ -97,7 +94,7 @@ namespace X
 		RenderCommand::DepthFunc(DepthComp::LEQUAL);
 		sSkyBoxShader->Bind();
 
-		sSkyBox->Bind(1);
+		sSkyBox->Bind(0);
 		sSkyBoxShader->SetInt("SkyBox", 0);
 		sBox.Draw();
 

@@ -51,7 +51,6 @@ namespace X
 	void Application::Init(const std::string& name)
 	{
 		Log::Init();
-		ConfigManager::GetInstance().Initialize();
 
 		mWindow= Window::Create(WindowProps(name));
 		mWindow->SetEventCallback(X_BIND_EVENT_FN(Application::OnEvent));

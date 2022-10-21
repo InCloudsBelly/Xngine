@@ -69,6 +69,10 @@ namespace X
 
 			stbi_image_free(data);
 		}
+        else
+        {
+            throw "Load Texture Failed!";
+        }
     }
 
     OpenGLTexture2D::~OpenGLTexture2D()
@@ -98,36 +102,9 @@ namespace X
     OpenGLCubeMapTexture::OpenGLCubeMapTexture(std::vector<std::string>& paths)
         : mPaths(paths)
     {
-        glDeleteTextures(1, &mRendererID);
         glGenTextures(1, &mRendererID);
         glBindTexture(GL_TEXTURE_CUBE_MAP, mRendererID);
-
-        int width, height, nrChannels;
-        for (unsigned int i = 0; i < paths.size(); i++)
-        {
-            unsigned char* data = stbi_load(paths[i].c_str(), &width, &height, &nrChannels, 0);
-            if (data)
-            {
-                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                    0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
-                );
-                stbi_image_free(data);
-            }
-            else
-            {
-                X_CORE_ERROR("Cubemap don't loaded correctly!");
-                stbi_image_free(data);
-            }
-        }
-
-        mWidth = width;
-        mHeight = height;
-
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        OpenGLCubeMapTexture::Generate();
     }
 
     OpenGLCubeMapTexture::~OpenGLCubeMapTexture()
@@ -149,5 +126,39 @@ namespace X
     void OpenGLCubeMapTexture::UnBind() const
     {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    }
+
+
+    void OpenGLCubeMapTexture::Generate()
+    {
+        int width = 0;
+        int height = 0;
+        int nrChannels = 0;
+
+        for (unsigned int i = 0; i < mPaths.size(); i++)
+        {
+            unsigned char* data = stbi_load(AssetManager::GetFullPath(mPaths[i]).string().c_str(), &width, &height, &nrChannels, 0);
+            if (data)
+            {
+                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                    0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+                );
+                stbi_image_free(data);
+            }
+            else
+            {
+                X_CORE_ERROR("Cubemap don't loaded correctly!");
+                stbi_image_free(data);
+            }
+        }
+
+        mWidth = width;
+        mHeight = height;
+
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     }
 }
