@@ -12,6 +12,7 @@ namespace X
 	{
 		Camera* mainCamera = nullptr;
 		glm::mat4 cameraTransform;
+		glm::vec3 cameraPos;
 		{
 			auto view = mLevel->mRegistry.view<TransformComponent, CameraComponent>();
 			for (auto entity : view)
@@ -22,6 +23,7 @@ namespace X
 				{
 					mainCamera = &camera.Camera;
 					cameraTransform = transform.GetTransform();
+					cameraPos = transform.GetTranslation();
 					break;
 				}
 			}
@@ -37,7 +39,7 @@ namespace X
 				for(auto entity:view)
 				{
 					auto [transform, mesh] = view.get<TransformComponent, StaticMeshComponent>(entity);
-					Renderer3D::DrawModel(transform.GetTransform(), mesh, (int)entity);
+					Renderer3D::DrawModel(transform.GetTransform(), cameraPos, mesh, (int)entity);
 				}
 			}
 
@@ -54,7 +56,7 @@ namespace X
 		for (auto entity : group)
 		{
 			auto [transform, mesh] = group.get<TransformComponent, StaticMeshComponent>(entity);
-			Renderer3D::DrawModel(transform.GetTransform(), mesh, (int)entity);
+			Renderer3D::DrawModel(transform.GetTransform(), camera.GetPosition(), mesh, (int)entity);
 		}
 		Renderer3D::EndScene();
 		Renderer3D::DrawSkyBox(camera);

@@ -2,6 +2,7 @@
 
 #include "Runtime/Renderer/StaticMesh.h"
 #include "Runtime/Renderer/RenderCommand.h"
+#include "Runtime/Library/TextureLibrary.h"
 
 namespace X
 {
@@ -47,7 +48,7 @@ namespace X
 		mVertexArray->SetIndexBuffer(mIB);
 	}
 
-	void StaticMesh::Draw(const glm::mat4& transform, const Ref<Shader>& shader, int entityID)
+	void StaticMesh::Draw(const glm::mat4& transform, const glm::vec3& cameraPos, const Ref<Shader>& shader, int entityID)
 	{
 		SetupMesh(entityID);
 		shader->Bind();
@@ -55,9 +56,50 @@ namespace X
 		mVertexArray->Bind();
 
 		// Temp
-		if (!mTextures.empty())
-			mTextures[0].texture2d->Bind();
-		shader->SetInt("texture_diffuse", 0);
+		std::vector<TextureType> textureNeeded = { TextureType::Albedo, TextureType::Normal, TextureType::Metalness, TextureType::Roughness, TextureType::AmbientOcclusion };
+		for (size_t i = 0; i < textureNeeded.size(); i++)
+		{
+			bool bFindInTextures = false;
+			for (auto& materialTexture : mTextures)
+			{
+				if (materialTexture.type == textureNeeded[i])
+				{
+					materialTexture.texture2d->Bind(i);
+					bFindInTextures = true;
+					break;
+				}
+			}
+			if (!bFindInTextures)
+			{
+				switch (textureNeeded[i])
+				{
+				case TextureType::Albedo:
+					TextureLibrary::GetInstance().GetDefaultTexture()->Bind(i);
+					break;
+				case TextureType::Normal:
+					TextureLibrary::GetInstance().GetTexture("DefaultNormal")->Bind(i);
+					break;
+				case TextureType::Metalness:
+					TextureLibrary::GetInstance().GetTexture("DefaultMetallicRoughness")->Bind(i);
+					break;
+				case TextureType::Roughness:
+					TextureLibrary::GetInstance().GetTexture("DefaultMetallicRoughness")->Bind(i);
+					break;
+				case TextureType::AmbientOcclusion:
+					TextureLibrary::GetInstance().GetTexture("WhiteTexture")->Bind(i);
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
+		shader->SetInt("albedoMap", 0);
+		shader->SetInt("normalMap", 1);
+		shader->SetInt("metallicMap", 2);
+		shader->SetInt("roughnessMap", 3);
+		shader->SetInt("aoMap", 4);
+		shader->SetFloat3("u_Uniform.camPos", cameraPos);
 
 		RenderCommand::DrawIndexed(mVertexArray, mIB->GetCount());
 	}

@@ -5,6 +5,7 @@
 #include "Runtime/Renderer/Shader.h"
 #include "Runtime/Renderer/UniformBuffer.h"
 #include "Runtime/Renderer/RenderCommand.h"
+#include "Runtime/Library/TextureLibrary.h"
 
 #include "Runtime/Resource/AssetManager/AssetManager.h"
 
@@ -57,7 +58,6 @@ namespace X
         Ref<VertexArray> QuadVertexArray;
         Ref<VertexBuffer> QuadVertexBuffer;
         Ref<Shader> QuadShader;
-        Ref<Texture2D> WhiteTexture;
 
 		//------Line------
 		Ref<VertexArray> LineVertexArray;
@@ -173,9 +173,6 @@ namespace X
 		sData.LineVertexBufferBase = new LineVertex[sData.MaxVertices];
 		//------Lines------
 
-        sData.WhiteTexture = Texture2D::Create(1, 1);
-        uint32_t whiteTextureData = 0xffffffff;
-        sData.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
         int32_t samplers[sData.MaxTextureSlots];
         for (uint32_t i = 0; i < sData.MaxTextureSlots; i++)
@@ -189,7 +186,7 @@ namespace X
         sData.QuadShader->SetIntArray("u_Textures", samplers, sData.MaxTextureSlots);
 
         // Set all texture slots to 0
-        sData.TextureSlots[0] = sData.WhiteTexture;
+        sData.TextureSlots[0] = TextureLibrary::GetInstance().GetTexture("WhiteTexture");
 
         sData.QuadVertexPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
         sData.QuadVertexPositions[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
