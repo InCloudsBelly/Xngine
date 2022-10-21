@@ -4,7 +4,7 @@
 #include "Runtime/Resource/ModeManager/ModeManager.h"
 #include "Runtime/Resource/ConfigManager/ConfigManager.h"
 #include "Runtime/Resource/AssetManager/AssetManager.h"
-#include "Runtime/Renderer/Renderer3D.h"
+#include "Runtime/Library/Library.h"
 
 #include <imgui/imgui.h>
 #include <regex>
@@ -56,7 +56,7 @@ namespace X
 						mPaths[pathIndex] = texturePath.string();
 						relativePath = std::regex_replace(relativePath, std::regex("\\\\"), "/");
 						tex = IconManager::GetInstance().LoadOrFindTexture(relativePath);
-						Renderer3D::GetSkyBox()->SetFace((FaceTarget)pathIndex, relativePath);
+						Library<CubeMapTexture>::GetInstance().Get("SkyBoxTexture")->SetFace((FaceTarget)pathIndex, relativePath);
 					}
 					ImGui::EndDragDropTarget();
 				}
@@ -70,7 +70,7 @@ namespace X
 		{
 			if (ImGui::Button("Update"))
 			{
-				Renderer3D::GetSkyBox()->Generate();
+				Library<CubeMapTexture>::GetInstance().Get("SkyBoxTexture")->Generate();
 			}
 			SkyBoxTreeNode("Right +X", mRight, 0);
 			SkyBoxTreeNode("Left -X", mLeft, 1);
