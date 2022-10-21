@@ -29,7 +29,6 @@ struct VertexOutput
 layout(location = 0) out VertexOutput Output;
 layout(location = 4) out flat int v_EntityID;
 
-
 void main()
 {
 	Output.LocalPosition = a_LocalPosition;

@@ -6,8 +6,8 @@
 #include "Runtime/Renderer/Shader.h"
 #include "Runtime/Renderer/RenderCommand.h"
 #include "Runtime/Renderer/UniformBuffer.h"
-
 #include "Runtime/Library/ShaderLibrary.h"
+#include "Runtime/Library/UniformBufferLibrary.h"
 
 #include "Runtime/Resource/AssetManager/AssetManager.h"
 
@@ -15,19 +15,6 @@
 
 namespace X
 {
-
-	struct Renderer3DData
-	{
-		struct CameraData
-		{
-			glm::mat4 ViewProjection;
-		};
-		CameraData CameraBuffer;
-		Ref<UniformBuffer> CameraUniformBuffer;
-	};
-
-	static Renderer3DData sData;
-
 	static Ref<CubeMapTexture> sSkyBox;
 	static Ref<Shader> sSkyBoxShader;
 	static Model sBox;
@@ -43,8 +30,6 @@ namespace X
 
 	void Renderer3D::Init()
 	{
-		sData.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer3DData::CameraData), 1);
-
 		sSkyBoxShader = Shader::Create(AssetManager::GetFullPath("Shaders/SkyBox.glsl"));
 		sSkyBox = CubeMapTexture::Create(sPaths);
 		sBox = Model(AssetManager::GetFullPath("Assets/Models/Box.obj").string());
@@ -61,14 +46,16 @@ namespace X
 
 	void Renderer3D::BeginScene(const Camera& camera, const glm::mat4& transform)
 	{
-		sData.CameraBuffer.ViewProjection = camera.GetProjection() * glm::inverse(transform);
-		sData.CameraUniformBuffer->SetData(&sData.CameraBuffer, sizeof(Renderer3DData::CameraData));
+		Ref<UniformBuffer> cameraUniform = UniformBufferLibrary::GetInstance().GetCameraUniformBuffer();
+		glm::mat4 ViewProjection = camera.GetProjection() * glm::inverse(transform);
+		cameraUniform->SetData(&ViewProjection, sizeof(ViewProjection));
 	}
 
 	void Renderer3D::BeginScene(const EditorCamera& camera)
 	{
-		sData.CameraBuffer.ViewProjection = camera.GetViewProjection();
-		sData.CameraUniformBuffer->SetData(&sData.CameraBuffer, sizeof(Renderer3DData::CameraData));
+		Ref<UniformBuffer> cameraUniform = UniformBufferLibrary::GetInstance().GetCameraUniformBuffer();
+		glm::mat4 ViewProjection = camera.GetViewProjection();
+		cameraUniform->SetData(&ViewProjection, sizeof(ViewProjection));
 	}
 
 	void Renderer3D::EndScene()
@@ -88,8 +75,9 @@ namespace X
 
 	void Renderer3D::DrawSkyBox(const EditorCamera& camera)
 	{
-		sData.CameraBuffer.ViewProjection = camera.GetProjection() * glm::mat4(glm::mat3(camera.GetViewMatrix()));
-		sData.CameraUniformBuffer->SetData(&sData.CameraBuffer, sizeof(Renderer3DData::CameraData), 0);
+		Ref<UniformBuffer> cameraUniform = UniformBufferLibrary::GetInstance().GetCameraUniformBuffer();
+		glm::mat4 ViewProjection = camera.GetProjection() * glm::mat4(glm::mat3(camera.GetViewMatrix()));
+		cameraUniform->SetData(&ViewProjection, sizeof(ViewProjection));
 
 		RenderCommand::Cull(0);
 		RenderCommand::DepthFunc(DepthComp::LEQUAL);

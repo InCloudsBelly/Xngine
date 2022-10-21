@@ -149,7 +149,8 @@ namespace X
 		ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
 		ImGui::SameLine();
 
-			ImGui::TableSetColumnIndex(1);
+
+		ImGui::TableSetColumnIndex(1);
 
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
@@ -164,7 +165,7 @@ namespace X
 		ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
 		ImGui::SameLine();
 
-			ImGui::TableSetColumnIndex(2);
+		ImGui::TableSetColumnIndex(2);
 
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
@@ -195,13 +196,12 @@ namespace X
 			auto& component = entity.GetComponent<T>();
 			ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
-			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4.0f, 4.0f });
 			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-			ImGui::Separator();
-			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name.c_str());
-			ImGui::PopStyleVar();
+			bool open = ImGuiWrapper::TreeNodeExStyle1((void*)typeid(T).hash_code(), name, treeNodeFlags);
 			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-			if (ImGui::ImageButton((ImTextureID)IconManager::GetInstance().GetSettingIcon()->GetRendererID(), ImVec2{ lineHeight - 7.0f, lineHeight - 7.0f })) {
+
+			if (ImGui::ImageButton((ImTextureID)IconManager::GetInstance().GetSettingIcon()->GetRendererID(), ImVec2{ lineHeight - 7.0f, lineHeight - 7.0f }))
+			{
 				ImGui::OpenPopup("ComponentSettings");
 			}
 
@@ -301,6 +301,7 @@ namespace X
 					ImGui::CloseCurrentPopup();
 				}
 			}
+
 			if (!mSelectionContext.HasComponent<StaticMeshComponent>())
 			{
 				if (ImGui::MenuItem("Static Mesh Renderer"))
@@ -309,6 +310,7 @@ namespace X
 					ImGui::CloseCurrentPopup();
 				}
 			}
+
 			if (!mSelectionContext.HasComponent<Rigidbody3DComponent>())
 			{
 				if (ImGui::MenuItem("Rigidbody 3D"))
@@ -326,6 +328,7 @@ namespace X
 					ImGui::CloseCurrentPopup();
 				}
 			}
+
 			ImGui::EndPopup();
 		}
 
@@ -502,7 +505,6 @@ namespace X
 
 			});
 
-
 		DrawComponent<StaticMeshComponent>("Static Mesh Renderer", entity, [](auto& component)
 			{
 				ImGui::Text("Mesh Path");
@@ -521,7 +523,7 @@ namespace X
 					else
 					{
 						// TODO: Import Model
-						X_CORE_ASSERT(false, "Xngine Now Only support the model from Assets!");
+						X_CORE_ASSERT(false, "HEngine Now Only support the model from Assets!");
 					}
 					if (!filepath.empty())
 					{

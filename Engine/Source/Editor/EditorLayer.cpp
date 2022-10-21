@@ -1,4 +1,5 @@
-#include "EditorLayer.h"
+#include "Editor/EditorLayer.h"
+#include "Editor/ImGuiWrapper/ImGuiWrapper.h"
 #include "Runtime/EcsFramework/Serializer/SceneSerializer.h"
 #include "Runtime/Utils/PlatformUtils.h"
 #include "Runtime/Utils/MathUtils/MathUtils.h"
@@ -45,11 +46,11 @@ namespace X
 		fbSpec.Samples = 4;
 		mFramebuffer = Framebuffer::Create(fbSpec);
 
-		mActiveScene = CreateRef<Level>();
-
 		RenderPassSpecification rpSpec = { mFramebuffer, "MainPass" };
 		mRenderPass = CreateRef<RenderPass>(rpSpec);
 		mRenderPass->AddPostProcessing(PostProcessingType::MSAA);
+
+		mActiveScene = CreateRef<Level>();
 
 		mEditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
@@ -245,7 +246,7 @@ namespace X
 			{
 				ImGui::MenuItem("Viewport", NULL, &bShowViewport);
 				ImGui::MenuItem("Content Browser", NULL, &bShowContentBrowser);
-				ImGui::MenuItem("Scene Hierachy", NULL, &bShowSceneHierachy);
+				ImGui::MenuItem("Level Hierachy", NULL, &bShowSceneHierachy);
 				ImGui::MenuItem("Properties", NULL, &bShowProperties);
 				ImGui::MenuItem("Stats", NULL, &bShowStats);
 				ImGui::MenuItem("Engine Settings", NULL, &bShowEngineSettings);
@@ -299,16 +300,26 @@ namespace X
 		if (bShowEngineSettings)
 		{
 			ImGui::Begin("Engine Settings", &bShowEngineSettings);
-			ImGui::Checkbox("Show physics colliders", &mShowPhysicsColliders);
 			const char* modes[] = { "2D", "3D" };
 			int lastMode = ModeManager::b3DMode;
-			if (ImGui::Combo("Mode", &ModeManager::b3DMode, modes, IM_ARRAYSIZE(modes)))
+			ImGui::Text("Mode");
+			ImGui::SameLine();
+			if (ImGui::Combo("##Mode", &ModeManager::b3DMode, modes, IM_ARRAYSIZE(modes)))
 			{
 				if (lastMode != ModeManager::b3DMode)
 				{
 					bChangeDim = true;
 				}
 			}
+
+			bool open = ImGuiWrapper::TreeNodeExStyle1((void*)"Physics Settings", "Physics Settings");
+
+			if (open)
+			{
+				ImGui::Checkbox("Show physics colliders", &mShowPhysicsColliders);
+				ImGui::TreePop();
+			}
+
 			ImGui::End();
 		}
 		if (bShowSceneSettings)

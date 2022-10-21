@@ -38,13 +38,13 @@ namespace X
 		void Draw();
 
 	private:
-		Ref<Material> mMaterial = CreateRef<Material>();
 		void LoadModel(const std::string& path);
 		void ProcessNode(aiNode* node, const aiScene* scene);
 		StaticMesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
 		std::optional<std::vector<MaterialTexture>> loadMaterialTextures(aiMaterial* mat, aiTextureType type);
 
 	private:
+		Ref<Material> mMaterial = CreateRef<Material>();
 		std::vector<StaticMesh> mMeshes;
 		std::string mDirectory;
 	};

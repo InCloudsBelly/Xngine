@@ -103,7 +103,6 @@ namespace X
         : mPaths(paths)
     {
         glGenTextures(1, &mRendererID);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, mRendererID);
         OpenGLCubeMapTexture::Generate();
     }
 
@@ -131,6 +130,8 @@ namespace X
 
     void OpenGLCubeMapTexture::Generate()
     {
+        glBindTexture(GL_TEXTURE_CUBE_MAP, mRendererID);
+
         int width = 0;
         int height = 0;
         int nrChannels = 0;

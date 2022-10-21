@@ -3,7 +3,7 @@ set(EngineRuntimeDir "${EngineSourceDir}/Runtime")
 set(EngineEditorDir "${EngineSourceDir}/Editor")
 
 # from https://github.com/BoomingTech/Pilot
-set(vulkan_include ${ThirdPartyDir}/Vulkansdk/include)
+set(vulkan_include ${ThirdPartyDir}/VulkanSDK/include)
 
 if(WIN32)
     set(vulkan_lib ${ThirdPartyDir}/VulkanSDK/lib/Win32/vulkan-1.lib)
@@ -23,15 +23,14 @@ endif()
 
 add_subdirectory(ThirdParty)
 
-#list(APPEND CMAKE_MODULE_PATH 
-#  "${PROJECT_SOURCE_DIR}/CMake"
-#  "${PROJECT_SOURCE_DIR}/CMake/Utils"
-#  "${PROJECT_SOURCE_DIR}/CMake/Packages"
-#)
-#
-#if (WIN32)
-#    find_package(DirectX11)
-#endif()
+# list(APPEND CMAKE_MODULE_PATH 
+#   "${PROJECT_SOURCE_DIR}/CMake"
+#   "${PROJECT_SOURCE_DIR}/CMake/Packages"
+# )
+# 
+# if (WIN32)
+#     find_package(DirectX11)
+# endif()
 
 add_subdirectory(Runtime)
 add_subdirectory(Editor)

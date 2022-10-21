@@ -25,12 +25,14 @@ namespace X
 		{
 			mSystems.emplace_back(CreateScope<RenderSystem3D>(this));
 			mSystems.emplace_back(CreateScope<PhysicSystem3D>(this));
+			mSystems.emplace_back(CreateScope<EnvironmentSystem>(this));
 		}
 		else
 		{
 			mSystems.emplace_back(CreateScope<PhysicSystem2D>(this));
 			mSystems.emplace_back(CreateScope<NativeScriptSystem>(this));
 			mSystems.emplace_back(CreateScope<RenderSystem2D>(this));
+			mSystems.emplace_back(CreateScope<EnvironmentSystem>(this));
 		}
     }
 
@@ -112,6 +114,7 @@ namespace X
 			mSystems.clear();
 			mSystems.emplace_back(CreateScope<RenderSystem3D>(this));
 			mSystems.emplace_back(CreateScope<PhysicSystem3D>(this));
+			mSystems.emplace_back(CreateScope<EnvironmentSystem>(this));
 		}
 		else
 		{
@@ -119,6 +122,7 @@ namespace X
 			mSystems.emplace_back(CreateScope<PhysicSystem2D>(this));
 			mSystems.emplace_back(CreateScope<NativeScriptSystem>(this));
 			mSystems.emplace_back(CreateScope<RenderSystem2D>(this));
+			mSystems.emplace_back(CreateScope<EnvironmentSystem>(this));
 		}
 	}
 
@@ -174,8 +178,6 @@ namespace X
 			system->OnUpdateEditor(ts, camera);
 		}
 	}
-
-	#include "Runtime/Renderer/Renderer3D.h"
 
     void Level::OnViewportResize(uint32_t width, uint32_t height)
     {

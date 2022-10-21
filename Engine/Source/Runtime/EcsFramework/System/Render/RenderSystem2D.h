@@ -12,6 +12,6 @@ namespace X
 
     public:
         void OnUpdateRuntime(Timestep ts) override;
-        void OnUpdateEditor(Timestep ts, EditorCamera& camra) override;
+        void OnUpdateEditor(Timestep ts, EditorCamera& camera) override;
     };
 }

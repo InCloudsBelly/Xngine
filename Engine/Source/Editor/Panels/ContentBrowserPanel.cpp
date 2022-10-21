@@ -9,7 +9,7 @@ namespace X
 {
 	namespace Utils
 	{
-		static bool HaveDirectoryMember(const std::filesystem::path currentPath)
+		static bool HaveDirectoryMember(std::filesystem::path currentPath)
 		{
 			for (auto& directoryEntry : std::filesystem::directory_iterator(currentPath))
 			{
@@ -22,7 +22,7 @@ namespace X
 		static bool IsImageFormat(std::string filePath)
 		{
 			std::string extension = filePath.substr(filePath.find_last_of(".") + 1);
-			if (extension == "png" || extension == "jpg" || extension == "bmp")
+			if (extension == "png" || extension == "jpg" || extension == "bmp" || extension == "hdr") 
 			{
 				return true;
 			}
@@ -78,7 +78,7 @@ namespace X
 		DrawTreeRecursive(ConfigManager::GetInstance().GetAssetsFolder());
 	}
 
-	void ContentBrowserPanel::DrawTreeRecursive(std::filesystem::path currentPath)
+	void ContentBrowserPanel::DrawTreeRecursive(const std::filesystem::path currentPath)
 	{
 		const ImGuiTreeNodeFlags baseFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick |
 			ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;

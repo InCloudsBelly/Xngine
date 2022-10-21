@@ -10,9 +10,9 @@ layout(location = 4) in int a_EntityID;
 layout(std140, binding = 1) uniform Camera
 {
 	mat4 u_ViewProjection;
-}; 
+};
 
-layout(push_constant) uniform Transform
+layout (push_constant) uniform Transform
 {
 	mat4 Transform;
 } u_Model;
@@ -24,8 +24,8 @@ struct VertexOutput
 	vec2 TexCoord;
 };
 
-layout(location = 0) out VertexOutput Output;
-layout(location = 3) out flat int v_EntityID;
+layout (location = 0) out VertexOutput Output;
+layout (location = 3) out flat int v_EntityID;
 
 void main()
 {
@@ -46,13 +46,13 @@ struct VertexOutput
 	vec2 TexCoord;
 };
 
-layout(location = 0) in VertexOutput Input;
-layout(location = 3) in flat int v_EntityID;
+layout (location = 0) in VertexOutput Input;
+layout (location = 3) in flat int v_EntityID;
 
-layout(location = 0) out vec4 color;
-layout(location = 1) out int color2;
-
-layout(binding = 0) uniform sampler2D texture_diffuse;
+layout (location = 0) out vec4 color;
+layout (location = 1) out int color2;
+	   
+layout (binding = 0) uniform sampler2D texture_diffuse;
 
 void main()
 {

@@ -263,7 +263,7 @@ namespace X
 		if (optimize)
 			options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
-		std::filesystem::path cacheDirectory = AssetManager::GetInstance().GetFullPath(Utils::GetCacheDirectory());
+		std::filesystem::path cacheDirectory = AssetManager::GetFullPath(Utils::GetCacheDirectory());
 
 		shaderData.clear();
 		mOpenGLSourceCode.clear();
