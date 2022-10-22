@@ -15,6 +15,13 @@ namespace X
             X_CORE_ASSERT(mLibrary.find(name) == mLibrary.end() && "Already have this member in Library!");
             mLibrary[name] = mem;
         }
+
+        void Set(const std::string& name, const Ref<LibType>& mem)
+        {
+            X_CORE_ASSERT(mLibrary.find(name) != mLibrary.end() && "Can't find this member in Library!");
+            mLibrary[name] = mem;
+        }
+
         [[nodiscard]] Ref<LibType> Get(const std::string& name)
         {
             X_CORE_ASSERT(mLibrary.find(name) != mLibrary.end() && "Can't find this member in Library!");

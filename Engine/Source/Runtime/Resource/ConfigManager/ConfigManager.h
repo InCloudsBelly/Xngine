@@ -3,6 +3,7 @@
 #include "Runtime/Core/Base/PublicSingleton.h"
 
 #include <filesystem>
+#include <glm/glm.hpp>
 
 namespace X
 {
@@ -22,6 +23,8 @@ namespace X
         [[nodiscard]] const std::filesystem::path& GetAssetsFolder() const;
         [[nodiscard]] const std::filesystem::path& GetShadersFolder() const;
         [[nodiscard]] const std::filesystem::path& GetResourcesFolder() const;
+
+        static glm::vec2 mViewportSize;
 
     private:
         std::filesystem::path mRootFolder;

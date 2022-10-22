@@ -10,7 +10,8 @@ namespace X
         Add("DefaultTexture", Texture2D::Create(std::string("Assets/Textures/DefaultTexture.png")));
         Add("DefaultNormal", Texture2D::Create(std::string("Assets/Textures/DefaultNormal.png")));
         Add("DefaultMetallicRoughness", Texture2D::Create(std::string("Assets/Textures/DefaultMetallicRoughness.png")));
-        
+        Add("DefaultHdr", Texture2D::Create(std::string("Assets/Textures/Hdr/Default.hdr")));
+
         Ref<Texture2D> whiteTexture = Texture2D::Create(1, 1);
         uint32_t whiteTextureData = 0xffffffff;
         whiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));

@@ -9,5 +9,6 @@ namespace X
         mDirectoryIcon = Texture2D::Create(AssetManager::GetFullPath("Resources/Icons/ContentBrowser/DirectoryIcon.png"));
         mFileIcon = Texture2D::Create(AssetManager::GetFullPath("Resources/Icons/ContentBrowser/FileIcon.png"));
         mSettingIcon = Texture2D::Create(AssetManager::GetFullPath("Resources/Icons/SettingIcon.png"));
+        Add("EntityIcon", Texture2D::Create(AssetManager::GetFullPath("Resources/Icons/Entity2.png")));
     }
 }

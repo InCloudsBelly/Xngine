@@ -3,6 +3,8 @@
 
 namespace X
 {
+    glm::vec2 ConfigManager::mViewportSize = { 0.0f, 0.0f };
+
     ConfigManager::ConfigManager()
     {
         mRootFolder = { X_XSTRINGIFY_MACRO(ENGINE_ROOT_DIR) };

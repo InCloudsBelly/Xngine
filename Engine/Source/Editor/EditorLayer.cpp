@@ -114,12 +114,12 @@ namespace X
 
 		// Resize
 		if (FramebufferSpecification spec = mFramebuffer->GetSpecification();
-			mViewportSize.x > 0.0f && mViewportSize.y > 0.0f && // zero sized framebuffer is invalid
-			(spec.Width != mViewportSize.x || spec.Height != mViewportSize.y))
+			ConfigManager::mViewportSize.x > 0.0f && ConfigManager::mViewportSize.y > 0.0f && // zero sized framebuffer is invalid
+			(spec.Width != ConfigManager::mViewportSize.x || spec.Height != ConfigManager::mViewportSize.y))
 		{
-			mFramebuffer->Resize((uint32_t)mViewportSize.x, (uint32_t)mViewportSize.y);
-			mEditorCamera.SetViewportSize(mViewportSize.x, mViewportSize.y);
-			mActiveScene->OnViewportResize((uint32_t)mViewportSize.x, (uint32_t)mViewportSize.y);
+			mFramebuffer->Resize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
+			mEditorCamera.SetViewportSize(ConfigManager::mViewportSize.x, ConfigManager::mViewportSize.y);
+			mActiveScene->OnViewportResize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
 		}
 
         // Render
@@ -345,11 +345,11 @@ namespace X
 			Application::GetInstance().GetImGuiLayer()->BlockEvents(!mViewportFocused && !mViewportHovered);
 
 			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-			mViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+			ConfigManager::mViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
 			uint32_t textureID = mFramebuffer->GetColorAttachmentRendererID();
 			textureID = mRenderPass->ExcuteAndReturnFinalTex();
-			ImGui::Image((void*)(intptr_t)textureID, ImVec2{ mViewportSize.x, mViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+			ImGui::Image((void*)(intptr_t)textureID, ImVec2{ ConfigManager::mViewportSize.x, ConfigManager::mViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
 			if (ImGui::BeginDragDropTarget())
 			{
@@ -648,8 +648,8 @@ namespace X
     void EditorLayer::NewScene()
     {
         mActiveScene = CreateRef<Level>();
-        mActiveScene->OnViewportResize((uint32_t)mViewportSize.x, (uint32_t)mViewportSize.y);
-        mSceneHierarchyPanel.SetContext(mActiveScene);
+		mActiveScene->OnViewportResize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
+		mSceneHierarchyPanel.SetContext(mActiveScene);
 
 		mEditorScenePath = std::filesystem::path();
     }
@@ -669,7 +669,7 @@ namespace X
 			ModeManager::ChangeState();
 		}
 
-		if (path.extension().string() != ".he")
+		if (path.extension().string() != ".scene")
 		{
 			X_WARN("Could not load {0} - not a scene file", path.filename().string());
 			return;
@@ -680,7 +680,7 @@ namespace X
 		if (serializer.Deserialize(path.string()))
 		{
 			mEditorScene = newScene;
-			mEditorScene->OnViewportResize((uint32_t)mViewportSize.x, (uint32_t)mViewportSize.y);
+			mEditorScene->OnViewportResize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
 			mSceneHierarchyPanel.SetContext(mEditorScene);
 
 			mActiveScene = mEditorScene;

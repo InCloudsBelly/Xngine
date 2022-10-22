@@ -27,6 +27,9 @@ namespace X
         virtual uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const override;
 
         virtual const FramebufferSpecification& GetSpecification() const override { return mSpecification; }
+
+        virtual void FramebufferTexture2D(uint32_t cubemapIndex, uint32_t cubemapID, uint32_t slot = 0) override;
+
     private:
         uint32_t mRendererID = 0;
         FramebufferSpecification mSpecification;
