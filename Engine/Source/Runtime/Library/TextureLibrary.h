@@ -12,5 +12,6 @@ namespace X
 	public:
 		Library();
 		[[nodiscard]] Ref<Texture2D> GetDefaultTexture();
+		[[nodiscard]] Ref<Texture2D> GetWhiteTexture();
 	};
 }

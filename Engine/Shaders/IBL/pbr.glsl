@@ -57,6 +57,9 @@ uniform vec3 lightColors[4];
 
 uniform vec3 camPos;
 
+// HDR tonemapping
+uniform float exposure;
+
 const float PI = 3.14159265359;
 // ----------------------------------------------------------------------------
 // Easy trick to get tangent-normals to world-space to keep PBR code simplified.
@@ -202,7 +205,7 @@ void main()
     vec3 color = ambient + Lo;
 
     // HDR tonemapping
-    color = color / (color + vec3(1.0));
+    color = vec3(1.0) - exp(-color * exposure);
     // gamma correct
     color = pow(color, vec3(1.0/2.2)); 
 

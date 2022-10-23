@@ -5,6 +5,7 @@
 #include "Runtime/Resource/ConfigManager/ConfigManager.h"
 #include "Runtime/Resource/AssetManager/AssetManager.h"
 #include "Runtime/Library/TextureLibrary.h"
+#include "Runtime/EcsFramework/System/Render/EnvironmentSystem.h"
 
 #include <imgui/imgui.h>
 
@@ -103,6 +104,21 @@ namespace X
 				}
 				ImGui::SameLine();
 				ImGui::Checkbox("Use", &ModeManager::bHdrUse);
+				
+				ImGui::Columns(2, nullptr, false);
+				ImGui::SetColumnWidth(0, 100.0f);
+				ImGui::Text("SkyBox Lod");
+				ImGui::NextColumn();
+				ImGui::SliderFloat("##SkyBox Lod", &EnvironmentSystem::environmentSettings.SkyBoxLod, 0.0f, 10.0f);
+				ImGui::EndColumns();
+
+				ImGui::Columns(2, nullptr, false);
+				ImGui::SetColumnWidth(0, 100.0f);
+				ImGui::Text("Exposure");
+				ImGui::NextColumn();
+				ImGui::SliderFloat("##Exposure", &EnvironmentSystem::environmentSettings.exposure, 0.0f, 10.0f);
+				ImGui::EndColumns();
+
 				ImGui::TreePop();
 			}
 		}
