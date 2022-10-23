@@ -50,6 +50,11 @@ namespace X
 				internalFormat = GL_RGB8;
 				dataFormat = GL_RGB;
 			}
+            else if (channels == 1)
+            {
+                internalFormat = GL_RGB;
+                dataFormat = GL_UNSIGNED_BYTE;
+            }
 
 			mInternalFormat = internalFormat;
 			mDataFormat = dataFormat;
@@ -90,7 +95,8 @@ namespace X
     void OpenGLTexture2D::Bind(uint32_t slot) const
     {
         glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTextureUnit(slot, mRendererID);
+        glBindTexture(GL_TEXTURE_2D, mRendererID);
+        //glBindTextureUnit(slot, mRendererID);
     }
 
     void OpenGLTexture2D::UnBind() const
@@ -119,7 +125,24 @@ namespace X
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     }
 
+    OpenGLCubeMapTexture::OpenGLCubeMapTexture(uint32_t width, uint32_t height)
+        : mWidth(width), mHeight(height)
+    {
+        glGenTextures(1, &mRendererID);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, mRendererID);
 
+        for (unsigned int i = 0; i < 6; ++i)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, mWidth, mHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+        }
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // enable pre-filter mipmap sampling (combatting visible dots artifact)
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    }
 
     // refer to https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/06%20Cubemaps/
 

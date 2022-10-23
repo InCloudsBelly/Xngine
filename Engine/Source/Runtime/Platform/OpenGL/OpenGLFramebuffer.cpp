@@ -85,7 +85,7 @@ namespace X
 			glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, TextureTarget(multisampled), id, 0);
 		}
 
-		static void AttachDepthRenderBuffer(uint32_t id, int samples, GLenum format, GLenum attachmentType, uint32_t width, uint32_t height)
+		static void AttachDepthRenderBuffer(uint32_t& id, int samples, GLenum format, GLenum attachmentType, uint32_t width, uint32_t height)
 		{
 			glGenRenderbuffers(1, &id);
 			bool multisampled = samples > 1;
@@ -150,8 +150,8 @@ namespace X
 			mDepthAttachment = 0;
         }
 
-        glCreateFramebuffers(1, &mRendererID);
-        glBindFramebuffer(GL_FRAMEBUFFER, mRendererID);
+		glCreateFramebuffers(1, &mRendererID);
+		glBindFramebuffer(GL_FRAMEBUFFER, mRendererID);
 
 		bool multisample = mSpecification.Samples > 1;
 
@@ -310,6 +310,8 @@ namespace X
 
 		case FramebufferTextureFormat::DEPTH24STENCIL8:
 			glClearBufferiv(GL_DEPTH24_STENCIL8, attachmentIndex, &value);
+			break;
+
 		}
 	}
 

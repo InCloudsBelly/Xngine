@@ -31,7 +31,8 @@ namespace X
             "Assets/Textures/Skybox/back.jpg",
         };
         Add("SkyBoxTexture", CubeMapTexture::Create(Paths));
-        Add("EnvironmentHdr", CubeMapTexture::Create());
-
+        Add("EnvironmentHdr", CubeMapTexture::Create(512, 512));
+        Add("EnvironmentIrradiance", CubeMapTexture::Create(32, 32));
+        Add("EnvironmentPrefilter", CubeMapTexture::Create(128, 128));
     }
 }

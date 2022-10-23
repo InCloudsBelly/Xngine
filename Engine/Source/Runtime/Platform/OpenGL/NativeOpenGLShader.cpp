@@ -88,6 +88,7 @@ namespace X
 	void NativeOpenGLShader::UploadUniformInt(const std::string& name, int value)
 	{
 		GLint location = glGetUniformLocation(mRendererID, name.c_str());
+		X_CORE_ASSERT(location != -1);
 		glUniform1i(location, value);
 	}
 
