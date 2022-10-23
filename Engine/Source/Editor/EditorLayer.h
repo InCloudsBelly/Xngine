@@ -80,8 +80,6 @@ namespace X
         ContentBrowserPanel mContentBrowserPanel;
         SceneSettingsPanel mSceneSettingsPanel;
 
-        // Editor resources
-        Ref<Texture2D> mIconPlay, mIconStop;
     };
 }
 

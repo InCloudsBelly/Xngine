@@ -143,14 +143,14 @@ namespace X
         if (mRendererID)
         {
             glDeleteFramebuffers(1, &mRendererID);
-            glDeleteTextures(mColorAttachments.size(), mColorAttachments.data());
-            glDeleteTextures(1, &mDepthAttachment);
+      /*      glDeleteTextures(mColorAttachments.size(), mColorAttachments.data());
+            glDeleteTextures(1, &mDepthAttachment);*/
 
 			mColorAttachments.clear();
-			mDepthAttachment = 0;
+			/*mDepthAttachment = 0;*/
         }
 
-		glCreateFramebuffers(1, &mRendererID);
+		glGenFramebuffers(1, &mRendererID);
 		glBindFramebuffer(GL_FRAMEBUFFER, mRendererID);
 
 		bool multisample = mSpecification.Samples > 1;
