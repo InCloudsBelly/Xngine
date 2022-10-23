@@ -185,6 +185,11 @@ namespace X
 			mHoveredEntity = pixelData == -1 ? Entity{} : Entity{ (entt::entity)pixelData, mActiveScene.get() };
 		}
 
+		Entity selectedEntity = mSceneHierarchyPanel.GetSelectedEntity();
+		if (selectedEntity && Input::IsKeyPressed(X_KEY_F))
+			mEditorCamera.SetCenter(selectedEntity.GetComponent<TransformComponent>().Translation);
+
+
 		OnOverlayRender();
 
         mFramebuffer->Unbind();
@@ -604,6 +609,7 @@ namespace X
 
         bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
         bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+		bool mouseRight = Input::IsMouseButtonPressed(Mouse::ButtonRight);
         switch (e.GetKeyCode())
         {
             case Key::N:
@@ -640,17 +646,21 @@ namespace X
 
 			// Gizmos
 			case Key::Q:
-				mGizmoType = -1;
-				break;			
+				if (!mouseRight)
+					mGizmoType = -1;
+				break;
 			case Key::W:
-				mGizmoType = ImGuizmo::OPERATION::TRANSLATE;
-				break;			
+				if (!mouseRight)
+					mGizmoType = ImGuizmo::OPERATION::TRANSLATE;
+				break;
 			case Key::E:
-				mGizmoType = ImGuizmo::OPERATION::ROTATE;
-				break;			
+				if (!mouseRight)
+					mGizmoType = ImGuizmo::OPERATION::ROTATE;
+				break;
 			case Key::R:
-				mGizmoType = ImGuizmo::OPERATION::SCALE;
-				break;			
+				if (!mouseRight)
+					mGizmoType = ImGuizmo::OPERATION::SCALE;
+				break;
         }
 		return false;
     }

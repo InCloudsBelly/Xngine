@@ -41,10 +41,10 @@ namespace X
 
 			// Draw model
 			{
-				auto view = mLevel->mRegistry.view<TransformComponent, StaticMeshComponent>();
+				auto view = mLevel->mRegistry.view<TransformComponent, MeshComponent>();
 				for (auto entity : view)
 				{
-					auto [transform, mesh] = view.get<TransformComponent, StaticMeshComponent>(entity);
+					auto [transform, mesh] = view.get<TransformComponent, MeshComponent>(entity);
 
 					Renderer3D::DrawModel(transform.GetTransform(), cameraPos, mesh, (int)entity);
 				}
@@ -69,12 +69,18 @@ namespace X
 				glm::vec3 lightPos = transform.GetTranslation();
 				glm::vec3 lightColor = light.LightColor;
 
-				Ref<Shader> iblPbr = Library<Shader>::GetInstance().Get("IBL_pbr");
+				Ref<Shader> iblPbrStatic = Library<Shader>::GetInstance().Get("IBL_pbr_static");
+				Ref<Shader> iblPbrAnim = Library<Shader>::GetInstance().Get("IBL_pbr_anim");
+
 				Ref<Shader> defaultPbr = Library<Shader>::GetInstance().GetDefaultShader();
 
-				iblPbr->Bind();
-				iblPbr->SetFloat3("lightPositions[" + std::to_string(i) + "]", lightPos);
-				iblPbr->SetFloat3("lightColors[" + std::to_string(i) + "]", lightColor);
+				iblPbrStatic->Bind();
+				iblPbrStatic->SetFloat3("lightPositions[" + std::to_string(i) + "]", lightPos);
+				iblPbrStatic->SetFloat3("lightColors[" + std::to_string(i) + "]", lightColor);
+
+				iblPbrAnim->Bind();
+				iblPbrAnim->SetFloat3("lightPositions[" + std::to_string(i) + "]", lightPos);
+				iblPbrAnim->SetFloat3("lightColors[" + std::to_string(i) + "]", lightColor);
 
 				defaultPbr->Bind();
 				defaultPbr->SetFloat3("u_Uniform.lightPositions[" + std::to_string(i) + "]", lightPos);
@@ -84,13 +90,18 @@ namespace X
 			}
 			if (i == 0)
 			{
-				Ref<Shader> iblPbr = Library<Shader>::GetInstance().Get("IBL_pbr");
+				Ref<Shader> iblPbrStatic = Library<Shader>::GetInstance().Get("IBL_pbr_static");
+				Ref<Shader> iblPbrAnim = Library<Shader>::GetInstance().Get("IBL_pbr_anim");
+
 				Ref<Shader> defaultPbr = Library<Shader>::GetInstance().GetDefaultShader();
 
 				for (size_t i = 0; i < 4; i++)
 				{
-					iblPbr->Bind();
-					iblPbr->SetFloat3("lightColors[" + std::to_string(i) + "]", glm::vec3{ -1.0f });
+					iblPbrStatic->Bind();
+					iblPbrStatic->SetFloat3("lightColors[" + std::to_string(i) + "]", glm::vec3{ -1.0f });
+
+					iblPbrAnim->Bind();
+					iblPbrAnim->SetFloat3("lightColors[" + std::to_string(i) + "]", glm::vec3{ -1.0f });
 
 					defaultPbr->Bind();
 					defaultPbr->SetFloat3("u_Uniform.lightColors[" + std::to_string(i) + "]", glm::vec3{ -1.0f });
@@ -98,12 +109,12 @@ namespace X
 			}
 		}
 
-		auto view = mLevel->mRegistry.view<TransformComponent, StaticMeshComponent>();
+		auto view = mLevel->mRegistry.view<TransformComponent, MeshComponent>();
 		for (auto e : view)
 		{
 			Entity entity = { e, mLevel };
 			auto& transform = entity.GetComponent<TransformComponent>();
-			auto& mesh = entity.GetComponent<StaticMeshComponent>();
+			auto& mesh = entity.GetComponent<MeshComponent>();
 
 			Renderer3D::DrawModel(transform.GetTransform(), camera.GetPosition(), mesh, (int)e);
 		}

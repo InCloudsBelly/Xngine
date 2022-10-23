@@ -314,11 +314,11 @@ namespace X
 				}
 			}
 
-			if (!mSelectionContext.HasComponent<StaticMeshComponent>())
+			if (!mSelectionContext.HasComponent<MeshComponent>())
 			{
-				if (ImGui::MenuItem("Static Mesh Renderer"))
+				if (ImGui::MenuItem("Mesh Renderer"))
 				{
-					mSelectionContext.AddComponent<StaticMeshComponent>();
+					mSelectionContext.AddComponent<MeshComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 			}
@@ -578,7 +578,7 @@ namespace X
 				floatValueUI("friction", component.friction);
 			});
 
-		DrawComponent<StaticMeshComponent>("Static Mesh Renderer", entity, [](StaticMeshComponent& component)
+		DrawComponent<MeshComponent>("Static Mesh Renderer", entity, [](MeshComponent& component)
 			{
 				ImGui::Text("Mesh Path");
 				ImGui::SameLine();
@@ -586,26 +586,27 @@ namespace X
 				ImGui::SameLine();
 				if (ImGui::Button("..."))
 				{
-					std::string filepath = FileDialogs::OpenFile("Model (*.obj *.fbx)\0*.obj;*.fbx\0");
+					std::string filepath = FileDialogs::OpenFile("Model (*.obj *.fbx *.dae)\0*.obj;*.fbx;*.dae\0");
 					if (filepath.find("Assets") != std::string::npos)
 					{
 						filepath = filepath.substr(filepath.find("Assets"), filepath.length());
 					}
 					else
 					{
-						// TODO: Import Model
-						X_CORE_ASSERT(false, "HEngine Now Only support the model from Assets!");
+						// TODO: Import Mesh
+						//X_CORE_ASSERT(false, "xngine Now Only support the model from Assets!");
+						//filepath = "";
 					}
 					if (!filepath.empty())
 					{
-						component.Mesh = Model(filepath);
+						component.mMesh = CreateRef<Mesh>(filepath);
 						component.Path = filepath;
 					}
 				}
 
 				if (ImGui::TreeNode((void*)"Material", "Material"))
 				{
-					const auto& materialNode = [&model = component.Mesh](const char* name, Ref<Texture2D>& tex, void(*func)(Model& model)) {
+					const auto& materialNode = [&model = component.mMesh](const char* name, Ref<Texture2D>& tex, void(*func)(Ref<Mesh>& model)) {
 						if (ImGui::TreeNode((void*)name, name))
 						{
 							ImGui::Image((ImTextureID)tex->GetRendererID(), ImVec2(64, 64), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
@@ -629,89 +630,92 @@ namespace X
 						}
 					};
 
-					materialNode("Albedo", component.Mesh.mAlbedoMap, [](Model& model) {
+					materialNode("Albedo", component.mMesh->mAlbedoMap, [](Ref<Mesh>& model) {
 						ImGui::SameLine();
-						ImGui::Checkbox("Use", &model.bUseAlbedoMap);
-						if (ImGui::ColorEdit4("##albedo", glm::value_ptr(model.col)))
+						ImGui::Checkbox("Use", &model->bUseAlbedoMap);
+
+						if (ImGui::ColorEdit4("##albedo", glm::value_ptr(model->col)))
 						{
-							if (!model.bUseAlbedoMap)
+							if (!model->bUseAlbedoMap)
 							{
 								unsigned char data[4];
 								for (size_t i = 0; i < 4; i++)
 								{
-									data[i] = (unsigned char)(model.col[i] * 255.0f);
+									data[i] = (unsigned char)(model->col[i] * 255.0f);
 								}
-								model.albedoRGBA->SetData(data, sizeof(unsigned char) * 4);
+								model->albedoRGBA->SetData(data, sizeof(unsigned char) * 4);
 							}
 						}
-					});
+						});
 
-					materialNode("Normal", component.Mesh.mNormalMap, [](Model& model) {
+					materialNode("Normal", component.mMesh->mNormalMap, [](Ref<Mesh>& model) {
 						ImGui::SameLine();
-						ImGui::Checkbox("Use", &model.bUseNormalMap);
-					});
+						ImGui::Checkbox("Use", &model->bUseNormalMap);
+						});
 
-					materialNode("Metallic", component.Mesh.mMetallicMap, [](Model& model) {
+					materialNode("Metallic", component.mMesh->mMetallicMap, [](Ref<Mesh>& model) {
 						ImGui::SameLine();
+
 						if (ImGui::BeginTable("Metallic", 1))
 						{
 							ImGui::TableNextRow();
 							ImGui::TableNextColumn();
 
-							ImGui::Checkbox("Use", &model.bUseMetallicMap);
+							ImGui::Checkbox("Use", &model->bUseMetallicMap);
 
 							ImGui::TableNextRow();
 							ImGui::TableNextColumn();
-							if (ImGui::SliderFloat("##Metallic", &model.metallic, 0.0f, 1.0f))
+							if (ImGui::SliderFloat("##Metallic", &model->metallic, 0.0f, 1.0f))
 							{
-								if (!model.bUseMetallicMap)
+								if (!model->bUseMetallicMap)
 								{
 									unsigned char data[4];
 									for (size_t i = 0; i < 3; i++)
 									{
-										data[i] = (unsigned char)(model.metallic * 255.0f);
+										data[i] = (unsigned char)(model->metallic * 255.0f);
 									}
-									data[4] = (unsigned char)255.0f;
-									model.metallicRGBA->SetData(data, sizeof(unsigned char) * 4);
+									data[3] = (unsigned char)255.0f;
+									model->metallicRGBA->SetData(data, sizeof(unsigned char) * 4);
 								}
 							}
 
 							ImGui::EndTable();
 						}
-					});
+						});
 
-					materialNode("Roughness", component.Mesh.mRoughnessMap, [](Model& model) {
+					materialNode("Roughness", component.mMesh->mRoughnessMap, [](Ref<Mesh>& model) {
 						ImGui::SameLine();
+
 						if (ImGui::BeginTable("Roughness", 1))
 						{
 							ImGui::TableNextRow();
 							ImGui::TableNextColumn();
 
-							ImGui::Checkbox("Use", &model.bUseRoughnessMap);
+							ImGui::Checkbox("Use", &model->bUseRoughnessMap);
 
 							ImGui::TableNextRow();
 							ImGui::TableNextColumn();
-							if (ImGui::SliderFloat("##Roughness", &model.roughness, 0.0f, 1.0f))
+							if (ImGui::SliderFloat("##Roughness", &model->roughness, 0.0f, 1.0f))
 							{
-								if (!model.bUseRoughnessMap)
+								if (!model->bUseRoughnessMap)
 								{
 									unsigned char data[4];
 									for (size_t i = 0; i < 3; i++)
 									{
-										data[i] = (unsigned char)(model.roughness * 255.0f);
+										data[i] = (unsigned char)(model->roughness * 255.0f);
 									}
-									data[4] = (unsigned char)255.0f;
-									model.roughnessRGBA->SetData(data, sizeof(unsigned char) * 4);
+									data[3] = (unsigned char)255.0f;
+									model->roughnessRGBA->SetData(data, sizeof(unsigned char) * 4);
 								}
 							}
+
 							ImGui::EndTable();
 						}
-					});
+						});
 
-					materialNode("Ambient Occlusion", component.Mesh.mAoMap, [](Model& model) {
-						static bool use = false;
+					materialNode("Ambient Occlusion", component.mMesh->mAoMap, [](Ref<Mesh>& model) {
 						ImGui::SameLine();
-						ImGui::Checkbox("Use", &model.bUseAoMap);
+						ImGui::Checkbox("Use", &model->bUseAoMap);
 						});
 
 					ImGui::TreePop();

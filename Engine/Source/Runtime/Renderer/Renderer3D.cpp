@@ -24,12 +24,17 @@ namespace X
 	{
 	}
 
-	void Renderer3D::DrawModel(const glm::mat4& transform, const glm::vec3& cameraPos, StaticMeshComponent& MeshComponent, int EntityID)
+	void Renderer3D::DrawModel(const glm::mat4& transform, const glm::vec3& cameraPos, MeshComponent& MeshComponent, int EntityID)
 	{
 		if (ModeManager::bHdrUse)
-			MeshComponent.Mesh.Draw(transform, cameraPos, Library<Shader>::GetInstance().Get("IBL_pbr"), EntityID);
+		{
+			if (MeshComponent.mMesh->bAnimated)
+				MeshComponent.mMesh->Draw(transform, cameraPos, Library<Shader>::GetInstance().Get("IBL_pbr_anim"), EntityID);
+			else
+				MeshComponent.mMesh->Draw(transform, cameraPos, Library<Shader>::GetInstance().Get("IBL_pbr_static"), EntityID);
+		}
 		else
-			MeshComponent.Mesh.Draw(transform, cameraPos, EntityID);
+			MeshComponent.mMesh->Draw(transform, cameraPos, EntityID);
 	}
 
 	void Renderer3D::BeginScene(const Camera& camera, const glm::mat4& transform)

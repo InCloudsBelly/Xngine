@@ -93,7 +93,7 @@ namespace X
 
 		Library<CubeMapTexture>::GetInstance().Get("SkyBoxTexture")->Bind(0);
 		Library<Shader>::GetInstance().GetSkyBoxShader()->SetInt("SkyBox", 0);
-		Library<Model>::GetInstance().Get("Box")->Draw();
+		Library<Mesh>::GetInstance().Get("Box")->Draw();
 
 		RenderCommand::DepthFunc(DepthComp::LESS);
 	}
@@ -155,7 +155,7 @@ namespace X
 				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap->GetRendererID(), 0);
 				RenderCommand::Clear();
 
-				Library<Model>::GetInstance().Get("Box")->Draw();
+				Library<Mesh>::GetInstance().Get("Box")->Draw();
 			}
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -177,7 +177,7 @@ namespace X
 			//	captureFBO->FramebufferTexture2D(i, envCubemap->GetRendererID());
 			//	RenderCommand::Clear();
 
-			//	Library<Model>::GetInstance().Get("Box")->Draw();
+			//	Library<Mesh>::GetInstance().Get("Box")->Draw();
 			//}
 			//captureFBO->Unbind();
 
@@ -224,7 +224,7 @@ namespace X
 				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap->GetRendererID(), 0);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-				Library<Model>::GetInstance().Get("Box")->Draw();
+				Library<Mesh>::GetInstance().Get("Box")->Draw();
 			}
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			//end temp
@@ -248,7 +248,7 @@ namespace X
 			//	RenderCommand::Clear();
 
 			//	//glDrawBuffer(GL_COLOR_ATTACHMENT0);
-			//	Library<Model>::GetInstance().Get("Box")->Draw();
+			//	Library<Mesh>::GetInstance().Get("Box")->Draw();
 			//}
 			//captureFBO->Unbind();
 			Library<CubeMapTexture>::GetInstance().Set("EnvironmentIrradiance", irradianceMap);
@@ -283,7 +283,7 @@ namespace X
 					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap->GetRendererID(), mip);
 
 					RenderCommand::Clear();
-					Library<Model>::GetInstance().Get("Box")->Draw();
+					Library<Mesh>::GetInstance().Get("Box")->Draw();
 				}
 			}
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -315,7 +315,7 @@ namespace X
 			//		captureFBO->FramebufferTexture2D(i, prefilterMap->GetRendererID());
 
 			//		RenderCommand::Clear();
-			//		Library<Model>::GetInstance().Get("Box")->Draw();
+			//		Library<Mesh>::GetInstance().Get("Box")->Draw();
 			//	}
 			//}
 			//captureFBO->Unbind();
@@ -329,14 +329,19 @@ namespace X
 
 		RenderCommand::DepthFunc(DepthComp::LEQUAL);
 
-		Library<Shader>::GetInstance().Get("IBL_pbr")->SetFloat("exposure", environmentSettings.exposure);
+		Library<Shader>::GetInstance().Get("IBL_pbr_static")->Bind();
+		Library<Shader>::GetInstance().Get("IBL_pbr_static")->SetFloat("exposure", environmentSettings.exposure);
+
+		Library<Shader>::GetInstance().Get("IBL_pbr_anim")->Bind();
+		Library<Shader>::GetInstance().Get("IBL_pbr_anim")->SetFloat("exposure", environmentSettings.exposure);
+
 		Ref<Shader> backgroundShader = Library<Shader>::GetInstance().Get("IBL_background");
 		backgroundShader->Bind();
 		backgroundShader->SetInt("environmentMap", 0);
 		backgroundShader->SetFloat("SkyBoxLod", environmentSettings.SkyBoxLod);
 		backgroundShader->SetFloat("exposure", environmentSettings.exposure);
 
-		Library<Model>::GetInstance().Get("Box")->Draw();
+		Library<Mesh>::GetInstance().Get("Box")->Draw();
 		RenderCommand::DepthFunc(DepthComp::LESS);
 	}
 }

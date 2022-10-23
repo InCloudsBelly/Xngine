@@ -267,7 +267,7 @@ namespace X
 	}
 
 	template<>
-	void Level::OnComponentAdded<StaticMeshComponent>(Entity entity, StaticMeshComponent& component)
+	void Level::OnComponentAdded<MeshComponent>(Entity entity, MeshComponent& component) 
 	{
 	}
 }

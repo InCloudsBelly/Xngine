@@ -35,6 +35,9 @@ namespace X
 
 		[[nodiscard]] float GetPitch() const { return mPitch; }
 		[[nodiscard]] float GetYaw() const { return mYaw; }
+
+		void SetCenter(const glm::vec3& center);
+
 	private:
 		void UpdateProjection();
 		void UpdateView();

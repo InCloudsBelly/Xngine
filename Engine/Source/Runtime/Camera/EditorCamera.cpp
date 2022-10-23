@@ -16,6 +16,13 @@ namespace X
 		UpdateView();
 	}
 
+	void EditorCamera::SetCenter(const glm::vec3& center)
+	{
+		mFocalPoint = center;
+		mDistance = 10.0f;
+		UpdateView();
+	}
+
 	void EditorCamera::UpdateProjection()
 	{
 		mAspectRatio = mViewportWidth / mViewportHeight;
@@ -77,19 +84,18 @@ namespace X
 			glm::vec2 deltaMove = { 0.0f, 0.0f };
 
 			if (Input::IsKeyPressed(X_KEY_A))
-				deltaMove.x += mCameraSpeed;
+				mFocalPoint -= GetRightDirection() * mCameraSpeed;
 			if (Input::IsKeyPressed(X_KEY_D))
-				deltaMove.x -= mCameraSpeed;
+				mFocalPoint += GetRightDirection() * mCameraSpeed;
 			if (Input::IsKeyPressed(X_KEY_W))
 				mFocalPoint += GetForwardDirection() * mCameraSpeed;
 			if (Input::IsKeyPressed(X_KEY_S))
 				mFocalPoint -= GetForwardDirection() * mCameraSpeed;
 			if (Input::IsKeyPressed(X_KEY_Q))
-				deltaMove.y -= mCameraSpeed;
+				mFocalPoint -= GetUpDirection() * mCameraSpeed;
 			if (Input::IsKeyPressed(X_KEY_E))
-				deltaMove.y += mCameraSpeed;
+				mFocalPoint += GetUpDirection() * mCameraSpeed;
 
-			MousePan(deltaMove);
 
 			const glm::vec2& mouse{ Input::GetMouseX(), Input::GetMouseY() };
 			glm::vec2 deltaRotate = (mouse - mInitialMousePosition) * 0.003f;
