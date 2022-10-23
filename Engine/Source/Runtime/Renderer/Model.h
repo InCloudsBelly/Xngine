@@ -46,6 +46,7 @@ namespace X
 		std::optional<std::vector<MaterialTexture>> loadMaterialTextures(aiMaterial* mat, aiTextureType type);
 	public:
 		bool bUseAlbedoMap = false;
+		float col[4] = { 1.0f, 1.0f, 1.0f, 1.0f }; // 0 ~ 1
 		Ref<Texture2D> albedoRGBA = Texture2D::Create(1, 1);
 		Ref<Texture2D> mAlbedoMap = Library<Texture2D>::GetInstance().GetDefaultTexture();
 		
@@ -53,10 +54,12 @@ namespace X
 		Ref<Texture2D> mNormalMap = Library<Texture2D>::GetInstance().Get("DefaultNormal");
 
 		bool bUseMetallicMap = false;
+		float metallic = 0.1f;
 		Ref<Texture2D> metallicRGBA = Texture2D::Create(1, 1);
 		Ref<Texture2D> mMetallicMap = Library<Texture2D>::GetInstance().Get("DefaultMetallicRoughness");
 
 		bool bUseRoughnessMap = false;
+		float roughness = 0.1f;
 		Ref<Texture2D> roughnessRGBA = Texture2D::Create(1, 1);
 		Ref<Texture2D> mRoughnessMap = Library<Texture2D>::GetInstance().Get("DefaultMetallicRoughness");
 
