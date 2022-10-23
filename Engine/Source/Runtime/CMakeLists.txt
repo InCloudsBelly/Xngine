@@ -45,6 +45,7 @@ target_link_libraries(XngineRuntime PUBLIC glfw
     PUBLIC spirv-cross-glsl
     PUBLIC headers
     PUBLIC ${vulkan_lib}
+    PUBLIC pybind11::embed pybind11::module pybind11::pybind11
 )
 
 if (WIN32)

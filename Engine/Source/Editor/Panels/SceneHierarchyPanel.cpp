@@ -350,6 +350,24 @@ namespace X
 				}
 			}
 
+			if (!mSelectionContext.HasComponent<SphereCollider3DComponent>())
+			{
+				if (ImGui::MenuItem("Sphere Collider 3D"))
+				{
+					mSelectionContext.AddComponent<SphereCollider3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			if (!mSelectionContext.HasComponent<PythonScriptComponent>())
+			{
+				if (ImGui::MenuItem("Python Script"))
+				{
+					mSelectionContext.AddComponent<PythonScriptComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
 			ImGui::EndPopup();
 		}
 
@@ -504,7 +522,7 @@ namespace X
 				const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
 				if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
 				{
-					for (int i = 0; i < 2; i++)
+					for (int i = 0; i < 3; i++)
 					{
 						bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
 						if (ImGui::Selectable(bodyTypeStrings[i], isSelected))
@@ -519,11 +537,45 @@ namespace X
 
 					ImGui::EndCombo();
 				}
+				ImGui::Text("mass");
+				ImGui::SameLine();
+				ImGui::SliderFloat("##masas", &component.mass, 0.0f, 10.0f, "%.2f");
 			});
 
 		DrawComponent<BoxCollider3DComponent>("Box Collider 3D", entity, [](auto& component)
 			{
+				const auto& floatValueUI = [](const char* name, float& value) {
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 100.0f);
+					ImGui::Text(name);
+					ImGui::NextColumn();
+					std::string label = std::string("##") + std::string(name);
+					ImGui::SliderFloat(label.c_str(), &value, 0.0f, 1.0f, "%.2f");
+					ImGui::EndColumns();
+				};
 
+				floatValueUI("linearDamping", component.linearDamping);
+				floatValueUI("angularDamping", component.angularDamping);
+				floatValueUI("restitution", component.restitution);
+				floatValueUI("friction", component.friction);
+			});
+
+		DrawComponent<SphereCollider3DComponent>("Sphere Collider 3D", entity, [](auto& component)
+			{
+				const auto& floatValueUI = [](const char* name, float& value) {
+					ImGui::Columns(2, nullptr, false);
+					ImGui::SetColumnWidth(0, 100.0f);
+					ImGui::Text(name);
+					ImGui::NextColumn();
+					std::string label = std::string("##") + std::string(name);
+					ImGui::SliderFloat(label.c_str(), &value, 0.0f, 1.0f, "%.2f");
+					ImGui::EndColumns();
+				};
+
+				floatValueUI("linearDamping", component.linearDamping);
+				floatValueUI("angularDamping", component.angularDamping);
+				floatValueUI("restitution", component.restitution);
+				floatValueUI("friction", component.friction);
 			});
 
 		DrawComponent<StaticMeshComponent>("Static Mesh Renderer", entity, [](StaticMeshComponent& component)
@@ -580,7 +632,7 @@ namespace X
 					materialNode("Albedo", component.Mesh.mAlbedoMap, [](Model& model) {
 						ImGui::SameLine();
 						ImGui::Checkbox("Use", &model.bUseAlbedoMap);
-						if (ImGui::ColorEdit4("##albedo", model.col))
+						if (ImGui::ColorEdit4("##albedo", glm::value_ptr(model.col)))
 						{
 							if (!model.bUseAlbedoMap)
 							{
@@ -671,6 +723,25 @@ namespace X
 				ImGui::Text("Light Color");
 				ImGui::SameLine();
 				ImGui::DragFloat3("##Light Color", (float*)&component.LightColor, 2.0f, 0.0f, 10000.0f, "%.1f");
+			});
+
+		DrawComponent<PythonScriptComponent>("Python Script", entity, [](auto& component)
+			{
+				ImGui::Text("Python Script");
+				ImGui::SameLine();
+				ImGui::Text(component.Path.c_str());
+
+				ImGui::SameLine();
+				if (ImGui::Button("..."))
+				{
+					std::string filepath = FileDialogs::OpenFile("PythonScript (*.py)\0*.py\0");
+					if (!filepath.empty())
+					{
+						filepath = std::regex_replace(filepath, std::regex("\\\\"), "/");
+						filepath = filepath.substr(filepath.find_last_of("/") + 1, filepath.length());
+						component.Path = filepath;
+					}
+				}
 			});
 	}
 }

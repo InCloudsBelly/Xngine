@@ -260,6 +260,46 @@ namespace X
 			out << YAML::EndMap; // CircleCollider2DComponent
 		}
 
+		if (entity.HasComponent<Rigidbody3DComponent>())
+		{
+			out << YAML::Key << "Rigidbody3DComponent";
+			out << YAML::BeginMap;
+
+			auto& rb3dComponent = entity.GetComponent<Rigidbody3DComponent>();
+			out << YAML::Key << "mass" << YAML::Value << rb3dComponent.mass;
+			out << YAML::Key << "type" << YAML::Value << (uint32_t)rb3dComponent.Type;
+
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<BoxCollider3DComponent>())
+		{
+			out << YAML::Key << "BoxCollider3DComponent";
+			out << YAML::BeginMap;
+
+			auto& bc3dComponent = entity.GetComponent<BoxCollider3DComponent>();
+			out << YAML::Key << "linearDamping" << YAML::Value << bc3dComponent.linearDamping;
+			out << YAML::Key << "angularDamping" << YAML::Value << bc3dComponent.angularDamping;
+			out << YAML::Key << "restitution" << YAML::Value << bc3dComponent.restitution;
+			out << YAML::Key << "friction" << YAML::Value << bc3dComponent.friction;
+
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<SphereCollider3DComponent>())
+		{
+			out << YAML::Key << "SphereCollider3DComponent";
+			out << YAML::BeginMap;
+
+			auto& sc3dComponent = entity.GetComponent<SphereCollider3DComponent>();
+			out << YAML::Key << "linearDamping" << YAML::Value << sc3dComponent.linearDamping;
+			out << YAML::Key << "angularDamping" << YAML::Value << sc3dComponent.angularDamping;
+			out << YAML::Key << "restitution" << YAML::Value << sc3dComponent.restitution;
+			out << YAML::Key << "friction" << YAML::Value << sc3dComponent.friction;
+
+			out << YAML::EndMap;
+		}
+
 		if (entity.HasComponent<StaticMeshComponent>())
 		{
 			out << YAML::Key << "StaticMeshComponent";
@@ -267,6 +307,21 @@ namespace X
 
 			auto& staticMeshComponent = entity.GetComponent<StaticMeshComponent>();
 			out << YAML::Key << "Path" << YAML::Value << staticMeshComponent.Path.c_str();
+
+			// Material 
+			out << YAML::Key << "bUseAlbedoMap" << YAML::Value << staticMeshComponent.Mesh.bUseAlbedoMap;
+			out << YAML::Key << "col" << YAML::Value << staticMeshComponent.Mesh.col;
+
+			out << YAML::Key << "bUseNormalMap" << YAML::Value << staticMeshComponent.Mesh.bUseNormalMap;
+
+			out << YAML::Key << "bUseMetallicMap" << YAML::Value << staticMeshComponent.Mesh.bUseMetallicMap;
+			out << YAML::Key << "metallic" << YAML::Value << staticMeshComponent.Mesh.metallic;
+
+			out << YAML::Key << "bUseRoughnessMap" << YAML::Value << staticMeshComponent.Mesh.bUseRoughnessMap;
+			out << YAML::Key << "roughness" << YAML::Value << staticMeshComponent.Mesh.roughness;
+
+			out << YAML::Key << "bUseAoMap" << YAML::Value << staticMeshComponent.Mesh.bUseRoughnessMap;
+			// End Material
 
 			out << YAML::EndMap;
 		}
@@ -423,11 +478,46 @@ namespace X
 					cc2d.RestitutionThreshold = circleCollider2DComponent["RestitutionThreshold"].as<float>();
 				}
 
+				auto rigidbody3DComponent = entity["Rigidbody3DComponent"];
+				if (rigidbody3DComponent)
+				{
+					auto& rb3d = deserializedEntity.AddComponent<Rigidbody3DComponent>();
+					rb3d.mass = rigidbody3DComponent["mass"].as<float>();
+					rb3d.Type = (Rigidbody3DComponent::Body3DType)rigidbody3DComponent["type"].as<uint32_t>();
+				}
+
+				auto boxCollider3DComponent = entity["BoxCollider3DComponent"];
+				if (boxCollider3DComponent)
+				{
+					auto& bc3d = deserializedEntity.AddComponent<BoxCollider3DComponent>();
+					bc3d.linearDamping = boxCollider3DComponent["linearDamping"].as<float>();
+					bc3d.angularDamping = boxCollider3DComponent["angularDamping"].as<float>();
+					bc3d.restitution = boxCollider3DComponent["restitution"].as<float>();
+					bc3d.friction = boxCollider3DComponent["friction"].as<float>();
+				}
+
+				auto sphereCollider3DComponent = entity["SphereCollider3DComponent"];
+				if (sphereCollider3DComponent)
+				{
+					auto& sc3d = deserializedEntity.AddComponent<SphereCollider3DComponent>();
+				}
+
 				auto staticMeshComponent = entity["StaticMeshComponent"];
 				if (staticMeshComponent)
 				{
 					std::string str = staticMeshComponent["Path"].as<std::string>();
-					auto& src = deserializedEntity.AddComponent<StaticMeshComponent>(str);
+					auto& sm = deserializedEntity.AddComponent<StaticMeshComponent>(str);
+
+					// Material
+					sm.Mesh.bUseAlbedoMap = staticMeshComponent["bUseAlbedoMap"].as<bool>();
+					sm.Mesh.col = staticMeshComponent["col"].as<glm::vec4>();
+					sm.Mesh.bUseNormalMap = staticMeshComponent["bUseNormalMap"].as<bool>();
+					sm.Mesh.bUseMetallicMap = staticMeshComponent["bUseMetallicMap"].as<bool>();
+					sm.Mesh.metallic = staticMeshComponent["metallic"].as<float>();
+					sm.Mesh.bUseRoughnessMap = staticMeshComponent["bUseRoughnessMap"].as<bool>();
+					sm.Mesh.roughness = staticMeshComponent["roughness"].as<float>();
+					sm.Mesh.bUseAoMap = staticMeshComponent["bUseAoMap"].as<bool>();
+					// End Material
 				}
 
 				auto lightComponent = entity["LightComponent"];
