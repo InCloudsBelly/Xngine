@@ -2,7 +2,6 @@
 
 #include "Runtime/Resource/AssetManager/AssetManager.h"
 #include "Runtime/Renderer/Model.h"
-#include "Runtime/Renderer/StaticMesh.h"
 
 #include <regex>
 
@@ -57,7 +56,7 @@ namespace X
 		}
 	}
 
-	StaticMesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
+	Mesh  Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 	{
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
@@ -100,6 +99,25 @@ namespace X
 			else
 				vertex.TexCoord = glm::vec2(0.0f, 0.0f);
 
+			if (mesh->HasTangentsAndBitangents())
+			{
+				// tangent
+				vector.x = mesh->mTangents[i].x;
+				vector.y = mesh->mTangents[i].y;
+				vector.z = mesh->mTangents[i].z;
+				vertex.Tangent = vector;
+				// bitangent
+				vector.x = mesh->mBitangents[i].x;
+				vector.y = mesh->mBitangents[i].y;
+				vector.z = mesh->mBitangents[i].z;
+				vertex.Bitangent = vector;
+			}
+			else
+			{
+				vertex.Tangent = glm::vec3{ 0.0f };
+				vertex.Bitangent = glm::vec3{ 0.0f };
+			}
+
 			vertex.EntityID = -1;
 
 			vertices.push_back(vertex);
@@ -132,7 +150,7 @@ namespace X
 		{
 			loadTexture(static_cast<aiTextureType>(type));
 		}
-		return StaticMesh(vertices, indices, textures);
+		return Mesh(vertices, indices, textures);
 	}
 
 	std::optional<std::vector<MaterialTexture>> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type) 

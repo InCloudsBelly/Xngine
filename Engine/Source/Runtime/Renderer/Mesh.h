@@ -6,6 +6,9 @@
 #include "Runtime/Renderer/Shader.h"
 #include "Runtime/Renderer/Material.h"
 
+#define MAX_BONE_INFLUENCE 4
+
+
 namespace X
 {
 	class Model;
@@ -14,18 +17,31 @@ namespace X
 	{
 		glm::vec3 Pos;
 		glm::vec3 Normal;
-		glm::vec3 Tangent;
 		glm::vec2 TexCoord;
-
-		//Editor
+		glm::vec3 Tangent;
+		glm::vec3 Bitangent;
 		int EntityID;
 	};
 
-	class StaticMesh
+	struct AnimatedVertex
+	{
+		glm::vec3 Position;
+		glm::vec3 Normal;
+		glm::vec2 TexCoords;
+		glm::vec3 Tangent;
+		glm::vec3 Bitangent;
+		int m_BoneIDs[MAX_BONE_INFLUENCE];
+		float m_Weights[MAX_BONE_INFLUENCE];
+		int EntityID;
+	};
+
+
+
+	class Mesh
 	{
 	public:
-		StaticMesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t> indices);
-		StaticMesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t> indices, const std::vector<MaterialTexture>& textures);
+		Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t> indices);
+		Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t> indices, const std::vector<MaterialTexture>& textures);
 
 		void Draw(const glm::mat4& transform, const glm::vec3& cameraPos, const Ref<Shader>& shader, int entityID, Model* model);
 		void Draw();
@@ -34,7 +50,10 @@ namespace X
 		void SetupMesh(int entityID);
 	private:
 		std::vector<MaterialTexture> mTextures;
-		std::vector<Vertex> mVertices;
+		
+		std::vector<Vertex> mStaticVertices;
+		std::vector<AnimatedVertex> mAnimatedVertices;
+
 		std::vector<uint32_t> mIndices;
 
 		Ref<VertexArray> mVertexArray;
