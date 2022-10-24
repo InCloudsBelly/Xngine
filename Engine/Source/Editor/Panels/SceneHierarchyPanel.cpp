@@ -520,7 +520,12 @@ namespace X
 			{
 				const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
 				const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
-				if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
+				
+				ImGui::Columns(2, nullptr, false);
+				ImGui::SetColumnWidth(0, 100.0f);
+				ImGui::Text("Body Type");
+				ImGui::NextColumn();
+				if (ImGui::BeginCombo("##Body Type", currentBodyTypeString))
 				{
 					for (int i = 0; i < 3; i++)
 					{
@@ -537,9 +542,12 @@ namespace X
 
 					ImGui::EndCombo();
 				}
-				ImGui::Text("mass");
-				ImGui::SameLine();
-				ImGui::SliderFloat("##masas", &component.mass, 0.0f, 10.0f, "%.2f");
+				ImGui::EndColumns();
+
+				ImGuiWrapper::DrawTwoUI(
+					[]() { ImGui::Text("mass"); },
+					[&component = component]() { ImGui::SliderFloat("##masas", &component.mass, 0.0f, 10.0f, "%.2f"); }
+				);
 			});
 
 		DrawComponent<BoxCollider3DComponent>("Box Collider 3D", entity, [](auto& component)
@@ -578,11 +586,14 @@ namespace X
 				floatValueUI("friction", component.friction);
 			});
 
-		DrawComponent<MeshComponent>("Static Mesh Renderer", entity, [](MeshComponent& component)
+		DrawComponent<MeshComponent>("Mesh Renderer", entity, [](MeshComponent& component)
 			{
+				ImGui::Columns(2, nullptr, false);
+				ImGui::SetColumnWidth(0, 100.0f);
 				ImGui::Text("Mesh Path");
-				ImGui::SameLine();
-				ImGui::Text(component.Path.c_str());
+				ImGui::NextColumn();
+				std::string standardPath = std::regex_replace(component.Path, std::regex("\\\\"), "/");
+				ImGui::Text(standardPath.substr(standardPath.find_last_of("/") + 1, standardPath.length()).c_str());
 				ImGui::SameLine();
 				if (ImGui::Button("..."))
 				{
@@ -603,8 +614,9 @@ namespace X
 						component.Path = filepath;
 					}
 				}
+				ImGui::EndColumns();
 
-				if (ImGui::TreeNode((void*)"Material", "Material"))
+				if (ImGuiWrapper::TreeNodeExStyle2((void*)"Material", "Material"))
 				{
 					const auto& materialNode = [&model = component.mMesh](const char* name, Ref<Texture2D>& tex, void(*func)(Ref<Mesh>& model)) {
 						if (ImGui::TreeNode((void*)name, name))
@@ -719,6 +731,32 @@ namespace X
 						});
 
 					ImGui::TreePop();
+				}
+
+				if (component.mMesh->bAnimated)
+				{
+					if (ImGuiWrapper::TreeNodeExStyle2((void*)"Animation", "Animation"))
+					{
+						ImGuiWrapper::DrawTwoUI(
+							[&mesh = component.mMesh]() {
+								static std::string label = "Play";
+								if (ImGui::Button(label.c_str()))
+								{
+									mesh->bPlayAnim = !mesh->bPlayAnim;
+									if (mesh->bPlayAnim)
+										label = "Stop";
+									else
+										label = "Play";
+								}
+							},
+							[]() { ImGui::Button("Pause"); },
+								200.0f
+							);
+						static float progress = 0.0f;
+						ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
+
+						ImGui::TreePop();
+					}
 				}
 			});
 
