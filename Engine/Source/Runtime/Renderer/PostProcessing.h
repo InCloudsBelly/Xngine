@@ -15,7 +15,6 @@ namespace X
 
 	class PostProcessing
 	{
-		friend class RenderPass;
 	public:
 		PostProcessing(const PostProcessingType& type);
 
@@ -25,11 +24,12 @@ namespace X
 		virtual uint32_t ExcuteAndReturnFinalTex(const Ref<Framebuffer>& fb) { return 0; };
 	protected:
 		void DoPostProcessing();
+	public:
+		static Ref<Framebuffer> mFramebuffer;
 	protected:
 		PostProcessingType mType;
 		static Ref<VertexArray> mScreenQuadVAO;
 		static Ref<VertexBuffer> mScreenQuadVBO;
 		static Ref<IndexBuffer> mScreenQuadIBO;
-		static Ref<Framebuffer> mFramebuffer;
 	};
 }
