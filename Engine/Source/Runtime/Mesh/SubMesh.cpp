@@ -30,8 +30,8 @@ namespace X
 		mVertexArray->SetIndexBuffer(mIB);
 	}
 
-	SubMesh::SubMesh(const std::vector<StaticVertex>& vertices, const std::vector<uint32_t> indices, const std::vector<MaterialTexture>& textures)
-		: mStaticVertices(vertices), mIndices(indices), mTextures(textures)
+	SubMesh::SubMesh(const std::vector<StaticVertex>& vertices, const std::vector<uint32_t> indices, const std::vector<MaterialTexture>& textures, uint32_t materialIndex)
+		: mStaticVertices(vertices), mIndices(indices), mTextures(textures), mMaterialIndex(materialIndex)
 	{
 		mVertexArray = VertexArray::Create();
 
@@ -76,8 +76,8 @@ namespace X
 		mVertexArray->SetIndexBuffer(mIB);
 	}
 
-	SubMesh::SubMesh(const std::vector<SkinnedVertex>& vertices, const std::vector<uint32_t> indices, const std::vector<MaterialTexture>& textures)
-		: mSkinnedVertices(vertices), mIndices(indices), mTextures(textures)
+	SubMesh::SubMesh(const std::vector<SkinnedVertex>& vertices, const std::vector<uint32_t> indices, const std::vector<MaterialTexture>& textures, uint32_t materialIndex)
+		: mSkinnedVertices(vertices), mIndices(indices), mTextures(textures), mMaterialIndex(materialIndex)
 	{
 		mVertexArray = VertexArray::Create();
 
@@ -122,28 +122,28 @@ namespace X
 			Library<CubeMapTexture>::GetInstance().Get("EnvironmentPrefilter")->Bind(1);
 			Library<Texture2D>::GetInstance().Get("BRDF_LUT")->Bind(2);
 
-			if (model->bUseAlbedoMap)
-				model->mAlbedoMap->Bind(3);
+			if (model->mMaterial[mMaterialIndex]->bUseAlbedoMap)
+				model->mMaterial[mMaterialIndex]->mAlbedoMap->Bind(3);
 			else
-				model->albedoRGBA->Bind(3);
+				model->mMaterial[mMaterialIndex]->albedoRGBA->Bind(3);
 
-			if (model->bUseNormalMap)
-				model->mNormalMap->Bind(4);
+			if (model->mMaterial[mMaterialIndex]->bUseNormalMap)
+				model->mMaterial[mMaterialIndex]->mNormalMap->Bind(4);
 			else
 				Library<Texture2D>::GetInstance().GetWhiteTexture()->Bind(4);
 
-			if (model->bUseMetallicMap)
-				model->mMetallicMap->Bind(5);
+			if (model->mMaterial[mMaterialIndex]->bUseMetallicMap)
+				model->mMaterial[mMaterialIndex]->mMetallicMap->Bind(5);
 			else
-				model->metallicRGBA->Bind(5);
+				model->mMaterial[mMaterialIndex]->metallicRGBA->Bind(5);
 
-			if (model->bUseRoughnessMap)
-				model->mRoughnessMap->Bind(6);
+			if (model->mMaterial[mMaterialIndex]->bUseRoughnessMap)
+				model->mMaterial[mMaterialIndex]->mRoughnessMap->Bind(6);
 			else
-				model->roughnessRGBA->Bind(6);
+				model->mMaterial[mMaterialIndex]->roughnessRGBA->Bind(6);
 
-			if (model->bUseAoMap)
-				model->mAoMap->Bind(7);
+			if (model->mMaterial[mMaterialIndex]->bUseAoMap)
+				model->mMaterial[mMaterialIndex]->mAoMap->Bind(7);
 			else
 				Library<Texture2D>::GetInstance().GetWhiteTexture()->Bind(7);
 
@@ -163,28 +163,28 @@ namespace X
 			shader->SetMat4("model", transform); // for animation 
 			mVertexArray->Bind();
 
-			if (model->bUseAlbedoMap)
-				model->mAlbedoMap->Bind(0);
+			if (model->mMaterial[mMaterialIndex]->bUseAlbedoMap)
+				model->mMaterial[mMaterialIndex]->mAlbedoMap->Bind(0);
 			else
-				model->albedoRGBA->Bind(0);
+				model->mMaterial[mMaterialIndex]->albedoRGBA->Bind(0);
 
-			if (model->bUseNormalMap)
-				model->mNormalMap->Bind(1);
+			if (model->mMaterial[mMaterialIndex]->bUseNormalMap)
+				model->mMaterial[mMaterialIndex]->mNormalMap->Bind(1);
 			else
 				Library<Texture2D>::GetInstance().GetWhiteTexture()->Bind(1);
 
-			if (model->bUseMetallicMap)
-				model->mMetallicMap->Bind(2);
+			if (model->mMaterial[mMaterialIndex]->bUseMetallicMap)
+				model->mMaterial[mMaterialIndex]->mMetallicMap->Bind(2);
 			else
-				model->metallicRGBA->Bind(2);
+				model->mMaterial[mMaterialIndex]->metallicRGBA->Bind(2);
 
-			if (model->bUseRoughnessMap)
-				model->mRoughnessMap->Bind(3);
+			if (model->mMaterial[mMaterialIndex]->bUseRoughnessMap)
+				model->mMaterial[mMaterialIndex]->mRoughnessMap->Bind(3);
 			else
-				model->roughnessRGBA->Bind(3);
+				model->mMaterial[mMaterialIndex]->roughnessRGBA->Bind(3);
 
-			if (model->bUseAoMap)
-				model->mAoMap->Bind(4);
+			if (model->mMaterial[mMaterialIndex]->bUseAoMap)
+				model->mMaterial[mMaterialIndex]->mAoMap->Bind(4);
 			else
 				Library<Texture2D>::GetInstance().GetWhiteTexture()->Bind(4);
 
