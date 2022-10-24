@@ -77,6 +77,7 @@ namespace X
 		RenderPassSpecification rpSpec = { mFramebuffer, "MainPass" };
 		mRenderPass = CreateRef<RenderPass>(rpSpec);
 		mRenderPass->AddPostProcessing(PostProcessingType::MSAA);
+		//mRenderPass->AddPostProcessing(PostProcessingType::Outline);
 
 		mActiveScene = CreateRef<Level>();
 
