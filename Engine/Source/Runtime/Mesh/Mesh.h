@@ -79,6 +79,7 @@ namespace X
 		// Animation
 		bool bAnimated = false;
 		bool bPlayAnim = false;
+		bool bStopAnim = false;
 
 		Animation mAnimation;
 		Animator mAnimator;
