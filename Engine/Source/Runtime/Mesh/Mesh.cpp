@@ -41,6 +41,8 @@ namespace X
 
 	void Mesh::LoadModel(const std::string& path)
 	{
+		mMaterial.resize(200);
+
 		Assimp::Importer importer;
 		std::string standardPath = std::regex_replace(path, std::regex("\\\\"), "/");
 		std::string standardFullPath = std::regex_replace(AssetManager::GetFullPath(path).string(), std::regex("\\\\"), "/");
@@ -62,6 +64,8 @@ namespace X
 		}
 		else
 			ProcessNode(scene->mRootNode, scene, subMeshIndex);
+
+		mMaterial.resize(subMeshIndex);
 	}
 
 	void Mesh::ProcessNode(aiNode* node, const aiScene* scene, uint32_t& subMeshIndex)
@@ -74,6 +78,8 @@ namespace X
 				mSubMeshes.push_back(ProcessMesh<SkinnedVertex>(mesh, scene, subMeshIndex));
 			else
 				mSubMeshes.push_back(ProcessMesh<StaticVertex>(mesh, scene, subMeshIndex));
+
+			subMeshIndex++;
 		}
 
 		for (uint32_t i = 0; i < node->mNumChildren; ++i)
@@ -210,6 +216,8 @@ namespace X
 		// specular: texture_specularN
 		// normal: texture_normalN
 
+		mMaterial[subMeshIndex] = CreateRef<Material>();
+
 		const auto& loadTexture = [&](aiTextureType type) {
 			auto maps = loadMaterialTextures(material, type, subMeshIndex);
 			if (maps) textures.insert(textures.end(), maps.value().begin(), maps.value().end());
@@ -225,7 +233,6 @@ namespace X
 
 	std::optional<std::vector<MaterialTexture>> Mesh::loadMaterialTextures(aiMaterial* mat, aiTextureType type, uint32_t& subMeshIndex)
 	{
-		mMaterial.push_back(CreateRef<Material>());
 		std::vector<MaterialTexture> textures;
 		for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
 		{
@@ -234,6 +241,8 @@ namespace X
 
 			// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
 			bool skip = false;
+			//if (!mMaterial[subMeshIndex]->mTextures.empty())
+			//{
 			for (unsigned int j = 0; j < mMaterial[subMeshIndex]->mTextures.size(); j++)
 			{
 				if (std::strcmp(mMaterial[subMeshIndex]->mTextures[j].path.data(), str.C_Str()) == 0)
@@ -243,6 +252,7 @@ namespace X
 					break;
 				}
 			}
+			//}
 			if (!skip)
 			{   // if texture hasn't been loaded already, load it
 				MaterialTexture texture;
@@ -264,6 +274,7 @@ namespace X
 				case aiTextureType_DIFFUSE:
 					texture.type = TextureType::Albedo;
 					mMaterial[subMeshIndex]->mAlbedoMap = texture.texture2d;
+					mMaterial[subMeshIndex]->bUseAlbedoMap = true;
 					break;
 				case aiTextureType_SPECULAR:
 					texture.type = TextureType::Specular;
@@ -274,6 +285,7 @@ namespace X
 				case aiTextureType_AMBIENT:
 					texture.type = TextureType::AmbientOcclusion;
 					mMaterial[subMeshIndex]->mAoMap = texture.texture2d;
+					mMaterial[subMeshIndex]->bUseAoMap = true;
 					break;
 				/*case aiTextureType_BASE_COLOR:
 					texture.type = TextureType::Albedo;
@@ -282,6 +294,7 @@ namespace X
 				case aiTextureType_NORMALS:
 					texture.type = TextureType::Normal;
 					mMaterial[subMeshIndex]->mNormalMap = texture.texture2d;
+					mMaterial[subMeshIndex]->bUseNormalMap = true;
 					break;
 				case aiTextureType_EMISSIVE:
 					texture.type = TextureType::Emission;
