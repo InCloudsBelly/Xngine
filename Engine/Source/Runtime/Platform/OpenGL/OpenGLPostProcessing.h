@@ -13,7 +13,7 @@ namespace X
 
 	private:
 		uint32_t DoMSAA(const Ref<Framebuffer>& fb);
-		uint32_t DoOutline(const Ref<Framebuffer>& fb);
-		uint32_t DoCartoon(const Ref<Framebuffer>& fb);
+		uint32_t DoPostWithShader(const Ref<Framebuffer>& fb, const Ref<class Shader>& shader);
+
 	};
 }

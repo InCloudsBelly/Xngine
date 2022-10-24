@@ -11,6 +11,8 @@ namespace X
 		MSAA,
 		Outline,
 		Cartoon,
+		GrayScale,
+		GaussianBlur,
 	};
 
 	class PostProcessing
