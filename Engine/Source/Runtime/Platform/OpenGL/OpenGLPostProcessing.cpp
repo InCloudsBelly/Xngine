@@ -37,6 +37,23 @@ namespace X
         return mFramebuffer->GetColorAttachmentRendererID();
     }
 
+    uint32_t OpenGLPostProcessing::DoCartoon(const Ref<Framebuffer>& fb)
+    {
+        uint32_t width = fb->GetSpecification().Width;
+        uint32_t height = fb->GetSpecification().Height;
+        mFramebuffer->Bind();
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, mFramebuffer->GetColorAttachmentRendererID());
+
+        Library<Shader>::GetInstance().Get("Post_Cartoon")->Bind();
+        Library<Shader>::GetInstance().Get("Post_Cartoon")->SetInt("screenTexture", 0);
+        DoPostProcessing();
+
+        return mFramebuffer->GetColorAttachmentRendererID();
+    }
+
+
     uint32_t OpenGLPostProcessing::ExcuteAndReturnFinalTex(const Ref<Framebuffer>& fb)
     {
         uint32_t re = 0;
@@ -50,6 +67,9 @@ namespace X
             break;
         case PostProcessingType::Outline:
             re = DoOutline(fb);
+            break;
+        case PostProcessingType::Cartoon:
+            re = DoCartoon(fb);
             break;
         default:
             return 0;
