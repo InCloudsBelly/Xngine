@@ -4,6 +4,7 @@
 namespace X
 {
     glm::vec2 ConfigManager::mViewportSize = { 1280.0f, 720.0f };
+    int ConfigManager::selectedEntity = -1;
 
     ConfigManager::ConfigManager()
     {

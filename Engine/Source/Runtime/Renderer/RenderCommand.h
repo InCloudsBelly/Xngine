@@ -43,15 +43,15 @@ namespace X
 		}
 
 		//Open/Close Depth Write
-		static void DepthMask(int32_t MaskBit)
+		static void DepthMask(bool maskFlag)
 		{
-			sRendererAPI->DepthMask(MaskBit);
+			sRendererAPI->DepthMask(maskFlag);
 		}
 
 		//Open/Close Depth Test
-		static void DepthTest(int32_t Bit)
+		static void DepthTest(bool enable)
 		{
-			sRendererAPI->DepthTest(Bit);
+			sRendererAPI->DepthTest(enable);
 		}
 
 		static void DepthFunc(DepthComp comp)
@@ -90,6 +90,12 @@ namespace X
 		{
 			sRendererAPI->ClearStencil();
 		}
+
+		static void StencilMask(uint32_t mask)
+		{
+			sRendererAPI->StencilMask(mask);
+		}
+
 
 		//cull
 		static void Cull(int32_t Bit)

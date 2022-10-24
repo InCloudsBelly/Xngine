@@ -51,8 +51,8 @@ namespace X
 		virtual void SetLineWidth(float width) = 0;
 
         //depth
-        virtual void DepthTest(int32_t Bit) = 0;
-        virtual void DepthMask(int32_t MaskBit) = 0;
+        virtual void DepthTest(bool enable) = 0;
+        virtual void DepthMask(bool maskFlag) = 0;
         virtual void DepthFunc(DepthComp comp) = 0;
 
         //blend
@@ -65,6 +65,7 @@ namespace X
         virtual void SetFrontOrBackStencilOp(int32_t FrontOrBack, StencilOp stencilFail, StencilOp depthFail, StencilOp depthSuccess) = 0;
         virtual void StencilTest(int32_t Bit) = 0;
         virtual void ClearStencil() = 0;
+        virtual void StencilMask(uint32_t mask) = 0;
 
         //cull
         virtual void Cull(int32_t Bit) = 0;

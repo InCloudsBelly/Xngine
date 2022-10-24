@@ -68,8 +68,8 @@ namespace X
     void EditorLayer::OnAttach()
     {
         FramebufferSpecification fbSpec;
-		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
-        fbSpec.Width = 1280;
+		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::DEPTH24STENCIL8 };
+		fbSpec.Width = 1280;
         fbSpec.Height = 720;
 		fbSpec.Samples = 4;
 		mFramebuffer = Framebuffer::Create(fbSpec);
@@ -187,8 +187,16 @@ namespace X
 		}
 
 		Entity selectedEntity = mSceneHierarchyPanel.GetSelectedEntity();
-		if (selectedEntity && Input::IsKeyPressed(X_KEY_F))
-			mEditorCamera.SetCenter(selectedEntity.GetComponent<TransformComponent>().Translation);
+		if (selectedEntity)
+		{
+			ConfigManager::selectedEntity = (int)(uint32_t)selectedEntity;
+			if (Input::IsKeyPressed(X_KEY_F))
+				mEditorCamera.SetCenter(selectedEntity.GetComponent<TransformComponent>().Translation);
+		}
+		else
+		{
+			ConfigManager::selectedEntity = -1;
+		}
 
 
 		OnOverlayRender();
