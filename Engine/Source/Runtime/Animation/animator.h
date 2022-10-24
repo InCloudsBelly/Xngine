@@ -78,6 +78,11 @@ namespace X
 			return mFinalBoneMatrices;
 		}
 
+		float GetProgress()
+		{
+			return mCurrentTime / mCurrentAnimation->GetDuration();
+		}
+
 	private:
 		std::vector<glm::mat4> mFinalBoneMatrices;
 		Animation* mCurrentAnimation;

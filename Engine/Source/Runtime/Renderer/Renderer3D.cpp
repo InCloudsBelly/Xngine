@@ -34,7 +34,12 @@ namespace X
 				MeshComponent.mMesh->Draw(transform, cameraPos, Library<Shader>::GetInstance().Get("IBL_pbr_static"), EntityID);
 		}
 		else
-			MeshComponent.mMesh->Draw(transform, cameraPos, EntityID);
+		{
+			if (MeshComponent.mMesh->bPlayAnim)
+				MeshComponent.mMesh->Draw(transform, cameraPos, Library<Shader>::GetInstance().Get("BasePBR_anim"), EntityID);
+			else
+				MeshComponent.mMesh->Draw(transform, cameraPos, Library<Shader>::GetInstance().Get("BasePBR"), EntityID);
+		}
 	}
 
 	void Renderer3D::BeginScene(const Camera& camera, const glm::mat4& transform)

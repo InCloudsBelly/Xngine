@@ -100,9 +100,21 @@ namespace X
 	void SubMesh::Draw(const glm::mat4& transform, const glm::vec3& cameraPos, const Ref<Shader>& shader, int entityID, Mesh* model)
 	{
 		SetupMesh(entityID);
+
+		shader->Bind();
+
+		if (model->bPlayAnim)
+		{
+			model->mAnimator.UpdateAnimation(0.01f * model->mAnimPlaySpeed);
+
+			auto transforms = model->mAnimator.GetFinalBoneMatrices();
+			for (int i = 0; i < transforms.size(); ++i)
+				shader->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+		}
+
+
 		if (ModeManager::bHdrUse)
 		{
-			shader->Bind();
 			shader->SetMat4("model", transform);
 			shader->SetFloat3("camPos", cameraPos);
 
@@ -135,14 +147,6 @@ namespace X
 			else
 				Library<Texture2D>::GetInstance().GetWhiteTexture()->Bind(7);
 
-			if (model->bAnimated)
-			{
-				model->mAnimator.UpdateAnimation(0.01f);
-
-				auto transforms = model->mAnimator.GetFinalBoneMatrices();
-				for (int i = 0; i < transforms.size(); ++i)
-					shader->SetMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
-			}
 
 			shader->SetInt("irradianceMap", 0);
 			shader->SetInt("prefilterMap", 1);
@@ -155,8 +159,8 @@ namespace X
 		}
 		else
 		{
-			shader->Bind();
-			shader->SetMat4("u_Model.Transform", (transform));
+			shader->SetMat4("u_Model.Transform", (transform)); // for static 
+			shader->SetMat4("model", transform); // for animation 
 			mVertexArray->Bind();
 
 			if (model->bUseAlbedoMap)

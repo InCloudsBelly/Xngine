@@ -752,8 +752,16 @@ namespace X
 							[]() { ImGui::Button("Pause"); },
 								200.0f
 							);
-						static float progress = 0.0f;
-						ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
+						ImGui::ProgressBar(component.mMesh->mAnimator.GetProgress(), ImVec2(0.0f, 0.0f));
+
+
+						ImGuiWrapper::DrawTwoUI(
+							[]() { ImGui::Text("Speed"); },
+							[&mesh = component.mMesh]() {
+								ImGui::SliderFloat("##Speed", &mesh->mAnimPlaySpeed, 0.1f, 10.0f);
+							},
+							100.0f
+						);
 
 						ImGui::TreePop();
 					}

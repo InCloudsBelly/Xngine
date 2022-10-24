@@ -82,6 +82,8 @@ namespace X
 
 		Animation mAnimation;
 		Animator mAnimator;
+
+		float mAnimPlaySpeed = 1.0f;
 	private:
 		Ref<Material> mMaterial = CreateRef<Material>();
 		std::vector<SubMesh> mSubMeshes;
