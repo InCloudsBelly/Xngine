@@ -25,8 +25,9 @@ namespace X
 
 		uint32_t ExcuteAndReturnFinalTex();
 
+	public:
+		std::vector<Scope<PostProcessing>> mPostProcessings;
 	private:
 		RenderPassSpecification mSpecification;
-		std::vector<Scope<PostProcessing>> mPostProcessings;
 	};
 }

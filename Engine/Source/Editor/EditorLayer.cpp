@@ -76,11 +76,8 @@ namespace X
 
 		RenderPassSpecification rpSpec = { mFramebuffer, "MainPass" };
 		mRenderPass = CreateRef<RenderPass>(rpSpec);
-		mRenderPass->AddPostProcessing(PostProcessingType::MSAA);
-		//mRenderPass->AddPostProcessing(PostProcessingType::Cartoon);
-		//mRenderPass->AddPostProcessing(PostProcessingType::Outline);
-		//mRenderPass->AddPostProcessing(PostProcessingType::GrayScale);
-		//mRenderPass->AddPostProcessing(PostProcessingType::GaussianBlur);
+		mRenderPass->AddPostProcessing(PostProcessingType::MSAA); // default
+
 
 		mActiveScene = CreateRef<Level>();
 
@@ -368,11 +365,58 @@ namespace X
 			ImGui::SliderFloat("##Camera Speed", &mEditorCamera.mCameraSpeed, 0.1f, 10.0f);
 			ImGui::EndColumns();
 
-			bool open = ImGuiWrapper::TreeNodeExStyle1((void*)"Physics Settings", "Physics Settings");
-
-			if (open)
+			if (ImGuiWrapper::TreeNodeExStyle1((void*)"Physics Settings", "Physics Settings"))
 			{
 				ImGui::Checkbox("Show physics colliders", &mShowPhysicsColliders);
+				ImGui::TreePop();
+			}
+
+			if (ImGuiWrapper::TreeNodeExStyle1((void*)"Post Processing", "Post Processing"))
+			{
+				if (ImGui::Button("Add Post Processing"))
+					ImGui::OpenPopup("AddPostProcessing");
+
+				if (ImGui::BeginPopup("AddPostProcessing"))
+				{
+					if (ImGui::MenuItem("Outline"))
+					{
+						mRenderPass->AddPostProcessing(PostProcessingType::Outline);
+						ImGui::CloseCurrentPopup();
+					}
+
+					if (ImGui::MenuItem("Cartoon"))
+					{
+						mRenderPass->AddPostProcessing(PostProcessingType::Cartoon);
+						ImGui::CloseCurrentPopup();
+					}
+
+					if (ImGui::MenuItem("GrayScale"))
+					{
+						mRenderPass->AddPostProcessing(PostProcessingType::GrayScale);
+						ImGui::CloseCurrentPopup();
+					}
+
+					if (ImGui::MenuItem("GaussianBlur"))
+					{
+						mRenderPass->AddPostProcessing(PostProcessingType::GaussianBlur);
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
+				}
+
+				for (size_t i = 1; i < mRenderPass->mPostProcessings.size(); i++)
+				{
+					ImGui::Selectable(PostProcessing::PostTypeToString(mRenderPass->mPostProcessings[i]->mType).c_str());
+					if (ImGui::BeginPopupContextItem())
+					{
+						if (ImGui::MenuItem("Delete"))
+							mRenderPass->mPostProcessings.erase(mRenderPass->mPostProcessings.begin() + i);
+
+						ImGui::EndPopup();
+					}
+				}
+
 				ImGui::TreePop();
 			}
 

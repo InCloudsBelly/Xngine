@@ -48,6 +48,35 @@ namespace X
         mFramebuffer = Framebuffer::Create(fbSpec);
     }
 
+    std::string PostProcessing::PostTypeToString(PostProcessingType type)
+    {
+        switch (type)
+        {
+        case X::PostProcessingType::None:
+            return "";
+            break;
+        case X::PostProcessingType::MSAA:
+            return "MSAA";
+            break;
+        case X::PostProcessingType::Outline:
+            return "Outline";
+            break;
+        case X::PostProcessingType::Cartoon:
+            return "Cartoon";
+            break;
+        case X::PostProcessingType::GrayScale:
+            return "GrayScale";
+            break;
+        case X::PostProcessingType::GaussianBlur:
+            return "GaussianBlur";
+            break;
+        default:
+            break;
+        }
+        return std::string();
+    }
+
+
     void PostProcessing::DoPostProcessing()
     {
         RenderCommand::DrawIndexed(mScreenQuadVAO);
