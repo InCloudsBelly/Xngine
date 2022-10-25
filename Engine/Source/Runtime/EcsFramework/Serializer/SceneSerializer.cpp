@@ -326,13 +326,13 @@ namespace X
 			out << YAML::EndMap;
 		}
 
-		if (entity.HasComponent<LightComponent>())
+		if (entity.HasComponent<PointLightComponent>())
 		{
-			out << YAML::Key << "LightComponent";
+			out << YAML::Key << "PointLightComponent";
 			out << YAML::BeginMap;
 
-			auto& lightComponent = entity.GetComponent<LightComponent>();
-			out << YAML::Key << "Color" << YAML::Value << lightComponent.LightColor;
+			auto& pointLightComponent = entity.GetComponent<PointLightComponent>();
+			out << YAML::Key << "Color" << YAML::Value << pointLightComponent.LightColor;
 
 			out << YAML::EndMap;
 		}
@@ -520,11 +520,11 @@ namespace X
 					// End Material
 				}
 
-				auto lightComponent = entity["LightComponent"];
-				if (lightComponent)
+				auto pointLightComponent = entity["PointLightComponent"];
+				if (pointLightComponent)
 				{
-					glm::vec3 color = lightComponent["Color"].as<glm::vec3>();
-					auto& src = deserializedEntity.AddComponent<LightComponent>(color);
+					glm::vec3 color = pointLightComponent["Color"].as<glm::vec3>();
+					auto& src = deserializedEntity.AddComponent<PointLightComponent>(color);
 				}
 			}
 		}

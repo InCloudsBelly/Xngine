@@ -62,11 +62,11 @@ namespace X
 
 		//Get the Light
 		{
-			auto view = mLevel->mRegistry.view<TransformComponent, LightComponent>();
+			auto view = mLevel->mRegistry.view<TransformComponent, PointLightComponent>();
 			int i = 0;
 			for (auto entity : view)
 			{
-				auto [transform, light] = view.get<TransformComponent, LightComponent>(entity);
+				auto [transform, light] = view.get<TransformComponent, PointLightComponent>(entity);
 
 				glm::vec3 lightPos = transform.GetTranslation();
 				glm::vec3 lightColor = light.LightColor;

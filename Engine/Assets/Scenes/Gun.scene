@@ -37,7 +37,7 @@ Entities:
       bUseAoMap: false
   - Entity: 3790196893551986594
     TagComponent:
-      Tag: Light
+      Tag: PointLight
     TransformComponent:
       Translation: [0.0838333666, 1.4817996, -32.7113266]
       Rotation: [0, 0, 0]

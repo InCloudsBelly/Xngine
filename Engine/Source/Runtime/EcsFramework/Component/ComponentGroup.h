@@ -16,7 +16,7 @@
 #include "Runtime/EcsFramework/Component/Shape/SpriteRendererComponent.h"
 #include "Runtime/EcsFramework/Component/Transform/TransformComponent.h" 
 #include "Runtime/EcsFramework/Component/Mesh/MeshComponent.h" 
-#include "Runtime/EcsFramework/Component/Renderer/LightComponent.h"
+#include "Runtime/EcsFramework/Component/Renderer/PointLightComponent.h"
 
 
 #include <concepts>
@@ -38,5 +38,5 @@ namespace X
     using AllComponents = ComponentGroup<TransformComponent, CircleRendererComponent, SpriteRendererComponent,
         CameraComponent, NativeScriptComponent, PythonScriptComponent, Rigidbody2DComponent, BoxCollider2DComponent,
         CircleCollider2DComponent, Rigidbody3DComponent, SphereCollider3DComponent, BoxCollider3DComponent,
-        MeshComponent, LightComponent>;
+        MeshComponent, PointLightComponent>;
 }
