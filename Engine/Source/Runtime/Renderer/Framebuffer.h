@@ -13,10 +13,9 @@ namespace X
 		RED_INTEGER,
 
 		// Depth/stencil
+		DEPTH32F_TEX3D,
 		DEPTH24STENCIL8,
 
-		// Defaults
-		Depth = DEPTH24STENCIL8
 	};
 
 	struct FramebufferTextureSpecification

@@ -12,6 +12,7 @@ namespace X
 	{
 		if (type == "vertex") return GL_VERTEX_SHADER;
 		if (type == "fragment" || type == "pixel") return GL_FRAGMENT_SHADER;
+		if (type == "geometry") return GL_GEOMETRY_SHADER;
 
 		X_CORE_ASSERT(false, "Unknown shader type!");
 		return 0;
@@ -180,8 +181,7 @@ namespace X
 	void NativeOpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
 		GLuint program = glCreateProgram();
-		X_CORE_ASSERT(shaderSources.size() <= 2, "We only support 2 shaders for now");
-		std::array<GLenum, 2> glShaderIDs;
+		std::vector<GLenum> glShaderIDs(shaderSources.size());
 		int glShaderIDIndex = 0;
 
 		for (auto& kv : shaderSources)

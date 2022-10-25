@@ -16,5 +16,9 @@ namespace X
         static void BeginScene(const Camera& camera, const glm::mat4& transform);
         static void BeginScene(const EditorCamera& camera);
         static void EndScene();
+
+    public:
+        // shadow pass
+        static Ref<class Framebuffer> lightFBO;
     };
 }

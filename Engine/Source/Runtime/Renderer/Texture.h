@@ -35,6 +35,12 @@ namespace X
         static Ref<Texture2D> Create(const std::string& path);
     };
 
+    class Texture3D : public Texture
+    {
+    public:
+        static Ref<Texture3D> Create(uint32_t width, uint32_t height);
+    };
+
     enum class FaceTarget : uint32_t
     {
         Right = 0,

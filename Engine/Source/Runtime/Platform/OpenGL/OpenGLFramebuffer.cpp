@@ -85,6 +85,24 @@ namespace X
 			glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, TextureTarget(multisampled), id, 0);
 		}
 
+		static void AttachDepthTexture3D(uint32_t& id, GLenum format, uint32_t width, uint32_t height, int depth = 5)
+		{
+			glGenTextures(1, &id);
+
+			glBindTexture(GL_TEXTURE_2D_ARRAY, id);
+			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, format, width, height, depth, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+			constexpr float bordercolor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, bordercolor);
+
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, id, 0);
+		}
+
 		static void AttachDepthRenderBuffer(uint32_t& id, int samples, GLenum format, GLenum attachmentType, uint32_t width, uint32_t height)
 		{
 			glGenRenderbuffers(1, &id);
@@ -109,6 +127,7 @@ namespace X
 		{
 			switch (format)
 			{
+			case X::FramebufferTextureFormat::DEPTH32F_TEX3D:
 			case X::FramebufferTextureFormat::DEPTH24STENCIL8:
 				return true;
 				break;
@@ -181,6 +200,9 @@ namespace X
 			{
 			case FramebufferTextureFormat::DEPTH24STENCIL8:
 				Utils::AttachDepthRenderBuffer(mDepthAttachment, mSpecification.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, mSpecification.Width, mSpecification.Height);
+				break;
+			case FramebufferTextureFormat::DEPTH32F_TEX3D:
+				Utils::AttachDepthTexture3D(mDepthAttachment, GL_DEPTH_COMPONENT32F, mSpecification.Width, mSpecification.Height);
 				break;
 			}
 		}
