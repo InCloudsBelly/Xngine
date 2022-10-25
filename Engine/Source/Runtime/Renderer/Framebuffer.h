@@ -69,7 +69,9 @@ namespace X
 		virtual void FramebufferTexture2D(uint32_t cubemapIndex, uint32_t cubemapID, uint32_t slot = 0) = 0;
 
 		[[nodiscard]] virtual Ref<class Texture3D> GetDepthTex3D() const = 0;
+		
 		virtual void BindDepthTex3D(uint32_t slot) = 0;
+		virtual void UnBindDepthTex3D(uint32_t slot) = 0;
 
         static Ref<Framebuffer> Create(const FramebufferSpecification& spec);
     };

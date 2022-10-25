@@ -30,7 +30,9 @@ namespace X
         virtual void FramebufferTexture2D(uint32_t cubemapIndex, uint32_t cubemapID, uint32_t slot = 0) override;
 
         virtual Ref<class Texture3D> GetDepthTex3D() const override; // have bugs
+        
         virtual void BindDepthTex3D(uint32_t slot) override;
+        virtual void UnBindDepthTex3D(uint32_t slot) override;
 
     private:
         uint32_t mRendererID = 0;

@@ -170,51 +170,22 @@ namespace X
 				glm::vec3 lightPos = transform.GetTranslation();
 				glm::vec3 lightColor = light.LightColor;
 
-				Ref<Shader> iblPbrStatic = Library<Shader>::GetInstance().Get("IBL_pbr_static");
-				Ref<Shader> iblPbrAnim = Library<Shader>::GetInstance().Get("IBL_pbr_anim");
+				Ref<Shader> defaultShader = Library<Shader>::GetInstance().GetDefaultShader();
 
-				Ref<Shader> basePbrStatic = Library<Shader>::GetInstance().GetDefaultShader();
-				Ref<Shader> basePbrAnim = Library<Shader>::GetInstance().Get("BasePBR_anim");
-
-				iblPbrStatic->Bind();
-				iblPbrStatic->SetFloat3("lightPositions[" + std::to_string(i) + "]", lightPos);
-				iblPbrStatic->SetFloat3("lightColors[" + std::to_string(i) + "]", lightColor);
-
-				iblPbrAnim->Bind();
-				iblPbrAnim->SetFloat3("lightPositions[" + std::to_string(i) + "]", lightPos);
-				iblPbrAnim->SetFloat3("lightColors[" + std::to_string(i) + "]", lightColor);
-
-				basePbrStatic->Bind();
-				basePbrStatic->SetFloat3("u_Uniform.lightPositions[" + std::to_string(i) + "]", lightPos);
-				basePbrStatic->SetFloat3("u_Uniform.lightColors[" + std::to_string(i) + "]", lightColor);
-
-				basePbrAnim->Bind();
-				basePbrAnim->SetFloat3("u_Uniform.lightPositions[" + std::to_string(i) + "]", lightPos);
-				basePbrAnim->SetFloat3("u_Uniform.lightColors[" + std::to_string(i) + "]", lightColor);
+				defaultShader->Bind();
+				defaultShader->SetFloat3("lightPositions[" + std::to_string(i) + "]", lightPos);
+				defaultShader->SetFloat3("lightColors[" + std::to_string(i) + "]", lightColor);
 
 				i++;
 			}
 			if (i == 0)
 			{
-				Ref<Shader> iblPbrStatic = Library<Shader>::GetInstance().Get("IBL_pbr_static");
-				Ref<Shader> iblPbrAnim = Library<Shader>::GetInstance().Get("IBL_pbr_anim");
-
-				Ref<Shader> basePbrStatic = Library<Shader>::GetInstance().GetDefaultShader();
-				Ref<Shader> basePbrAnim = Library<Shader>::GetInstance().Get("BasePBR_anim");
+				Ref<Shader> defaultShader = Library<Shader>::GetInstance().GetDefaultShader();
 
 				for (size_t i = 0; i < 4; i++)
 				{
-					iblPbrStatic->Bind();
-					iblPbrStatic->SetFloat3("lightColors[" + std::to_string(i) + "]", glm::vec3{ -1.0f });
-
-					iblPbrAnim->Bind();
-					iblPbrAnim->SetFloat3("lightColors[" + std::to_string(i) + "]", glm::vec3{ -1.0f });
-
-					basePbrStatic->Bind();
-					basePbrStatic->SetFloat3("u_Uniform.lightColors[" + std::to_string(i) + "]", glm::vec3{ -1.0f });
-
-					basePbrAnim->Bind();
-					basePbrAnim->SetFloat3("u_Uniform.lightColors[" + std::to_string(i) + "]", glm::vec3{ -1.0f });
+					defaultShader->Bind();
+					defaultShader->SetFloat3("lightColors[" + std::to_string(i) + "]", glm::vec3{ -1.0f });
 				}
 			}
 		}
@@ -222,6 +193,13 @@ namespace X
 		// Directional light depth pass
 		{
 			auto view = mLevel->mRegistry.view<TransformComponent, DirectionalLightComponent>();
+
+			Ref<Shader> shader = Library<Shader>::GetInstance().GetDefaultShader();
+			shader->Bind();
+			shader->SetInt("shadowMap", 8);
+			Renderer3D::lightFBO->UnBindDepthTex3D(8);
+
+
 			for (auto e : view)
 			{
 				Entity entity = { e, mLevel };
@@ -240,18 +218,16 @@ namespace X
 					lightMatricesUBO->SetData(&lightMatrices[i], sizeof(glm::mat4x4), i * sizeof(glm::mat4x4));
 				}
 
-				Ref<Shader> shader = Library<Shader>::GetInstance().Get("IBL_pbr_static");
-				shader->Bind();
 				shader->SetMat4("view", camera.GetViewMatrix());
 				shader->SetFloat3("lightDir", glm::normalize(directionalLight.LightDir));
 				shader->SetFloat("farPlane", cameraFarPlane);
 				shader->SetInt("cascadeCount", shadowCascadeLevels.size());
-				shader->SetInt("shadowMap", 8);
+
 				for (size_t i = 0; i < shadowCascadeLevels.size(); ++i)
 				{
 					shader->SetFloat("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
 				}
-
+				Renderer3D::lightFBO->BindDepthTex3D(8);
 				//only one depth map now
 				break;
 			}
@@ -261,7 +237,6 @@ namespace X
 
 		// Light Depth pass
 		Renderer3D::lightFBO->Bind();
-		Renderer3D::lightFBO->BindDepthTex3D(8);
 		RenderCommand::SetViewport(0, 0, 2048, 2048);
 		RenderCommand::Clear();
 		RenderCommand::CullFrontOrBack(true); // peter panning

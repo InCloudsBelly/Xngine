@@ -355,8 +355,14 @@ namespace X
 
 	void OpenGLFramebuffer::BindDepthTex3D(uint32_t slot)
 	{
-		glActiveTexture(GL_TEXTURE8);
+		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, mDepthAttachment);
+	}
+
+	void OpenGLFramebuffer::UnBindDepthTex3D(uint32_t slot)
+	{
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	}
 }
 

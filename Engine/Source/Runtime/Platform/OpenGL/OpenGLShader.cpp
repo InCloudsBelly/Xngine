@@ -495,6 +495,12 @@ namespace X
 		glUseProgram(0);
 	}
 
+	void OpenGLShader::SetBool(const std::string& name, bool value)
+	{
+		GLint location = glGetUniformLocation(mRendererID, name.c_str());
+		glUniform1i(location, value);
+	}
+
 	void OpenGLShader::SetInt(const std::string& name, int value)
 	{
 		UploadUniformInt(name, value);
