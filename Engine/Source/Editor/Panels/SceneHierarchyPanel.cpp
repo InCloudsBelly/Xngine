@@ -58,6 +58,12 @@ namespace X
 						entity.AddComponent<PointLightComponent>();
 						SetSelectedEntity(entity);
 					}
+					if (ImGui::MenuItem("Create Directional Light"))
+					{
+						auto entity = mContext->CreateEntity("Directional Light");
+						entity.AddComponent<DirectionalLightComponent>();
+						SetSelectedEntity(entity);
+					}
 
 					ImGui::EndPopup();
 				}
@@ -349,6 +355,16 @@ namespace X
 					ImGui::CloseCurrentPopup();
 				}
 			}
+
+			if (!mSelectionContext.HasComponent<DirectionalLightComponent>())
+			{
+				if (ImGui::MenuItem("Directional Light"))
+				{
+					mSelectionContext.AddComponent<DirectionalLightComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
 
 			if (!mSelectionContext.HasComponent<SphereCollider3DComponent>())
 			{
@@ -805,6 +821,13 @@ namespace X
 				ImGui::Text("Light Color");
 				ImGui::SameLine();
 				ImGui::DragFloat3("##Light Color", (float*)&component.LightColor, 2.0f, 0.0f, 10000.0f, "%.1f");
+			});
+
+		DrawComponent<DirectionalLightComponent>("Directional Light", entity, [](auto& component)
+			{
+				ImGui::Text("Light Dir");
+				ImGui::SameLine();
+				ImGui::DragFloat3("##Light Dir", (float*)&component.LightDir, 0.01f, -1.0f, 1.0f, "%.2f");
 			});
 
 		DrawComponent<PythonScriptComponent>("Python Script", entity, [](auto& component)
