@@ -39,6 +39,9 @@ namespace X
 		[[nodiscard]] float GetNearPlane() const { return mNearClip; }
 		[[nodiscard]] float GetFarPlane() const { return mFarClip; }
 
+		[[nodiscard]] float GetFOV() const { return mFOV; }
+		[[nodiscard]] float GetAspect() const { return mAspectRatio; }
+
 		void SetCenter(const glm::vec3& center);
 
 	private:

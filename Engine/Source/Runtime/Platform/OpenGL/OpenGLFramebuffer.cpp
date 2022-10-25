@@ -1,6 +1,8 @@
 #include "Xpch.h"
 
 #include "Runtime/Platform/OpenGL/OpenGLFramebuffer.h"
+#include "Runtime/Platform/OpenGL/OpenGLTexture.h"
+
 #include <glad/glad.h>
 
 namespace X
@@ -162,11 +164,15 @@ namespace X
         if (mRendererID)
         {
             glDeleteFramebuffers(1, &mRendererID);
-      /*      glDeleteTextures(mColorAttachments.size(), mColorAttachments.data());
-            glDeleteTextures(1, &mDepthAttachment);*/
+            //glDeleteTextures(mColorAttachments.size(), mColorAttachments.data());
+           
+			if (mDepthAttachmentSpecification.TextureFormat == FramebufferTextureFormat::DEPTH32F_TEX3D)
+			{
+				glDeleteTextures(1, &mDepthAttachment);
+				mDepthAttachment = 0;
+			}
 
 			mColorAttachments.clear();
-			/*mDepthAttachment = 0;*/
         }
 
 		glGenFramebuffers(1, &mRendererID);
@@ -340,4 +346,18 @@ namespace X
 	{
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + slot, GL_TEXTURE_CUBE_MAP_POSITIVE_X + cubemapIndex, cubemapID, 0);
 	}
+
+
+	Ref<Texture3D> OpenGLFramebuffer::GetDepthTex3D() const
+	{
+		return CreateRef<OpenGLTexture3D>(mDepthAttachment, mSpecification.Width, mSpecification.Height);
+	}
+
+	void OpenGLFramebuffer::BindDepthTex3D(uint32_t slot)
+	{
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, mDepthAttachment);
+	}
+}
+
 }

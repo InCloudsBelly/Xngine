@@ -35,9 +35,12 @@ namespace X
 			return frustumCorners;
 		}
 
-		static glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane, const glm::vec3& lightDir, const glm::mat4& projview)
+		static glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane, float cameraFOV, float aspect, const glm::vec3& lightDir, const glm::mat4& view)
 		{
-			const auto corners = getFrustumCornersWorldSpace(projview);
+			const auto proj = glm::perspective(
+				glm::radians(cameraFOV), aspect, nearPlane,
+				farPlane);
+			const auto corners = getFrustumCornersWorldSpace(proj * view);
 
 			glm::vec3 center = glm::vec3(0, 0, 0);
 			for (const auto& v : corners)
@@ -89,22 +92,22 @@ namespace X
 			return lightProjection * lightView;
 		}
 
-		static std::vector<glm::mat4> getLightSpaceMatrices(float cameraNearPlane, float cameraFarPlane, const glm::vec3& lightDir, const glm::mat4& projview, const std::vector<float>& shadowCascadeLevels)
+		static std::vector<glm::mat4> getLightSpaceMatrices(float cameraNearPlane, float cameraFarPlane, float cameraFOV, float aspect, const glm::vec3& lightDir, const glm::mat4& projview, const std::vector<float>& shadowCascadeLevels)
 		{
 			std::vector<glm::mat4> ret;
 			for (size_t i = 0; i < shadowCascadeLevels.size() + 1; ++i)
 			{
 				if (i == 0)
 				{
-					ret.push_back(getLightSpaceMatrix(cameraNearPlane, shadowCascadeLevels[i], lightDir, projview));
+					ret.push_back(getLightSpaceMatrix(cameraNearPlane, shadowCascadeLevels[i], cameraFOV, aspect, lightDir, projview));
 				}
 				else if (i < shadowCascadeLevels.size())
 				{
-					ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1], shadowCascadeLevels[i], lightDir, projview));
+					ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1], shadowCascadeLevels[i], cameraFOV, aspect, lightDir, projview));
 				}
 				else
 				{
-					ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1], cameraFarPlane, lightDir, projview));
+					ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1], cameraFarPlane, cameraFOV, aspect, lightDir, projview));
 				}
 			}
 			return ret;
@@ -229,12 +232,26 @@ namespace X
 				float cameraFarPlane = camera.GetFarPlane();
 				std::vector<float> shadowCascadeLevels{ cameraFarPlane / 50.0f, cameraFarPlane / 25.0f, cameraFarPlane / 10.0f, cameraFarPlane / 2.0f };
 
-				const auto lightMatrices = Utils::getLightSpaceMatrices(cameraNearPlane, cameraFarPlane, glm::normalize(directionalLight.LightDir), camera.GetViewProjection(), shadowCascadeLevels);
+				const auto lightMatrices = Utils::getLightSpaceMatrices(cameraNearPlane, cameraFarPlane, camera.GetFOV(),
+					camera.GetAspect(), glm::normalize(directionalLight.LightDir), camera.GetViewMatrix(), shadowCascadeLevels);
 				Ref<UniformBuffer> lightMatricesUBO = Library<UniformBuffer>::GetInstance().Get("LightMatricesUniform");
 				for (size_t i = 0; i < lightMatrices.size(); i++)
 				{
 					lightMatricesUBO->SetData(&lightMatrices[i], sizeof(glm::mat4x4), i * sizeof(glm::mat4x4));
 				}
+
+				Ref<Shader> shader = Library<Shader>::GetInstance().Get("IBL_pbr_static");
+				shader->Bind();
+				shader->SetMat4("view", camera.GetViewMatrix());
+				shader->SetFloat3("lightDir", glm::normalize(directionalLight.LightDir));
+				shader->SetFloat("farPlane", cameraFarPlane);
+				shader->SetInt("cascadeCount", shadowCascadeLevels.size());
+				shader->SetInt("shadowMap", 8);
+				for (size_t i = 0; i < shadowCascadeLevels.size(); ++i)
+				{
+					shader->SetFloat("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
+				}
+
 				//only one depth map now
 				break;
 			}
@@ -244,6 +261,9 @@ namespace X
 
 		// Light Depth pass
 		Renderer3D::lightFBO->Bind();
+		Renderer3D::lightFBO->BindDepthTex3D(8);
+		RenderCommand::Clear();
+		RenderCommand::CullFrontOrBack(true); // peter panning
 		auto view = mLevel->mRegistry.view<TransformComponent, MeshComponent>();
 		for (auto e : view)
 		{
@@ -253,6 +273,7 @@ namespace X
 
 			mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Library<Shader>::GetInstance().Get("CSM_Depth"), (int)e);
 		}
+		RenderCommand::CullFrontOrBack(false);
 
 		// Render pass
 		RenderCommand::BindFrameBuffer(mainFramebuffer);

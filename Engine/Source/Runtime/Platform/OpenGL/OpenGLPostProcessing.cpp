@@ -37,6 +37,7 @@ namespace X
 
         shader->Bind();
         shader->SetInt("screenTexture", 0);
+        shader->SetInt("depthMap", 0);
         DoPostProcessing();
 
         return mFramebuffer->GetColorAttachmentRendererID();
