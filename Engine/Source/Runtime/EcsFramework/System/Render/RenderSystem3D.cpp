@@ -247,7 +247,14 @@ namespace X
 			auto& transform = entity.GetComponent<TransformComponent>();
 			auto& mesh = entity.GetComponent<MeshComponent>();
 
-			mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Library<Shader>::GetInstance().Get("CSM_Depth"), (int)e);
+			Ref<Shader> csmShader = Library<Shader>::GetInstance().Get("CSM_Depth");
+			csmShader->Bind();
+			if (mesh.mMesh->bPlayAnim)
+				csmShader->SetBool("u_Animated", true);
+			else
+				csmShader->SetBool("u_Animated", false);
+
+			mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), csmShader, (int)e);
 		}
 		RenderCommand::CullFrontOrBack(false);
 
