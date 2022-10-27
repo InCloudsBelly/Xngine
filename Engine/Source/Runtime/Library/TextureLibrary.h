@@ -13,5 +13,7 @@ namespace X
 		Library();
 		[[nodiscard]] Ref<Texture2D> GetDefaultTexture();
 		[[nodiscard]] Ref<Texture2D> GetWhiteTexture();
+
+		[[nodiscard]] Ref<Texture2D> GetOrCreateTexture(std::string path);
 	};
 }

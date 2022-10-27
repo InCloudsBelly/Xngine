@@ -311,16 +311,23 @@ namespace X
 			// Material 
 			out << YAML::Key << "bUseAlbedoMap" << YAML::Value << meshComponent.mMesh->mMaterial[0]->bUseAlbedoMap;
 			out << YAML::Key << "col" << YAML::Value << meshComponent.mMesh->mMaterial[0]->col;
-			
+			out << YAML::Key << "mAlbedoMapPath" << YAML::Value << meshComponent.mMesh->mMaterial[0]->mAlbedoMapPath;
+
+
 			out << YAML::Key << "bUseNormalMap" << YAML::Value << meshComponent.mMesh->mMaterial[0]->bUseNormalMap;
+			out << YAML::Key << "mNormalMapPath" << YAML::Value << meshComponent.mMesh->mMaterial[0]->mNormalMapPath;
 
 			out << YAML::Key << "bUseMetallicMap" << YAML::Value << meshComponent.mMesh->mMaterial[0]->bUseMetallicMap;
 			out << YAML::Key << "metallic" << YAML::Value << meshComponent.mMesh->mMaterial[0]->metallic;
+			out << YAML::Key << "mMetallicMapPath" << YAML::Value << meshComponent.mMesh->mMaterial[0]->mMetallicMapPath;
 
 			out << YAML::Key << "bUseRoughnessMap" << YAML::Value << meshComponent.mMesh->mMaterial[0]->bUseRoughnessMap;
 			out << YAML::Key << "roughness" << YAML::Value << meshComponent.mMesh->mMaterial[0]->roughness;
+			out << YAML::Key << "mRoughnessMapPath" << YAML::Value << meshComponent.mMesh->mMaterial[0]->mRoughnessMapPath;
 
 			out << YAML::Key << "bUseAoMap" << YAML::Value << meshComponent.mMesh->mMaterial[0]->bUseRoughnessMap;
+			out << YAML::Key << "mAoMapPath" << YAML::Value << meshComponent.mMesh->mMaterial[0]->mAoMapPath;
+
 			// End Material
 
 			out << YAML::EndMap;
@@ -332,7 +339,19 @@ namespace X
 			out << YAML::BeginMap;
 
 			auto& pointLightComponent = entity.GetComponent<PointLightComponent>();
+			out << YAML::Key << "pointIntensity" << YAML::Value << pointLightComponent.Intensity;
 			out << YAML::Key << "Color" << YAML::Value << pointLightComponent.LightColor;
+
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<DirectionalLightComponent>())
+		{
+			out << YAML::Key << "DirectionalLightComponent";
+			out << YAML::BeginMap;
+
+			auto& lightComponent = entity.GetComponent<DirectionalLightComponent>();
+			out << YAML::Key << "dirIntensity" << YAML::Value << lightComponent.Intensity;
 
 			out << YAML::EndMap;
 		}
@@ -511,20 +530,39 @@ namespace X
 					// Material
 					mc.mMesh->mMaterial[0]->bUseAlbedoMap = meshComponent["bUseAlbedoMap"].as<bool>();
 					mc.mMesh->mMaterial[0]->col = meshComponent["col"].as<glm::vec4>();
+					mc.mMesh->mMaterial[0]->mAlbedoMapPath = meshComponent["mAlbedoMapPath"].as<std::string>();
+
 					mc.mMesh->mMaterial[0]->bUseNormalMap = meshComponent["bUseNormalMap"].as<bool>();
+					mc.mMesh->mMaterial[0]->mNormalMapPath = meshComponent["mNormalMapPath"].as<std::string>();
+
 					mc.mMesh->mMaterial[0]->bUseMetallicMap = meshComponent["bUseMetallicMap"].as<bool>();
 					mc.mMesh->mMaterial[0]->metallic = meshComponent["metallic"].as<float>();
+					mc.mMesh->mMaterial[0]->mMetallicMapPath = meshComponent["mMetallicMapPath"].as<std::string>();
+
 					mc.mMesh->mMaterial[0]->bUseRoughnessMap = meshComponent["bUseRoughnessMap"].as<bool>();
 					mc.mMesh->mMaterial[0]->roughness = meshComponent["roughness"].as<float>();
+					mc.mMesh->mMaterial[0]->mRoughnessMapPath = meshComponent["mRoughnessMapPath"].as<std::string>();
+
 					mc.mMesh->mMaterial[0]->bUseAoMap = meshComponent["bUseAoMap"].as<bool>();
+					mc.mMesh->mMaterial[0]->mAoMapPath = meshComponent["mAoMapPath"].as<std::string>();
+
+					mc.mMesh->mMaterial[0]->LoadTextures();
 					// End Material
 				}
 
 				auto pointLightComponent = entity["PointLightComponent"];
 				if (pointLightComponent)
 				{
+					float intensity = pointLightComponent["pointIntensity"].as<float>();
 					glm::vec3 color = pointLightComponent["Color"].as<glm::vec3>();
-					auto& src = deserializedEntity.AddComponent<PointLightComponent>(color);
+					auto& src = deserializedEntity.AddComponent<PointLightComponent>(intensity, color);
+				}
+
+				auto directionalLightComponent = entity["DirectionalLightComponent"];
+				if (directionalLightComponent)
+				{
+					float intensity = directionalLightComponent["dirIntensity"].as<float>();
+					auto& src = deserializedEntity.AddComponent<DirectionalLightComponent>(intensity);
 				}
 			}
 		}

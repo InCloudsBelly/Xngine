@@ -12,10 +12,10 @@ namespace X
 	public:
 		DirectionalLightComponent() = default;
 		DirectionalLightComponent(const DirectionalLightComponent&) = default;
-		DirectionalLightComponent(const glm::vec3& lightDir)
-			:LightDir(lightDir) {}
+		DirectionalLightComponent(float intensity)
+			: Intensity(intensity) {}
 
-		glm::vec3 LightDir = glm::normalize(glm::vec3(20.0f, 50, 20.0f));
+		float Intensity = 1.0f;
 
 	};
 }

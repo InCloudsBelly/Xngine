@@ -25,9 +25,9 @@ namespace X
 		if (ModeManager::b3DMode)
 		{
 			mSystems.emplace_back(CreateScope<RenderSystem3D>(this));
-			mSystems.emplace_back(CreateScope<PhysicSystem3D>(this));
+			//mSystems.emplace_back(CreateScope<PhysicSystem3D>(this));
 			mSystems.emplace_back(CreateScope<EnvironmentSystem>(this));
-			mSystems.emplace_back(CreateScope<PythonScriptSystem>(this));
+			//mSystems.emplace_back(CreateScope<PythonScriptSystem>(this));
 		}
 		else
 		{

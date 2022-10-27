@@ -19,12 +19,17 @@ Entities:
       Path: Assets\Models\Sphere.obj
       bUseAlbedoMap: false
       col: [1, 1, 1, 1]
+      mAlbedoMapPath: ""
       bUseNormalMap: false
+      mNormalMapPath: ""
       bUseMetallicMap: false
       metallic: 0.100000001
+      mMetallicMapPath: ""
       bUseRoughnessMap: false
       roughness: 0.100000001
+      mRoughnessMapPath: ""
       bUseAoMap: false
+      mAoMapPath: ""
   - Entity: 7617012176787555479
     TagComponent:
       Tag: Model2
@@ -44,12 +49,17 @@ Entities:
       Path: Assets//Models//Box.obj
       bUseAlbedoMap: false
       col: [1, 1, 1, 1]
+      mAlbedoMapPath: ""
       bUseNormalMap: false
+      mNormalMapPath: ""
       bUseMetallicMap: false
       metallic: 0.100000001
+      mMetallicMapPath: ""
       bUseRoughnessMap: false
       roughness: 0.100000001
+      mRoughnessMapPath: ""
       bUseAoMap: false
+      mAoMapPath: ""
   - Entity: 15794395185893427742
     TagComponent:
       Tag: Floor
@@ -69,12 +79,17 @@ Entities:
       Path: Assets//Models//Box.obj
       bUseAlbedoMap: false
       col: [0, 0.601780295, 0.67181468, 1]
+      mAlbedoMapPath: ""
       bUseNormalMap: true
+      mNormalMapPath: ""
       bUseMetallicMap: false
       metallic: 0.100000001
+      mMetallicMapPath: ""
       bUseRoughnessMap: false
       roughness: 0.731999993
+      mRoughnessMapPath: ""
       bUseAoMap: false
+      mAoMapPath: ""
   - Entity: 8151843350312499595
     TagComponent:
       Tag: Camera
@@ -112,12 +127,17 @@ Entities:
       Path: Assets//Models//Box.obj
       bUseAlbedoMap: false
       col: [1, 1, 1, 1]
+      mAlbedoMapPath: ""
       bUseNormalMap: false
+      mNormalMapPath: ""
       bUseMetallicMap: false
       metallic: 0.100000001
+      mMetallicMapPath: ""
       bUseRoughnessMap: false
       roughness: 0.100000001
+      mRoughnessMapPath: ""
       bUseAoMap: false
+      mAoMapPath: ""
   - Entity: 712240269855225408
     TagComponent:
       Tag: Sphere
@@ -137,9 +157,23 @@ Entities:
       Path: Assets\Models\Sphere.obj
       bUseAlbedoMap: false
       col: [1, 1, 1, 1]
+      mAlbedoMapPath: ""
       bUseNormalMap: false
+      mNormalMapPath: ""
       bUseMetallicMap: false
       metallic: 0.100000001
+      mMetallicMapPath: ""
       bUseRoughnessMap: false
       roughness: 0.100000001
+      mRoughnessMapPath: ""
       bUseAoMap: false
+      mAoMapPath: ""
+  - Entity: 16143781570424148301
+    TagComponent:
+      Tag: Directional Light
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0.961166978, 1.4201858, 1.2031641]
+      Scale: [0.999997258, 0.999999523, 0.999997199]
+    DirectionalLightComponent:
+      dirIntensity: 1.07000005

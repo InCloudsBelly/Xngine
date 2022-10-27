@@ -124,8 +124,8 @@ namespace X
 		}
 		else
 		{
-			Library<CubeMapTexture>::GetInstance().Get("BlackCubeMap")->Bind(0);
-			Library<CubeMapTexture>::GetInstance().Get("BlackCubeMap")->Bind(1);
+			Library<CubeMapTexture>::GetInstance().Get("SkyBoxTexture")->Bind(0);
+			Library<CubeMapTexture>::GetInstance().Get("SkyBoxTexture")->Bind(1);
 			Library<Texture2D>::GetInstance().Get("BlackTexture")->Bind(2);
 		}
 

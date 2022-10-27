@@ -1,6 +1,7 @@
 #include "Xpch.h"
 
 #include "Runtime/EcsFramework/System/Render/RenderSystem3D.h"
+#include "Runtime/EcsFramework/System/Render/EnvironmentSystem.h"
 #include "Runtime/EcsFramework/Component/ComponentGroup.h"
 #include "Runtime/EcsFramework/Entity/Entity.h"
 
@@ -10,6 +11,7 @@
 #include "Runtime/Renderer/UniformBuffer.h"
 #include "Runtime/Library/ShaderLibrary.h"
 #include "Runtime/Resource/ConfigManager/ConfigManager.h"
+#include "Runtime/Resource/ModeManager/ModeManager.h"
 
 namespace X
 {
@@ -159,6 +161,22 @@ namespace X
 	{
 		Renderer3D::BeginScene(camera);
 
+		Ref<Shader> defaultShader = Library<Shader>::GetInstance().GetDefaultShader();
+		if (ModeManager::bHdrUse)
+			defaultShader->SetFloat("exposure", EnvironmentSystem::environmentSettings.exposure);
+		else
+			defaultShader->SetFloat("exposure", 1.0f);
+
+		// directional light reset
+		defaultShader->SetInt("cascadeCount", -2);
+		//for (size_t i = 0; i < 4; ++i)
+		//{
+		//	defaultShader->SetFloat("cascadePlaneDistances[" + std::to_string(i) + "]", 1);
+		//}
+		defaultShader->SetFloat3("lightDir", glm::vec3(0.0f));
+
+
+
 		//Point Light
 		{
 			auto view = mLevel->mRegistry.view<TransformComponent, PointLightComponent>();
@@ -168,20 +186,17 @@ namespace X
 				auto [transform, light] = view.get<TransformComponent, PointLightComponent>(entity);
 
 				glm::vec3 lightPos = transform.GetTranslation();
+				float intensity = light.Intensity;
 				glm::vec3 lightColor = light.LightColor;
-
-				Ref<Shader> defaultShader = Library<Shader>::GetInstance().GetDefaultShader();
 
 				defaultShader->Bind();
 				defaultShader->SetFloat3("lightPositions[" + std::to_string(i) + "]", lightPos);
-				defaultShader->SetFloat3("lightColors[" + std::to_string(i) + "]", lightColor);
+				defaultShader->SetFloat3("lightColors[" + std::to_string(i) + "]", intensity * lightColor);
 
 				i++;
 			}
 			if (i == 0)
 			{
-				Ref<Shader> defaultShader = Library<Shader>::GetInstance().GetDefaultShader();
-
 				for (size_t i = 0; i < 4; i++)
 				{
 					defaultShader->Bind();
@@ -190,13 +205,12 @@ namespace X
 			}
 		}
 
-		// Directional light depth pass
+		// Directional light
 		{
 			auto view = mLevel->mRegistry.view<TransformComponent, DirectionalLightComponent>();
 
-			Ref<Shader> shader = Library<Shader>::GetInstance().GetDefaultShader();
-			shader->Bind();
-			shader->SetInt("shadowMap", 8);
+			defaultShader->Bind();
+			defaultShader->SetInt("shadowMap", 8);
 			Renderer3D::lightFBO->UnBindDepthTex3D(8);
 
 
@@ -210,22 +224,26 @@ namespace X
 				float cameraFarPlane = camera.GetFarPlane();
 				std::vector<float> shadowCascadeLevels{ cameraFarPlane / 50.0f, cameraFarPlane / 25.0f, cameraFarPlane / 10.0f, cameraFarPlane / 2.0f };
 
+
+				glm::vec3 lightDir = glm::normalize(glm::eulerAngles(glm::quat(transform.Rotation)));
+
 				const auto lightMatrices = Utils::getLightSpaceMatrices(cameraNearPlane, cameraFarPlane, camera.GetFOV(),
-					camera.GetAspect(), glm::normalize(directionalLight.LightDir), camera.GetViewMatrix(), shadowCascadeLevels);
+					camera.GetAspect(), lightDir, camera.GetViewMatrix(), shadowCascadeLevels);
 				Ref<UniformBuffer> lightMatricesUBO = Library<UniformBuffer>::GetInstance().Get("LightMatricesUniform");
 				for (size_t i = 0; i < lightMatrices.size(); i++)
 				{
 					lightMatricesUBO->SetData(&lightMatrices[i], sizeof(glm::mat4x4), i * sizeof(glm::mat4x4));
 				}
 
-				shader->SetMat4("view", camera.GetViewMatrix());
-				shader->SetFloat3("lightDir", glm::normalize(directionalLight.LightDir));
-				shader->SetFloat("farPlane", cameraFarPlane);
-				shader->SetInt("cascadeCount", shadowCascadeLevels.size());
+				defaultShader->SetMat4("view", camera.GetViewMatrix());
+				defaultShader->SetFloat3("lightDir", lightDir);
+				defaultShader->SetFloat("farPlane", cameraFarPlane);
+				defaultShader->SetInt("cascadeCount", shadowCascadeLevels.size());
+				defaultShader->SetFloat("dirLightIntensity", directionalLight.Intensity);
 
 				for (size_t i = 0; i < shadowCascadeLevels.size(); ++i)
 				{
-					shader->SetFloat("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
+					defaultShader->SetFloat("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
 				}
 				Renderer3D::lightFBO->BindDepthTex3D(8);
 				//only one depth map now
@@ -237,7 +255,7 @@ namespace X
 
 		// Light Depth pass
 		Renderer3D::lightFBO->Bind();
-		RenderCommand::SetViewport(0, 0, 2048, 2048);
+		RenderCommand::SetViewport(0, 0, Renderer3D::lightFBO->GetSpecification().Width, Renderer3D::lightFBO->GetSpecification().Height);
 		RenderCommand::Clear();
 		RenderCommand::CullFrontOrBack(true); // peter panning
 		auto view = mLevel->mRegistry.view<TransformComponent, MeshComponent>();
@@ -258,6 +276,8 @@ namespace X
 		}
 		RenderCommand::CullFrontOrBack(false);
 
+
+
 		// Render pass
 		RenderCommand::BindFrameBuffer(mainFramebuffer);
 		RenderCommand::SetViewport(0, 0, ConfigManager::mViewportSize.x, ConfigManager::mViewportSize.y);
@@ -276,10 +296,11 @@ namespace X
 
 				RenderCommand::SetStencilFunc(StencilFunc::NOTEQUAL, 1, 0xFF);
 				RenderCommand::StencilMask(0x00);
-				if (mesh.mMesh->bPlayAnim)
-					mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Library<Shader>::GetInstance().Get("NormalOutline_anim"), (int)e);
-				else
+				if (!mesh.mMesh->bPlayAnim)
 					mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Library<Shader>::GetInstance().Get("NormalOutline"), (int)e);
+				//else
+					//mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Library<Shader>::GetInstance().Get("NormalOutline_anim"), (int)e);
+				
 				RenderCommand::StencilMask(0xFF);
 				RenderCommand::SetStencilFunc(StencilFunc::ALWAYS, 0, 0xFF);
 				RenderCommand::ClearStencil();

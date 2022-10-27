@@ -14,5 +14,7 @@ namespace X
         {}
 
         std::string Path;
+        static bool UseScript;
+
     };
 }

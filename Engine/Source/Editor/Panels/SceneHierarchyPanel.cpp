@@ -636,7 +636,7 @@ namespace X
 				{
 					uint32_t matIndex = 0;
 
-					const auto& materialNode = [&matIndex = matIndex](const char* name, Ref<Material>& material, Ref<Texture2D>& tex, void(*func)(Ref<Material>& mat)) {
+					const auto& materialNode = [&matIndex = matIndex](const char* name, Ref<Material>& material, Ref<Texture2D>& tex, aiTextureType type, void(*func)(Ref<Material>& mat)) {
 						std::string label = std::string(name) + std::to_string(matIndex);
 						ImGui::PushID(label.c_str());
 						if (ImGui::TreeNode((void*)name, name))
@@ -651,6 +651,26 @@ namespace X
 									std::filesystem::path texturePath = ConfigManager::GetInstance().GetAssetsFolder() / path;
 									relativePath = std::regex_replace(relativePath, std::regex("\\\\"), "/");
 									tex = IconManager::GetInstance().LoadOrFindTexture(relativePath);
+								
+
+									switch (type)
+									{
+									case aiTextureType_DIFFUSE:
+										material->mAlbedoMapPath = relativePath;
+										break;
+									case aiTextureType_AMBIENT:
+										material->mAoMapPath = relativePath;
+										break;
+									case aiTextureType_NORMALS:
+										material->mNormalMapPath = relativePath;
+										break;
+									case aiTextureType_SPECULAR:
+										material->mMetallicMapPath = relativePath;
+										break;
+									case aiTextureType_DIFFUSE_ROUGHNESS:
+										material->mRoughnessMapPath = relativePath;
+										break;
+									}
 								}
 								ImGui::EndDragDropTarget();
 							}
@@ -669,7 +689,7 @@ namespace X
 
 						if (ImGui::TreeNode((void*)label.c_str(), std::to_string(matIndex).c_str()))
 						{
-							materialNode("Albedo", material, material->mAlbedoMap, [](Ref<Material>& mat) {
+							materialNode("Albedo", material, material->mAlbedoMap, aiTextureType_DIFFUSE,[](Ref<Material>& mat) {
 								ImGui::SameLine();
 								ImGui::Checkbox("Use", &mat->bUseAlbedoMap);
 
@@ -687,13 +707,13 @@ namespace X
 								}
 								});
 
-							materialNode("Normal", material, material->mNormalMap, [](Ref<Material>& mat) {
+							materialNode("Normal", material, material->mNormalMap, aiTextureType_NORMALS,[](Ref<Material>& mat) {
 								ImGui::SameLine();
 								ImGui::Checkbox("Use", &mat->bUseNormalMap);
 								});
 
 							
-							materialNode("Metallic", material, material->mMetallicMap, [](Ref<Material>& mat) {
+							materialNode("Metallic", material, material->mMetallicMap, aiTextureType_SPECULAR,[](Ref<Material>& mat) {
 								ImGui::SameLine();
 
 								if (ImGui::BeginTable("Metallic", 1))
@@ -725,7 +745,7 @@ namespace X
 
 
 
-							materialNode("Roughness", material, material->mRoughnessMap, [](Ref<Material>& mat) {
+							materialNode("Roughness", material, material->mRoughnessMap, aiTextureType_DIFFUSE_ROUGHNESS,[](Ref<Material>& mat) {
 								ImGui::SameLine();
 
 								if (ImGui::BeginTable("Roughness", 1))
@@ -755,7 +775,7 @@ namespace X
 								});
 
 
-							materialNode("Ambient Occlusion", material, material->mAoMap, [](Ref<Material>& mat) {
+							materialNode("Ambient Occlusion", material, material->mAoMap, aiTextureType_AMBIENT,[](Ref<Material>& mat) {
 								ImGui::SameLine();
 								ImGui::Checkbox("Use", &mat->bUseAoMap);
 								});
@@ -818,22 +838,31 @@ namespace X
 
 		DrawComponent<PointLightComponent>("Point Light", entity, [](auto& component)
 			{
-				ImGui::Text("Light Color");
-				ImGui::SameLine();
-				ImGui::DragFloat3("##Light Color", (float*)&component.LightColor, 2.0f, 0.0f, 10000.0f, "%.1f");
+				ImGuiWrapper::DrawTwoUI(
+					[]() { ImGui::Text("Light Intensity"); },
+					[&component = component]() { ImGui::SliderFloat("##Light Intensity", &component.Intensity, 0.0f, 10000.0f, "%.1f"); }
+				);
+
+				ImGuiWrapper::DrawTwoUI(
+					[]() { ImGui::Text("Light Color"); },
+					[&component = component]() { ImGui::ColorEdit3("##Light Color", (float*)&component.LightColor); }
+				);
 			});
 
 		DrawComponent<DirectionalLightComponent>("Directional Light", entity, [](auto& component)
 			{
-				ImGui::Text("Light Dir");
-				ImGui::SameLine();
-				ImGui::DragFloat3("##Light Dir", (float*)&component.LightDir, 0.01f, -1.0f, 1.0f, "%.2f");
+				ImGuiWrapper::DrawTwoUI(
+					[]() { ImGui::Text("Light Intensity"); },
+					[&component = component]() { ImGui::SliderFloat("##Light Intensity", &component.Intensity, 0.0f, 10.0f, "%.2f"); }
+				);
 			});
 
 		DrawComponent<PythonScriptComponent>("Python Script", entity, [](auto& component)
 			{
+				ImGui::Columns(2, nullptr, false);
+				ImGui::SetColumnWidth(0, 100.0f);
 				ImGui::Text("Python Script");
-				ImGui::SameLine();
+				ImGui::NextColumn();
 				ImGui::Text(component.Path.c_str());
 
 				ImGui::SameLine();
@@ -847,6 +876,12 @@ namespace X
 						component.Path = filepath;
 					}
 				}
+				ImGui::EndColumns();
+
+				ImGuiWrapper::DrawTwoUI(
+					[]() { ImGui::Text("Use"); },
+					[&component = component]() { ImGui::Checkbox("##Py Script Use", &component.UseScript); }
+				);
 			});
 	}
 }

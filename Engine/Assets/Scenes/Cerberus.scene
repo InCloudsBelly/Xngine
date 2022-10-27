@@ -1,0 +1,52 @@
+Scene: Untitled
+Entities:
+  - Entity: 12552804923778293813
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 1.48352981
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 15259686778746511975
+    TagComponent:
+      Tag: Gun
+    TransformComponent:
+      Translation: [-0.372335374, -4.22275209, -14.5396652]
+      Rotation: [-1.54427135, 0.455259919, 0.0677645504]
+      Scale: [2.09151602, 2.0915215, 2.09153986]
+    MeshComponent:
+      Path: Assets\Models\cerberus\cerberus.fbx
+      bUseAlbedoMap: true
+      col: [1, 1, 1, 1]
+      mAlbedoMapPath: Assets/Models/cerberus/Textures/Cerberus_A.png
+      bUseNormalMap: true
+      mNormalMapPath: Assets/Models/cerberus/Textures/Cerberus_N.png
+      bUseMetallicMap: true
+      metallic: 0.100000001
+      mMetallicMapPath: Assets/Models/cerberus/Textures/Cerberus_M.png
+      bUseRoughnessMap: true
+      roughness: 0.899999976
+      mRoughnessMapPath: Assets/Models/cerberus/Textures/Cerberus_R.png
+      bUseAoMap: true
+      mAoMapPath: Assets/Textures/DefaultTexture.png
+  - Entity: 15221416280751507656
+    TagComponent:
+      Tag: Point Light
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointLightComponent:
+      pointIntensity: 100
+      Color: [1, 1, 1]

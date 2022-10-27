@@ -78,59 +78,9 @@ namespace X
 		mRenderPass = CreateRef<RenderPass>(rpSpec);
 		mRenderPass->AddPostProcessing(PostProcessingType::MSAA); // default
 
-
 		mActiveScene = CreateRef<Level>();
 
 		mEditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
-
-#if 0
-        // Entity
-        Entity square = mActiveScene->CreateEntity("Green Square");
-        square.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
-
-        Entity redSquare = mActiveScene->CreateEntity("Red Square");
-        redSquare.AddComponent<SpriteRendererComponent>(glm::vec4{ 1.0f, 0.0f, 0.0f, 1.0f });
-
-        mSquareEntity = square;
-
-        mCameraEntity = mActiveScene->CreateEntity("Camera A");
-        mCameraEntity.AddComponent<CameraComponent>();
-
-        mSecondCamera = mActiveScene->CreateEntity("Camera B");
-        mSecondCamera.AddComponent<CameraComponent>().Primary = false;
-
-        class CameraController : public ScriptableEntity
-        {
-        public:
-            void OnCreate()
-            {
-                auto& translation = GetComponent<TransformComponent>().Translation;
-                translation.x = rand() % 10 - 5.0f;
-            }
-
-            void OnDestroy()
-            {
-            }
-
-            void OnUpdate(Timestep ts)
-            {
-                auto& translation = GetComponent<TransformComponent>().Translation;
-                float speed = 5.0f;
-
-                if (Input::IsKeyPressed(KeyCode::A))
-                    translation.x -= speed * ts;
-                if (Input::IsKeyPressed(KeyCode::D))
-                    translation.x += speed * ts;
-                if (Input::IsKeyPressed(KeyCode::W))
-                    translation.y += speed * ts;
-                if (Input::IsKeyPressed(KeyCode::S))
-                    translation.y -= speed * ts;
-            }
-        };
-
-        mCameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-        mSecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-#endif
     }
 
     void EditorLayer::OnDetach()
@@ -150,7 +100,6 @@ namespace X
 			mEditorCamera.SetViewportSize(ConfigManager::mViewportSize.x, ConfigManager::mViewportSize.y);
 			mActiveScene->OnViewportResize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
 			PostProcessing::mFramebuffer->Resize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
-			Renderer3D::lightFBO->Resize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
 		}
 
         // Render
@@ -201,7 +150,7 @@ namespace X
 		}
 
 
-		OnOverlayRender();
+		//OnOverlayRender();
 
         mFramebuffer->Unbind();
     }
@@ -641,7 +590,7 @@ namespace X
 	void EditorLayer::LoadDefaultEditorConfig()
 	{
 		const std::filesystem::path CurrentEditorConfigPath{ AssetManager::GetFullPath("imgui.ini") };
-		const std::filesystem::path DefaultEditorConfigPath{ AssetManager::GetFullPath("Assets/Config/imgui.ini") };
+		const std::filesystem::path DefaultEditorConfigPath{ AssetManager::GetFullPath("Config/imgui.ini") };
 
 		X_CORE_ASSERT(std::filesystem::exists(DefaultEditorConfigPath));
 		if (std::filesystem::exists(CurrentEditorConfigPath))
@@ -652,10 +601,17 @@ namespace X
 		bShowContentBrowser = true;
 		bShowSceneHierachy = true;
 		bShowProperties = true;
-		bShowStats = true;
+		bShowStats = false;
 		bShowEngineSettings = true;
 		bShowSceneSettings = true;
-		
+		bShowSRT = true;
+
+		// Help
+		bShowTutorial = false;
+		bShowAboutMe = false;
+		bShowDemoImGui = false;
+
+
 		// seems imgui docking branch has some bugs with load ini file?
 
 		//auto& io = ImGui::GetIO();
@@ -813,7 +769,7 @@ namespace X
 
     void EditorLayer::OpenScene()
     {
-        std::string filepath = FileDialogs::OpenFile("X Level (*.he)\0*.he\0");
+        std::string filepath = FileDialogs::OpenFile("X Level (*.scene)\0*.scene\0");
 		if (!filepath.empty())
 			OpenScene(filepath);
     }
@@ -855,7 +811,7 @@ namespace X
 
     void EditorLayer::SaveSceneAs()
     {
-        std::string filepath = FileDialogs::SaveFile("X Level (*.he)\0*.he\0");
+        std::string filepath = FileDialogs::SaveFile("X Level (*.scene)\0*.scene\0");
         if (!filepath.empty())
         {
 			SerializeScene(mActiveScene, filepath);
