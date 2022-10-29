@@ -52,7 +52,7 @@ namespace X
 	{
 		Log::Init();
 
-		mWindow= Window::Create(WindowProps(name));
+		mWindow = Window::Create(WindowProps(name));
 		mWindow->SetEventCallback(X_BIND_EVENT_FN(Application::OnEvent));
 
 		mImGuiLayer = ImGuiLayer::Create();
@@ -109,5 +109,3 @@ namespace X
 		return false;
 	}
 }
-
-

@@ -5,7 +5,7 @@
 
 #include <vector>
 
-namespace X 
+namespace X
 {
 
 	class XNGINE_API LayerStack

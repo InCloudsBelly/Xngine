@@ -15,7 +15,7 @@ int main(int argc, char** argv);
 
 namespace X
 {
-	class Application: public PublicSingleton<Application>
+	class Application : public PublicSingleton<Application>
 	{
 	public:
 		Application() = default;
@@ -48,10 +48,7 @@ namespace X
 		float m_LastFrameTime = 0.0f;
 	private:
 		friend int ::main(int argc, char** argv);
-		
+
 		friend void AppInitialize(Application& app);
 	};
 }
-
-
-
