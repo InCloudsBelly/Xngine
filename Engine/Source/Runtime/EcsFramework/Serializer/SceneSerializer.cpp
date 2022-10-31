@@ -325,7 +325,7 @@ namespace X
 			out << YAML::Key << "roughness" << YAML::Value << meshComponent.mMesh->mMaterial[0]->roughness;
 			out << YAML::Key << "mRoughnessMapPath" << YAML::Value << meshComponent.mMesh->mMaterial[0]->mRoughnessMapPath;
 
-			out << YAML::Key << "bUseAoMap" << YAML::Value << meshComponent.mMesh->mMaterial[0]->bUseRoughnessMap;
+			out << YAML::Key << "bUseAoMap" << YAML::Value << meshComponent.mMesh->mMaterial[0]->bUseAoMap;
 			out << YAML::Key << "mAoMapPath" << YAML::Value << meshComponent.mMesh->mMaterial[0]->mAoMapPath;
 
 			// End Material

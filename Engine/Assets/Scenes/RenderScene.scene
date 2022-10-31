@@ -1,0 +1,193 @@
+Scene: Untitled
+Entities:
+  - Entity: 12552804923778293813
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      Translation: [0, 82.5236435, 194.07428]
+      Rotation: [-0.570722699, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      Camera:
+        ProjectionType: 0
+        PerspectiveFOV: 1.48352981
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+      Primary: true
+      FixedAspectRatio: false
+  - Entity: 15259686778746511975
+    TagComponent:
+      Tag: Lion
+    TransformComponent:
+      Translation: [-46.6393929, 14.3160305, 105.788811]
+      Rotation: [0.133393392, -0.0371294171, 0.0139626199]
+      Scale: [49.9999962, 50, 50]
+    MeshComponent:
+      Path: Assets\Models\bakemyscan\bakemyscan.ply
+      bUseAlbedoMap: true
+      col: [1, 1, 1, 1]
+      mAlbedoMapPath: Assets/Models/bakemyscan/albedo.jpg
+      bUseNormalMap: true
+      mNormalMapPath: Assets/Models/bakemyscan/normal.jpg
+      bUseMetallicMap: true
+      metallic: 0.100000001
+      mMetallicMapPath: Assets/Models/bakemyscan/metallic.jpg
+      bUseRoughnessMap: true
+      roughness: 0.899999976
+      mRoughnessMapPath: Assets/Models/bakemyscan/roughness.jpg
+      bUseAoMap: true
+      mAoMapPath: Assets/Models/bakemyscan/ao.jpg
+  - Entity: 15221416280751507656
+    TagComponent:
+      Tag: Point Light
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointLightComponent:
+      pointIntensity: 100
+      Color: [1, 1, 1]
+  - Entity: 9045881148342227418
+    TagComponent:
+      Tag: Free Helmet
+    TransformComponent:
+      Translation: [-4.77720213, -4.40563965, -15.7930899]
+      Rotation: [0, 0.139626339, 0]
+      Scale: [50, 50, 50]
+    MeshComponent:
+      Path: Assets\Models\free-sci-fi-helmet\head.ply
+      bUseAlbedoMap: true
+      col: [1, 1, 1, 1]
+      mAlbedoMapPath: Assets/Models/free-sci-fi-helmet/head_albedo.jpg
+      bUseNormalMap: true
+      mNormalMapPath: Assets/Models/free-sci-fi-helmet/head_normal.png
+      bUseMetallicMap: true
+      metallic: 0.100000001
+      mMetallicMapPath: Assets/Models/free-sci-fi-helmet/head_metallic.jpg
+      bUseRoughnessMap: true
+      roughness: 0.899999976
+      mRoughnessMapPath: Assets/Models/free-sci-fi-helmet/head_roughness.jpg
+      bUseAoMap: false
+      mAoMapPath: Assets/Models/free-sci-fi-helmet/head_ao.jpg
+  - Entity: 13664357790993800949
+    TagComponent:
+      Tag: visor1
+    TransformComponent:
+      Translation: [-4.77997589, -4.41003609, -15.7900028]
+      Rotation: [0, 0.139626399, 0]
+      Scale: [49.9999847, 50, 49.9999847]
+    MeshComponent:
+      Path: Assets\Models\free-sci-fi-helmet\visor01.ply
+      bUseAlbedoMap: true
+      col: [1, 1, 1, 1]
+      mAlbedoMapPath: Assets/Models/free-sci-fi-helmet/visor01_albedo.jpg
+      bUseNormalMap: true
+      mNormalMapPath: Assets/Models/free-sci-fi-helmet/visor01_normal.png
+      bUseMetallicMap: true
+      metallic: 0.100000001
+      mMetallicMapPath: Assets/Models/free-sci-fi-helmet/visor01_metallic.jpg
+      bUseRoughnessMap: true
+      roughness: 0.899999976
+      mRoughnessMapPath: Assets/Models/free-sci-fi-helmet/visor01_roughness.jpg
+      bUseAoMap: false
+      mAoMapPath: Assets/Models/free-sci-fi-helmet/visor01_ao.jpg
+  - Entity: 359266504945850451
+    TagComponent:
+      Tag: Directional Light
+    TransformComponent:
+      Translation: [-279.685028, 47.4741631, 12.8532801]
+      Rotation: [0.0207694191, 0.0303687286, 0.0422369689]
+      Scale: [1, 0.999999762, 0.999999762]
+    DirectionalLightComponent:
+      dirIntensity: 1
+  - Entity: 16042295891877220026
+    TagComponent:
+      Tag: Sphere
+    TransformComponent:
+      Translation: [-111.096237, 1.30965066, 72.1150055]
+      Rotation: [0, 0, 0]
+      Scale: [20, 20, 20]
+    MeshComponent:
+      Path: Assets\Models\Sphere.obj
+      bUseAlbedoMap: true
+      col: [1, 1, 1, 1]
+      mAlbedoMapPath: Assets/Textures/Pbr/wrinkled-paper/albedo.png
+      bUseNormalMap: true
+      mNormalMapPath: Assets/Textures/Pbr/wrinkled-paper/normal.png
+      bUseMetallicMap: true
+      metallic: 0.100000001
+      mMetallicMapPath: Assets/Textures/Pbr/wrinkled-paper/metallic.png
+      bUseRoughnessMap: true
+      roughness: 0.899999976
+      mRoughnessMapPath: Assets/Textures/Pbr/wrinkled-paper/roughness.png
+      bUseAoMap: true
+      mAoMapPath: Assets/Textures/Pbr/wrinkled-paper/ao.png
+  - Entity: 89014970716431686
+    TagComponent:
+      Tag: Box1
+    TransformComponent:
+      Translation: [26.5096416, 77.1087265, 115.669594]
+      Rotation: [-1.66849518, 1.11578667, -1.20155644]
+      Scale: [10, 10, 10]
+    MeshComponent:
+      Path: Assets\Models\Box.obj
+      bUseAlbedoMap: true
+      col: [1, 1, 1, 1]
+      mAlbedoMapPath: Assets/Textures/Pbr/ornate-celtic-gold/albedo.png
+      bUseNormalMap: true
+      mNormalMapPath: Assets/Textures/Pbr/ornate-celtic-gold/normal.png
+      bUseMetallicMap: true
+      metallic: 0.100000001
+      mMetallicMapPath: Assets/Textures/Pbr/ornate-celtic-gold/metallic.png
+      bUseRoughnessMap: true
+      roughness: 0.899999976
+      mRoughnessMapPath: Assets/Textures/Pbr/ornate-celtic-gold/roughness.png
+      bUseAoMap: true
+      mAoMapPath: Assets/Textures/Pbr/ornate-celtic-gold/ao.png
+  - Entity: 14821100196949315954
+    TagComponent:
+      Tag: Plane
+    TransformComponent:
+      Translation: [-6.96324423e-05, -51.3023682, 49.3333588]
+      Rotation: [-3.14159226, 0, -3.14159226]
+      Scale: [183.724655, 1.58000004, 118.230003]
+    MeshComponent:
+      Path: Assets\Models\Box.fbx
+      bUseAlbedoMap: true
+      col: [1, 1, 1, 1]
+      mAlbedoMapPath: Assets/Textures/Pbr/paint-peeling/albedo.png
+      bUseNormalMap: true
+      mNormalMapPath: Assets/Textures/Pbr/paint-peeling/normal.png
+      bUseMetallicMap: true
+      metallic: 0.100000001
+      mMetallicMapPath: Assets/Textures/Pbr/paint-peeling/metallic.png
+      bUseRoughnessMap: true
+      roughness: 0.899999976
+      mRoughnessMapPath: Assets/Textures/Pbr/paint-peeling/roughness.png
+      bUseAoMap: true
+      mAoMapPath: Assets/Textures/Pbr/paint-peeling/ao.png
+  - Entity: 13951029373404688458
+    TagComponent:
+      Tag: Gun
+    TransformComponent:
+      Translation: [-0.227030516, -6.63317776, 60.4755211]
+      Rotation: [-1.57079637, 0, 0.157079622]
+      Scale: [1, 0.999930978, 0.999902129]
+    MeshComponent:
+      Path: Assets\Models\cerberus\cerberus.fbx
+      bUseAlbedoMap: true
+      col: [1, 1, 1, 1]
+      mAlbedoMapPath: Assets/Models/cerberus/Textures/Cerberus_A.png
+      bUseNormalMap: true
+      mNormalMapPath: Assets/Models/cerberus/Textures/Cerberus_N.png
+      bUseMetallicMap: true
+      metallic: 0.100000001
+      mMetallicMapPath: Assets/Models/cerberus/Textures/Cerberus_M.png
+      bUseRoughnessMap: true
+      roughness: 0.899999976
+      mRoughnessMapPath: Assets/Models/cerberus/Textures/Cerberus_R.png
+      bUseAoMap: false
+      mAoMapPath: Assets/Models/cerberus/Textures/Cerberus_M.png

@@ -124,9 +124,9 @@ namespace X
 		}
 		else
 		{
-			Library<CubeMapTexture>::GetInstance().Get("SkyBoxTexture")->Bind(0);
-			Library<CubeMapTexture>::GetInstance().Get("SkyBoxTexture")->Bind(1);
-			Library<Texture2D>::GetInstance().Get("BlackTexture")->Bind(2);
+			Library<CubeMapTexture>::GetInstance().Get("EnvironmentIrradiance")->Bind(0);
+			Library<CubeMapTexture>::GetInstance().Get("EnvironmentPrefilter")->Bind(1);
+			Library<Texture2D>::GetInstance().Get("BRDF_LUT")->Bind(2);
 		}
 
 		if (model->mMaterial[mMaterialIndex]->bUseAlbedoMap)
