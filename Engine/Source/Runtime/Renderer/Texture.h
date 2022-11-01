@@ -1,13 +1,28 @@
 #pragma once
 
 #include "Runtime/Core/Base/Base.h"
-
+#include "Runtime/Renderer/Image.h"
 #include <string>
 #include <filesystem>
 
 
 namespace X
 {
+    enum class TextureFormat
+    {
+        None = 0,
+        RGB = 1,
+        RGBA = 2,
+        Float16 = 3
+    };
+
+    enum class TextureType
+    {
+        None = 0,
+        Texture2D,
+        TextureCube
+    };
+
     class Texture
     {
     public:
@@ -27,13 +42,52 @@ namespace X
         virtual bool operator==(const Texture& other) const = 0;
     };
 
+    enum class FilterType
+    {
+        None = 0,
+        Linear,
+    };
+    enum class WrapType
+    {
+        None = 0,
+        Repeat,
+        ClampToEdge,
+        ClampToBorder
+    };
+
+    enum class DataFormat
+    {
+        None =0,
+        RGBA,
+        RGBA8,
+        RGB,
+        Alpha,
+
+    };
+
     class Texture2D : public Texture
     {
     public:
-        static Ref<Texture2D> Create(uint32_t width, uint32_t height);
+        static Ref<Texture2D> Create(uint32_t width, uint32_t height,
+            DataFormat internal = DataFormat::RGBA8,
+            DataFormat external = DataFormat::RGBA8,
+            DataFormat data = DataFormat::RGBA,
+            FilterType min = FilterType::Linear,
+            FilterType mag = FilterType::Linear,
+            WrapType wraps = WrapType::Repeat,
+            WrapType wrapt = WrapType::Repeat
+        );
         static Ref<Texture2D> Create(const std::filesystem::path& path);
         static Ref<Texture2D> Create(const std::string& path);
+
+        virtual void setBindUnit(unsigned int unit) = 0;
+        virtual unsigned int GetUnit() = 0;
+
+        virtual unsigned int GetInternalFormat() = 0;
+       
     };
+
+
 
     class Texture3D : public Texture
     {
@@ -65,6 +119,5 @@ namespace X
         [[nodiscard]] virtual std::vector<std::string> GetPaths() = 0;
     };
 }
-
 
 

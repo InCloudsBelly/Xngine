@@ -103,3 +103,6 @@ namespace X
 
 #include "Runtime/Core/Log/Log.h"
 #include "Runtime/Core/Base/Assert.h"
+
+using byte = uint8_t;
+

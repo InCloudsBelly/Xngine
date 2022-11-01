@@ -8,11 +8,20 @@
 
 namespace X
 {
+	static GLenum GetOpenGLBarrierType(BarrierType& type)
+	{
+		if (type == BarrierType::ShaderImageAccess) return GL_SHADER_IMAGE_ACCESS_BARRIER_BIT;
+
+		X_CORE_ASSERT(false, "Unknown BarrierType!");
+		return 0;
+	}
+
 	static GLenum ShaderTypeFromString(const std::string& type)
 	{
 		if (type == "vertex") return GL_VERTEX_SHADER;
 		if (type == "fragment" || type == "pixel") return GL_FRAGMENT_SHADER;
 		if (type == "geometry") return GL_GEOMETRY_SHADER;
+		if (type == "compute") return GL_COMPUTE_SHADER;
 
 		X_CORE_ASSERT(false, "Unknown shader type!");
 		return 0;
@@ -92,6 +101,22 @@ namespace X
 		UploadUniformMat4(name, value);
 	}
 
+	void NativeOpenGLShader::setImage(unsigned int imageBindUnit, Ref<Texture2D> tex)
+	{
+		if (imageBindUnit != -1)
+		{
+			if (mBindingImageTextureSet.find(tex) == mBindingImageTextureSet.end())
+			{
+				glBindImageTexture(imageBindUnit, tex->GetRendererID(), 0, GL_FALSE, 0, GL_READ_WRITE, tex->GetInternalFormat());
+				mBindingImageTextureSet.insert(tex);
+			}
+			else
+			{
+				glBindImageTexture(imageBindUnit, tex->GetRendererID(), 0, GL_FALSE, 0, GL_READ_WRITE, tex->GetInternalFormat());
+			}
+		}
+	}
+
 	void NativeOpenGLShader::UploadUniformInt(const std::string& name, int value)
 	{
 		GLint location = glGetUniformLocation(mRendererID, name.c_str());
@@ -139,6 +164,22 @@ namespace X
 	{
 		GLint location = glGetUniformLocation(mRendererID, name.c_str());
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+	}
+
+	void NativeOpenGLShader::GetLocalGroupSize(std::vector<int>& localGroupSize)
+	{
+		localGroupSize.resize(3);
+		glGetProgramiv(mRendererID, GL_COMPUTE_WORK_GROUP_SIZE, localGroupSize.data());
+	}
+
+	void NativeOpenGLShader::ComputeDispatch(int globalSize0, int globalSize1, int globalSize2)
+	{
+		glDispatchCompute(globalSize0, globalSize1, globalSize2);
+	}
+
+	void NativeOpenGLShader::setBarrier(BarrierType type)
+	{
+		glMemoryBarrier(GetOpenGLBarrierType(type));
 	}
 
 	std::string NativeOpenGLShader::ReadFile(const std::string& filepath)

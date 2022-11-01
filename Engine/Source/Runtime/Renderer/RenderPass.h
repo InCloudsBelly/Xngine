@@ -6,28 +6,27 @@ namespace X
 {
 	struct  RenderPassSpecification
 	{
-		Ref<Framebuffer> TargetFramebuffer = nullptr;
-		std::string DebugName = "";
+		Ref<Framebuffer> TargetFramebuffer;
+		std::string DebugName;
 
 	};
 
 	class RenderPass
 	{
 	public:
-		RenderPass(RenderPassSpecification Spec) : mSpecification(Spec) {};
 		virtual ~RenderPass() = default;
 
-	public:
-		RenderPassSpecification& GetSpecification() { return mSpecification; };
-		const RenderPassSpecification& GetSpecification() const { return mSpecification; };
+		virtual RenderPassSpecification& GetSpecification() = 0; 
+		virtual const RenderPassSpecification& GetSpecification() const = 0; 
 
-		void AddPostProcessing(PostProcessingType type);
+		virtual std::vector<Scope<PostProcessing>>& GetPostProcessings() = 0;
+		virtual const std::vector<Scope<PostProcessing>>& GetPostProcessings() const = 0;
 
-		uint32_t ExcuteAndReturnFinalTex();
+		virtual void AddPostProcessing(PostProcessingType type) = 0;
 
-	public:
-		std::vector<Scope<PostProcessing>> mPostProcessings;
-	private:
-		RenderPassSpecification mSpecification;
+		virtual uint32_t ExcuteAndReturnFinalTex() = 0;
+
+
+		static Ref<RenderPass> Create(const RenderPassSpecification& spec);
 	};
 }

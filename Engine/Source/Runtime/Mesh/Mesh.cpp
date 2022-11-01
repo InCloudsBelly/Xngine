@@ -273,38 +273,38 @@ namespace X
 				{
 				case aiTextureType_DIFFUSE:
 				case aiTextureType_BASE_COLOR:
-					texture.type = TextureType::Albedo;
+					texture.type = Mat_TextureType::Albedo;
 					mMaterial[subMeshIndex]->mAlbedoMap = texture.texture2d;
 					mMaterial[subMeshIndex]->bUseAlbedoMap = true;
 					break;
 				case aiTextureType_HEIGHT:
-					texture.type = TextureType::Height;
+					texture.type = Mat_TextureType::Height;
 					break;
 				case aiTextureType_AMBIENT:
 				case aiTextureType_AMBIENT_OCCLUSION:
-					texture.type = TextureType::AmbientOcclusion;
+					texture.type = Mat_TextureType::AmbientOcclusion;
 					mMaterial[subMeshIndex]->mAoMap = texture.texture2d;
 					mMaterial[subMeshIndex]->bUseAoMap = true;
 					break;
 				case aiTextureType_NORMALS:
 				case aiTextureType_NORMAL_CAMERA:
-					texture.type = TextureType::Normal;
+					texture.type = Mat_TextureType::Normal;
 					mMaterial[subMeshIndex]->mNormalMap = texture.texture2d;
 					mMaterial[subMeshIndex]->bUseNormalMap = true;
 					break;
 				case aiTextureType_SPECULAR:
 				case aiTextureType_METALNESS:
-					texture.type = TextureType::Metalness;
+					texture.type = Mat_TextureType::Metalness;
 					mMaterial[subMeshIndex]->mMetallicMap = texture.texture2d;
 					mMaterial[subMeshIndex]->bUseMetallicMap = true;
 					break;
 				case aiTextureType_DIFFUSE_ROUGHNESS:
-					texture.type = TextureType::Roughness;
+					texture.type = Mat_TextureType::Roughness;
 					mMaterial[subMeshIndex]->mRoughnessMap = texture.texture2d;
 					mMaterial[subMeshIndex]->bUseRoughnessMap = true;
 					break;
 				case aiTextureType_EMISSIVE:
-					texture.type = TextureType::Emission;
+					texture.type = Mat_TextureType::Emission;
 					break;
 				}
 				texture.path = str.C_Str();

@@ -6,12 +6,21 @@
 
 #include <glm/glm.hpp>
 
+#include "Runtime/Renderer/Texture.h"
+
 namespace X
 {
     // from https://github.dev/dtrajko/MoravaEngine/tree/bca0095d04d18f4ec8f04c670a74aaa1339f000a/MoravaEngine/src/Hazel/Renderer
     enum class ShaderUniformType
     {
         None = 0, Bool, Int, UInt, Float, Vec2, Vec3, Vec4, Mat3, Mat4
+    };
+
+    enum class BarrierType
+    {
+        None = 0,
+        ShaderImageAccess,
+
     };
 
     class ShaderUniform
@@ -66,10 +75,15 @@ namespace X
         virtual void SetFloat3(const std::string& name, const glm::vec3& value) = 0;
         virtual void SetFloat4(const std::string& name, const glm::vec4& value) = 0;
         virtual void SetMat4(const std::string& name, const glm::mat4& value) = 0;
-        
+        virtual void setImage(unsigned int imageBindUnit, Ref<Texture2D> tex) = 0;
+
         virtual void SetUniform(const std::string& fullname, const glm::mat4& value) {};
 
         [[nodiscard]] virtual const std::string& GetName() const = 0;
+
+        virtual void GetLocalGroupSize(std::vector<int>& localGroupSize) =0;
+        virtual void ComputeDispatch(int globalSize0, int globalSize1, int globalSize2) = 0;
+        virtual void setBarrier(BarrierType type) = 0;
 
         static Ref<Shader> Create(const std::filesystem::path& filepath);
         static Ref<Shader> Create(const std::string& filepath);

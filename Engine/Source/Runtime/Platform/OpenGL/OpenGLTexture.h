@@ -9,7 +9,11 @@ namespace X
     class OpenGLTexture2D : public Texture2D
     {
     public:
-        OpenGLTexture2D(uint32_t width, uint32_t height);
+        OpenGLTexture2D(uint32_t width, uint32_t height,
+            DataFormat internal, DataFormat external, DataFormat data,
+            FilterType min, FilterType mag, 
+            WrapType wraps, WrapType wrapt);
+
         OpenGLTexture2D(const std::filesystem::path& path);
         virtual ~OpenGLTexture2D();
 
@@ -28,12 +32,28 @@ namespace X
         {
             return mRendererID == ((OpenGLTexture2D&)other).mRendererID;
         }
+
+       virtual void setBindUnit(unsigned int unit) override
+        {
+            mBindingUnit = unit;
+        }
+       virtual unsigned int GetUnit() override
+        {
+            return mBindingUnit;
+        }
+
+       virtual GLenum GetInternalFormat() override
+        {
+            return mInternalFormat;
+        }
+
     private:
+        GLint mBindingUnit = -1;
         std::filesystem::path mPath;
 		bool mIsLoaded = false;
         uint32_t mWidth, mHeight;
         uint32_t mRendererID;
-        GLenum mInternalFormat, mDataFormat;
+        GLenum mInternalFormat, mExternalFormat, mDataFormat;
     };
 
 

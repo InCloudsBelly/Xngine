@@ -9,7 +9,8 @@ namespace X
     {
         Add("BasePBR", Shader::CreateNative(AssetManager::GetFullPath("Shaders/BasePBR.glsl")));
         Add("SkyBox", Shader::Create(AssetManager::GetFullPath("Shaders/SkyBox.glsl")));
-
+        
+        Add("ComputeTest", Shader::CreateNative(AssetManager::GetFullPath("Shaders/ComputeTest.glsl")));
 
         Add("IBL_background", Shader::CreateNative(AssetManager::GetFullPath("Shaders/IBL/background.glsl")));
         Add("IBL_brdf", Shader::CreateNative(AssetManager::GetFullPath("Shaders/IBL/brdf.glsl")));

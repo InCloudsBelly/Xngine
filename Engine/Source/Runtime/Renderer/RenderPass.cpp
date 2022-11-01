@@ -1,38 +1,23 @@
 #include "Xpch.h"
 #include "Runtime/Renderer/RenderPass.h"
 #include "Runtime/Renderer/Renderer.h"
-#include "Runtime/Platform/OpenGL/OpenGLPostProcessing.h"
+#include "Runtime/Platform/OpenGL/OpenGLRenderPass.h"
 
 namespace X
 {
-    void RenderPass::AddPostProcessing(PostProcessingType type) 
+
+    Ref<RenderPass> RenderPass::Create(const RenderPassSpecification& spec)
     {
         switch (RendererAPI::Current())
         {
-        case RendererAPI::RendererAPIType::None:    X_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return;
-        case RendererAPI::RendererAPIType::OpenGL:  mPostProcessings.emplace_back(CreateScope<OpenGLPostProcessing>(type)); return;
-        case RendererAPI::RendererAPIType::Vulkan:  return;
-        case RendererAPI::RendererAPIType::DX11:    return;
-        case RendererAPI::RendererAPIType::DX12:    return;
+        case RendererAPI::RendererAPIType::None:    X_CORE_ASSERT(false, "RendererAPI_::None is currently not supported!"); return Ref<RenderPass>();
+        case RendererAPI::RendererAPIType::OpenGL:  return CreateRef<OpenGLRenderPass>(spec);
+        case RendererAPI::RendererAPIType::Vulkan:  return nullptr;
+        case RendererAPI::RendererAPIType::DX11:    return nullptr;
         }
 
         X_CORE_ASSERT(false, "Unknown RendererAPI!");
-        return;
-
-	}
-
-    uint32_t RenderPass::ExcuteAndReturnFinalTex()
-    {
-        PostProcessing::mIntermediateScreenTex = Texture2D::Create(
-            mSpecification.TargetFramebuffer->GetSpecification().Width,
-            mSpecification.TargetFramebuffer->GetSpecification().Height
-        );
-
-        uint32_t final = 0;
-        for (auto& effect : mPostProcessings)
-        {
-            final = effect->ExcuteAndReturnFinalTex(mSpecification.TargetFramebuffer);
-        }
-        return final;
+        return Ref<RenderPass>();
     }
+
 }

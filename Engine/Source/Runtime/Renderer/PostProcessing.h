@@ -13,6 +13,7 @@ namespace X
 		Cartoon,
 		GrayScale,
 		GaussianBlur,
+		ComputeTest,
 	};
 
 	class PostProcessing

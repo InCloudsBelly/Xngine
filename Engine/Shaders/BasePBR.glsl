@@ -343,8 +343,9 @@ void main()
         float NdotL = max(dot(N, L), 0.0);
 
         vec3 radiance = vec3(10.0) * dirLightIntensity;
+        float shadow = ShadowCalculation(Input.WorldPos);
 
-        Lo += (diffuseBRDF + specularBRDF) * radiance * NdotL;
+        Lo += (1.0-shadow) * (diffuseBRDF + specularBRDF) * radiance * NdotL;
     }
 
     // ambient lighting (we now use IBL as the ambient term)
@@ -366,8 +367,8 @@ void main()
     vec3 ambient = (kD * diffuse + specular) * ao;
 
     // calculate shadow
-    float shadow = ShadowCalculation(Input.WorldPos);
-    vec3 color = ambient + (1.0 - shadow) * Lo;
+    
+    vec3 color = ambient +  Lo;
 
     // HDR tonemapping
     color = vec3(1.0) - exp(-color * exposure);

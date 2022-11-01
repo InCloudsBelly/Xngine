@@ -75,7 +75,7 @@ namespace X
 		mFramebuffer = Framebuffer::Create(fbSpec);
 
 		RenderPassSpecification rpSpec = { mFramebuffer, "MainPass" };
-		mRenderPass = CreateRef<RenderPass>(rpSpec);
+		mRenderPass = RenderPass::Create(rpSpec);
 		mRenderPass->AddPostProcessing(PostProcessingType::MSAA); // default
 
 		mActiveScene = CreateRef<Level>();
@@ -351,23 +351,28 @@ namespace X
 						mRenderPass->AddPostProcessing(PostProcessingType::GaussianBlur);
 						ImGui::CloseCurrentPopup();
 					}
+					if (ImGui::MenuItem("ComputeTest"))
+					{
+						mRenderPass->AddPostProcessing(PostProcessingType::ComputeTest);
+						ImGui::CloseCurrentPopup();
+					}
 
 					ImGui::EndPopup();
 				}
 
-				for (size_t i = 1; i < mRenderPass->mPostProcessings.size(); i++)
+				for (size_t i = 1; i < mRenderPass->GetPostProcessings().size(); i++)
 				{
-					ImGui::Selectable(PostProcessing::PostTypeToString(mRenderPass->mPostProcessings[i]->mType).c_str());
+					ImGui::Selectable(PostProcessing::PostTypeToString(mRenderPass->GetPostProcessings()[i]->mType).c_str());
 					
 					// imgui demo: Drag to reorder items (simple)
 					if (ImGui::IsItemActive() && !ImGui::IsItemHovered())
 					{
 						int next = i + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
-						if (next >= 1 && next < mRenderPass->mPostProcessings.size())
+						if (next >= 1 && next < mRenderPass->GetPostProcessings().size())
 						{
-							PostProcessingType tempType = mRenderPass->mPostProcessings[i]->mType;
-							mRenderPass->mPostProcessings[i]->mType = mRenderPass->mPostProcessings[next]->mType;
-							mRenderPass->mPostProcessings[next]->mType = tempType;
+							PostProcessingType tempType = mRenderPass->GetPostProcessings()[i]->mType;
+							mRenderPass->GetPostProcessings()[i]->mType = mRenderPass->GetPostProcessings()[next]->mType;
+							mRenderPass->GetPostProcessings()[next]->mType = tempType;
 							ImGui::ResetMouseDragDelta();
 						}
 					}
@@ -375,7 +380,7 @@ namespace X
 					if (ImGui::BeginPopupContextItem())
 					{
 						if (ImGui::MenuItem("Delete"))
-							mRenderPass->mPostProcessings.erase(mRenderPass->mPostProcessings.begin() + i);
+							mRenderPass->GetPostProcessings().erase(mRenderPass->GetPostProcessings().begin() + i);
 
 						ImGui::EndPopup();
 					}
@@ -409,7 +414,9 @@ namespace X
 			ConfigManager::mViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
 			uint32_t textureID = mFramebuffer->GetColorAttachmentRendererID();
+
 			textureID = mRenderPass->ExcuteAndReturnFinalTex();
+
 			ImGui::Image((void*)(intptr_t)textureID, ImVec2{ ConfigManager::mViewportSize.x, ConfigManager::mViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
 			if (ImGui::BeginDragDropTarget())

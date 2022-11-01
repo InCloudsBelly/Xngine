@@ -70,6 +70,9 @@ namespace X
         case X::PostProcessingType::GaussianBlur:
             return "GaussianBlur";
             break;
+        case X::PostProcessingType::ComputeTest:
+            return "ComputeTest";
+            break;
         default:
             break;
         }

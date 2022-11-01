@@ -207,7 +207,7 @@ namespace X
 	template<typename T, typename UIFunction>
 	static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction)
 	{
-		const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
+		const ImGuiTreeNodeFlags treeNodeFlags = /*ImGuiTreeNodeFlags_DefaultOpen |*/ ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
 
 		if (entity.HasComponent<T>())
 		{
@@ -457,6 +457,243 @@ namespace X
 				}
 			});
 
+
+		DrawComponent<MeshComponent>("Mesh Renderer", entity, [](MeshComponent& component)
+			{
+				ImGui::Columns(2, nullptr, false);
+				ImGui::SetColumnWidth(0, 100.0f);
+				ImGui::Text("Mesh Path");
+				ImGui::NextColumn();
+				std::string standardPath = std::regex_replace(component.Path, std::regex("\\\\"), "/");
+				ImGui::Text(standardPath.substr(standardPath.find_last_of("/") + 1, standardPath.length()).c_str());
+				ImGui::SameLine();
+				if (ImGui::Button("..."))
+				{
+					std::string filepath = FileDialogs::OpenFile("Model (*.obj *.fbx *.dae *.gltf)\0");
+					if (filepath.find("Assets") != std::string::npos)
+					{
+						filepath = filepath.substr(filepath.find("Assets"), filepath.length());
+					}
+					else
+					{
+						// TODO: Import Mesh
+						//X_CORE_ASSERT(false, "xngine Now Only support the model from Assets!");
+						//filepath = "";
+					}
+					if (!filepath.empty())
+					{
+						component.mMesh = CreateRef<Mesh>(filepath);
+						component.Path = filepath;
+					}
+				}
+				ImGui::EndColumns();
+
+				if (ImGuiWrapper::TreeNodeExStyle2((void*)"Material", "Material", ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					uint32_t matIndex = 0;
+
+					const auto& materialNode = [&matIndex = matIndex](const char* name, Ref<Material>& material, Ref<Texture2D>& tex, aiTextureType type, void(*func)(Ref<Material>& mat)) {
+						std::string label = std::string(name) + std::to_string(matIndex);
+						ImGui::PushID(label.c_str());
+						/*if (ImGui::TreeNode((void*)name, name))
+						{*/
+						ImGui::Text(name);
+							ImGui::Image((ImTextureID)tex->GetRendererID(), ImVec2(50,50), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+							if (ImGui::BeginDragDropTarget())
+							{
+								if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+								{
+									auto path = (const wchar_t*)payload->Data;
+									std::string relativePath = (std::filesystem::path("Assets") / path).string();
+									std::filesystem::path texturePath = ConfigManager::GetInstance().GetAssetsFolder() / path;
+									relativePath = std::regex_replace(relativePath, std::regex("\\\\"), "/");
+									tex = IconManager::GetInstance().LoadOrFindTexture(relativePath);
+
+
+									switch (type)
+									{
+									case aiTextureType_DIFFUSE:
+										material->mAlbedoMapPath = relativePath;
+										break;
+									case aiTextureType_AMBIENT:
+										material->mAoMapPath = relativePath;
+										break;
+									case aiTextureType_NORMALS:
+										material->mNormalMapPath = relativePath;
+										break;
+									case aiTextureType_SPECULAR:
+										material->mMetallicMapPath = relativePath;
+										break;
+									case aiTextureType_DIFFUSE_ROUGHNESS:
+										material->mRoughnessMapPath = relativePath;
+										break;
+									}
+								}
+								ImGui::EndDragDropTarget();
+							}
+
+							func(material);
+
+						/*	ImGui::TreePop();
+						}*/
+						ImGui::PopID();
+					};
+
+					for (auto& material : component.mMesh->mMaterial)
+					{
+						std::string label = std::string("material") + std::to_string(matIndex);
+						ImGui::PushID(label.c_str());
+
+						if (ImGuiWrapper::TreeNodeExStyle2((void*)label.c_str(), ("Material No." + std::to_string(matIndex)).c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+						//if (ImGui::TreeNode((void*)label.c_str(), ("Material No."+std::to_string(matIndex)).c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+						{
+							materialNode("Albedo", material, material->mAlbedoMap, aiTextureType_DIFFUSE, [](Ref<Material>& mat) {
+								ImGui::SameLine();
+								ImGui::Checkbox("Use", &mat->bUseAlbedoMap);
+
+								if (ImGui::ColorEdit4("##albedo", glm::value_ptr(mat->col)))
+								{
+									if (!mat->bUseAlbedoMap)
+									{
+										unsigned char data[4];
+										for (size_t i = 0; i < 4; i++)
+										{
+											data[i] = (unsigned char)(mat->col[i] * 255.0f);
+										}
+										mat->albedoRGBA->SetData(data, sizeof(unsigned char) * 4);
+									}
+								}
+								});
+
+							materialNode("Normal", material, material->mNormalMap, aiTextureType_NORMALS, [](Ref<Material>& mat) {
+								ImGui::SameLine();
+								ImGui::Checkbox("Use", &mat->bUseNormalMap);
+								});
+
+
+							materialNode("Metallic", material, material->mMetallicMap, aiTextureType_SPECULAR, [](Ref<Material>& mat) {
+								ImGui::SameLine();
+
+								if (ImGui::BeginTable("Metallic", 1))
+								{
+									ImGui::TableNextRow();
+									ImGui::TableNextColumn();
+
+									ImGui::Checkbox("Use", &mat->bUseMetallicMap);
+
+
+									ImGui::TableNextRow();
+									ImGui::TableNextColumn();
+									if (ImGui::SliderFloat("##Metallic", &mat->metallic, 0.0f, 1.0f))
+									{
+										if (!mat->bUseMetallicMap)
+										{
+											unsigned char data[4];
+											for (size_t i = 0; i < 3; i++)
+											{
+												data[i] = (unsigned char)(mat->metallic * 255.0f);
+											}
+											data[3] = (unsigned char)255.0f;
+											mat->metallicRGBA->SetData(data, sizeof(unsigned char) * 4);
+										}
+									}
+									ImGui::EndTable();
+								}
+								});
+
+
+
+							materialNode("Roughness", material, material->mRoughnessMap, aiTextureType_DIFFUSE_ROUGHNESS, [](Ref<Material>& mat) {
+								ImGui::SameLine();
+
+								if (ImGui::BeginTable("Roughness", 1))
+								{
+									ImGui::TableNextRow();
+									ImGui::TableNextColumn();
+
+									ImGui::Checkbox("Use", &mat->bUseRoughnessMap);
+
+									ImGui::TableNextRow();
+									ImGui::TableNextColumn();
+									if (ImGui::SliderFloat("##Roughness", &mat->roughness, 0.0f, 1.0f))
+									{
+										if (!mat->bUseRoughnessMap)
+										{
+											unsigned char data[4];
+											for (size_t i = 0; i < 3; i++)
+											{
+												data[i] = (unsigned char)(mat->roughness * 255.0f);
+											}
+											data[3] = (unsigned char)255.0f;
+											mat->roughnessRGBA->SetData(data, sizeof(unsigned char) * 4);
+										}
+									}
+									ImGui::EndTable();
+								}
+								});
+
+
+							materialNode("Ambient Occlusion", material, material->mAoMap, aiTextureType_AMBIENT, [](Ref<Material>& mat) {
+								ImGui::SameLine();
+								ImGui::Checkbox("Use", &mat->bUseAoMap);
+								});
+
+							ImGui::TreePop();
+						}
+						matIndex++;
+
+						ImGui::PopID();
+					}
+
+					ImGui::TreePop();
+				}
+
+				if (component.mMesh->bAnimated)
+				{
+					if (ImGuiWrapper::TreeNodeExStyle2((void*)"Animation", "Animation"))
+					{
+						ImGuiWrapper::DrawTwoUI(
+							[&mesh = component.mMesh]() {
+								static std::string label = "Play";
+								if (ImGui::Button(label.c_str()))
+								{
+									mesh->bPlayAnim = !mesh->bPlayAnim;
+									if (mesh->bPlayAnim)
+										label = "Stop";
+									else
+									{
+										label = "Play";
+										mesh->mAnimator.Reset();
+									}
+								}
+							},
+							[&mesh = component.mMesh]() {
+								static std::string label = "Pause";
+								if (ImGui::Button(label.c_str()))
+								{
+									mesh->bStopAnim = !mesh->bStopAnim;
+									if (mesh->bStopAnim)
+										label = "Resume";
+									else
+										label = "Pause";
+								}
+							},
+								88.0f
+								);
+
+						ImGui::Columns(2, nullptr, false);
+						ImGui::Text("Speed");
+						ImGui::NextColumn();
+						ImGui::SliderFloat("##Speed", &component.mMesh->mAnimPlaySpeed, 0.1f, 10.0f);
+						ImGui::EndColumns();
+
+						ImGui::ProgressBar(component.mMesh->mAnimator.GetProgress(), ImVec2(0.0f, 0.0f));
+
+						ImGui::TreePop();
+					}
+				}
+			});
+
 		DrawComponent<SpriteRendererComponent>("Sprite Render", entity, [](auto& component)
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
@@ -602,239 +839,7 @@ namespace X
 				floatValueUI("friction", component.friction);
 			});
 
-		DrawComponent<MeshComponent>("Mesh Renderer", entity, [](MeshComponent& component)
-			{
-				ImGui::Columns(2, nullptr, false);
-				ImGui::SetColumnWidth(0, 100.0f);
-				ImGui::Text("Mesh Path");
-				ImGui::NextColumn();
-				std::string standardPath = std::regex_replace(component.Path, std::regex("\\\\"), "/");
-				ImGui::Text(standardPath.substr(standardPath.find_last_of("/") + 1, standardPath.length()).c_str());
-				ImGui::SameLine();
-				if (ImGui::Button("..."))
-				{
-					std::string filepath = FileDialogs::OpenFile("Model (*.obj *.fbx *.dae *.gltf)\0");
-					if (filepath.find("Assets") != std::string::npos)
-					{
-						filepath = filepath.substr(filepath.find("Assets"), filepath.length());
-					}
-					else
-					{
-						// TODO: Import Mesh
-						//X_CORE_ASSERT(false, "xngine Now Only support the model from Assets!");
-						//filepath = "";
-					}
-					if (!filepath.empty())
-					{
-						component.mMesh = CreateRef<Mesh>(filepath);
-						component.Path = filepath;
-					}
-				}
-				ImGui::EndColumns();
-
-				if (ImGuiWrapper::TreeNodeExStyle2((void*)"Material", "Material"))
-				{
-					uint32_t matIndex = 0;
-
-					const auto& materialNode = [&matIndex = matIndex](const char* name, Ref<Material>& material, Ref<Texture2D>& tex, aiTextureType type, void(*func)(Ref<Material>& mat)) {
-						std::string label = std::string(name) + std::to_string(matIndex);
-						ImGui::PushID(label.c_str());
-						if (ImGui::TreeNode((void*)name, name))
-						{
-							ImGui::Image((ImTextureID)tex->GetRendererID(), ImVec2(64, 64), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-							if (ImGui::BeginDragDropTarget())
-							{
-								if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-								{
-									auto path = (const wchar_t*)payload->Data;
-									std::string relativePath = (std::filesystem::path("Assets") / path).string();
-									std::filesystem::path texturePath = ConfigManager::GetInstance().GetAssetsFolder() / path;
-									relativePath = std::regex_replace(relativePath, std::regex("\\\\"), "/");
-									tex = IconManager::GetInstance().LoadOrFindTexture(relativePath);
-								
-
-									switch (type)
-									{
-									case aiTextureType_DIFFUSE:
-										material->mAlbedoMapPath = relativePath;
-										break;
-									case aiTextureType_AMBIENT:
-										material->mAoMapPath = relativePath;
-										break;
-									case aiTextureType_NORMALS:
-										material->mNormalMapPath = relativePath;
-										break;
-									case aiTextureType_SPECULAR:
-										material->mMetallicMapPath = relativePath;
-										break;
-									case aiTextureType_DIFFUSE_ROUGHNESS:
-										material->mRoughnessMapPath = relativePath;
-										break;
-									}
-								}
-								ImGui::EndDragDropTarget();
-							}
-
-							func(material);
-
-							ImGui::TreePop();
-						}
-						ImGui::PopID();
-					};
-
-					for (auto& material : component.mMesh->mMaterial)
-					{
-						std::string label = std::string("material") + std::to_string(matIndex);
-						ImGui::PushID(label.c_str());
-
-						if (ImGui::TreeNode((void*)label.c_str(), std::to_string(matIndex).c_str()))
-						{
-							materialNode("Albedo", material, material->mAlbedoMap, aiTextureType_DIFFUSE,[](Ref<Material>& mat) {
-								ImGui::SameLine();
-								ImGui::Checkbox("Use", &mat->bUseAlbedoMap);
-
-								if (ImGui::ColorEdit4("##albedo", glm::value_ptr(mat->col)))
-								{
-									if (!mat->bUseAlbedoMap)
-									{
-										unsigned char data[4];
-										for (size_t i = 0; i < 4; i++)
-										{
-											data[i] = (unsigned char)(mat->col[i] * 255.0f);
-										}
-										mat->albedoRGBA->SetData(data, sizeof(unsigned char) * 4);
-									}
-								}
-								});
-
-							materialNode("Normal", material, material->mNormalMap, aiTextureType_NORMALS,[](Ref<Material>& mat) {
-								ImGui::SameLine();
-								ImGui::Checkbox("Use", &mat->bUseNormalMap);
-								});
-
-							
-							materialNode("Metallic", material, material->mMetallicMap, aiTextureType_SPECULAR,[](Ref<Material>& mat) {
-								ImGui::SameLine();
-
-								if (ImGui::BeginTable("Metallic", 1))
-								{
-									ImGui::TableNextRow();
-									ImGui::TableNextColumn();
-
-									ImGui::Checkbox("Use", &mat->bUseMetallicMap);
-
-
-									ImGui::TableNextRow();
-									ImGui::TableNextColumn();
-									if (ImGui::SliderFloat("##Metallic", &mat->metallic, 0.0f, 1.0f))
-									{
-										if (!mat->bUseMetallicMap)
-										{
-											unsigned char data[4];
-											for (size_t i = 0; i < 3; i++)
-											{
-												data[i] = (unsigned char)(mat->metallic * 255.0f);
-											}
-											data[3] = (unsigned char)255.0f;
-											mat->metallicRGBA->SetData(data, sizeof(unsigned char) * 4);
-										}
-									}
-									ImGui::EndTable();
-								}
-								});
-
-
-
-							materialNode("Roughness", material, material->mRoughnessMap, aiTextureType_DIFFUSE_ROUGHNESS,[](Ref<Material>& mat) {
-								ImGui::SameLine();
-
-								if (ImGui::BeginTable("Roughness", 1))
-								{
-									ImGui::TableNextRow();
-									ImGui::TableNextColumn();
-
-									ImGui::Checkbox("Use", &mat->bUseRoughnessMap);
-
-									ImGui::TableNextRow();
-									ImGui::TableNextColumn();
-									if (ImGui::SliderFloat("##Roughness", &mat->roughness, 0.0f, 1.0f))
-									{
-										if (!mat->bUseRoughnessMap)
-										{
-											unsigned char data[4];
-											for (size_t i = 0; i < 3; i++)
-											{
-												data[i] = (unsigned char)(mat->roughness * 255.0f);
-											}
-											data[3] = (unsigned char)255.0f;
-											mat->roughnessRGBA->SetData(data, sizeof(unsigned char) * 4);
-										}
-									}
-									ImGui::EndTable();
-								}
-								});
-
-
-							materialNode("Ambient Occlusion", material, material->mAoMap, aiTextureType_AMBIENT,[](Ref<Material>& mat) {
-								ImGui::SameLine();
-								ImGui::Checkbox("Use", &mat->bUseAoMap);
-								});
-
-							ImGui::TreePop();
-						}
-						matIndex++;
-
-						ImGui::PopID();
-					}
-
-					ImGui::TreePop();
-				}
-
-				if (component.mMesh->bAnimated)
-				{
-					if (ImGuiWrapper::TreeNodeExStyle2((void*)"Animation", "Animation"))
-					{
-						ImGuiWrapper::DrawTwoUI(
-							[&mesh = component.mMesh]() {
-								static std::string label = "Play";
-								if (ImGui::Button(label.c_str()))
-								{
-									mesh->bPlayAnim = !mesh->bPlayAnim;
-									if (mesh->bPlayAnim)
-										label = "Stop";
-									else
-									{
-										label = "Play";
-										mesh->mAnimator.Reset();
-									}
-								}
-							},
-							[&mesh = component.mMesh]() {
-								static std::string label = "Pause";
-								if (ImGui::Button(label.c_str()))
-								{
-									mesh->bStopAnim = !mesh->bStopAnim;
-									if (mesh->bStopAnim)
-										label = "Resume";
-									else
-										label = "Pause";
-								}	
-							},
-							88.0f
-						);
-
-						ImGui::Columns(2, nullptr, false);
-						ImGui::Text("Speed");
-						ImGui::NextColumn();
-						ImGui::SliderFloat("##Speed", &component.mMesh->mAnimPlaySpeed, 0.1f, 10.0f);
-						ImGui::EndColumns();
-
-						ImGui::ProgressBar(component.mMesh->mAnimator.GetProgress(), ImVec2(0.0f, 0.0f));
-
-						ImGui::TreePop();
-					}
-				}
-			});
+		
 
 		DrawComponent<PointLightComponent>("Point Light", entity, [](auto& component)
 			{

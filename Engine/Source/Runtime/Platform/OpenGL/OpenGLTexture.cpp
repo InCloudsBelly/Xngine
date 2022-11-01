@@ -9,21 +9,57 @@
 
 namespace X
 {
+
+    static GLenum GetOpenGLFilterType(FilterType& type)
+    {
+        if (type == FilterType::Linear) return GL_LINEAR;
+        
+        X_CORE_ASSERT(false, "Unknown Image FilterType");
+        return 0;
+    }
+
+    static GLenum GetOpenGLWrapType(WrapType& type)
+    {
+        if (type == WrapType::Repeat)           return GL_REPEAT;
+        if (type == WrapType::ClampToEdge)       return GL_CLAMP_TO_EDGE;
+        if (type == WrapType::ClampToBorder)    return GL_CLAMP_TO_BORDER;
+
+        X_CORE_ASSERT(false, "Unknown Image FilterType");
+        return 0;
+    }
+
+    static GLenum GetOpenGLDataFormat(DataFormat& format)
+    {
+        switch (format)
+        {
+        case DataFormat::Alpha:     return GL_ALPHA;
+        case DataFormat::RGB:       return GL_RGB;
+        case DataFormat::RGBA:      return GL_RGBA;
+        case DataFormat::RGBA8:     return GL_RGBA8;
+        }
+        X_CORE_ASSERT(false, "Unknown Data Format!");
+        return 0;
+    }
+
     // ---------------Tex2D--------------------
-    OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
+    OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height, 
+        DataFormat internal, DataFormat external, DataFormat data, 
+        FilterType min, FilterType mag, WrapType wraps, WrapType wrapt)
         : mWidth(width), mHeight(height)
     {
-        mInternalFormat = GL_RGBA8;
-        mDataFormat = GL_RGBA;
+        mInternalFormat = GetOpenGLDataFormat(internal);
+        mExternalFormat = GetOpenGLDataFormat(external);
+        mDataFormat = GetOpenGLDataFormat(data);
         
         glCreateTextures(GL_TEXTURE_2D, 1, &mRendererID);
+        //glTexImage2D(GL_TEXTURE_2D, 1, mInternalFormat, mWidth, mHeight, 0, mExternalFormat, mDataFormat,nullptr);
         glTextureStorage2D(mRendererID, 1, mInternalFormat, mWidth, mHeight);
 
-        glTextureParameteri(mRendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameteri(mRendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(mRendererID, GL_TEXTURE_MIN_FILTER, GetOpenGLFilterType(min));
+        glTextureParameteri(mRendererID, GL_TEXTURE_MAG_FILTER, GetOpenGLFilterType(mag));
 
-        glTextureParameteri(mRendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTextureParameteri(mRendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTextureParameteri(mRendererID, GL_TEXTURE_WRAP_S, GetOpenGLWrapType(wraps));
+        glTextureParameteri(mRendererID, GL_TEXTURE_WRAP_T, GetOpenGLWrapType(wrapt));
     }
 
     OpenGLTexture2D::OpenGLTexture2D(const std::filesystem::path& path)

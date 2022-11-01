@@ -18,7 +18,7 @@ namespace X
         }
     };
 
-    enum class TextureType
+    enum class Mat_TextureType
     {
         Albedo = 0,
         Normal,
@@ -33,7 +33,7 @@ namespace X
     struct MaterialTexture
     {
         Ref<Texture2D> texture2d = nullptr;
-        TextureType type;
+        Mat_TextureType type;
         std::string path;
     };
 
@@ -46,13 +46,13 @@ namespace X
         void SetShader(Ref<Shader> shader) { mShader = shader; }
         [[nodiscard]] Ref<Shader> GetShader() { return mShader; }
 
-        void AddTexture(TextureType type, Ref<Texture2D> texture)
+        void AddTexture(Mat_TextureType type, Ref<Texture2D> texture)
         {
             X_CORE_ASSERT(mTexMap.find(type) == mTexMap.end());
             mTexMap[type] = texture;
         }
 
-        [[nodiscard]] Ref<Texture2D> GetTexture(TextureType type) { return mTexMap[type]; }
+        [[nodiscard]] Ref<Texture2D> GetTexture(Mat_TextureType type) { return mTexMap[type]; }
 
         void LoadTextures();
     private:
@@ -90,6 +90,6 @@ namespace X
 
     private:
         Ref<Shader> mShader;
-        std::unordered_map<TextureType, Ref<Texture2D>, EnumClassHash> mTexMap;
+        std::unordered_map<Mat_TextureType, Ref<Texture2D>, EnumClassHash> mTexMap;
     };
 }
