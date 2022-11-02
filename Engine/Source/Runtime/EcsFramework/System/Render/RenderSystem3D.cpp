@@ -211,7 +211,7 @@ namespace X
 
 			defaultShader->Bind();
 			defaultShader->SetInt("shadowMap", 8);
-			Renderer3D::lightFBO->UnBindDepthTex3D(8);
+			Renderer3D::lightPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer->UnBindDepthTex3D(8);
 
 
 			for (auto e : view)
@@ -245,7 +245,7 @@ namespace X
 				{
 					defaultShader->SetFloat("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
 				}
-				Renderer3D::lightFBO->BindDepthTex3D(8);
+				Renderer3D::lightPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer->BindDepthTex3D(8);
 				//only one depth map now
 				break;
 			}
@@ -254,34 +254,42 @@ namespace X
 		uint32_t mainFramebuffer = RenderCommand::GetDrawFrameBuffer();
 
 		// Light Depth pass
-		Renderer3D::lightFBO->Bind();
-		RenderCommand::SetViewport(0, 0, Renderer3D::lightFBO->GetSpecification().Width, Renderer3D::lightFBO->GetSpecification().Height);
-		RenderCommand::Clear();
-		RenderCommand::CullFrontOrBack(true); // peter panning
-		auto view = mLevel->mRegistry.view<TransformComponent, MeshComponent>();
-		for (auto e : view)
+		
 		{
-			Entity entity = { e, mLevel };
-			auto& transform = entity.GetComponent<TransformComponent>();
-			auto& mesh = entity.GetComponent<MeshComponent>();
+			Ref<Framebuffer> shadowfb = Renderer3D::lightPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+			shadowfb->Bind();
+			RenderCommand::SetViewport(0, 0, shadowfb->GetSpecification().Width, shadowfb->GetSpecification().Height);
 
-			Ref<Shader> csmShader = Library<Shader>::GetInstance().Get("CSM_Depth");
-			csmShader->Bind();
-			if (mesh.mMesh->bPlayAnim)
-				csmShader->SetBool("u_Animated", true);
-			else
-				csmShader->SetBool("u_Animated", false);
+			RenderCommand::Clear();
+			RenderCommand::CullFrontOrBack(true); // peter panning
 
-			mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), csmShader, (int)e);
+
+			auto view = mLevel->mRegistry.view<TransformComponent, MeshComponent>();
+			for (auto e : view)
+			{
+				Entity entity = { e, mLevel };
+				auto& transform = entity.GetComponent<TransformComponent>();
+				auto& mesh = entity.GetComponent<MeshComponent>();
+
+				Ref<Shader> csmShader = Renderer3D::lightPipeline->GetSpecification().Shader;
+
+				csmShader->Bind();
+				if (mesh.mMesh->bPlayAnim)
+					csmShader->SetBool("u_Animated", true);
+				else
+					csmShader->SetBool("u_Animated", false);
+
+				mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Renderer3D::lightPipeline, (int)e);
+			}
+			RenderCommand::CullFrontOrBack(false);
 		}
-		RenderCommand::CullFrontOrBack(false);
-
 
 
 		// Render pass
-		RenderCommand::BindFrameBuffer(mainFramebuffer);
+		Renderer3D::GeometryPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer->Bind();
 		RenderCommand::SetViewport(0, 0, ConfigManager::mViewportSize.x, ConfigManager::mViewportSize.y);
 
+		auto view = mLevel->mRegistry.view<TransformComponent, MeshComponent>();
 		for (auto e : view)
 		{
 			Entity entity = { e, mLevel };
@@ -292,21 +300,21 @@ namespace X
 			{
 				RenderCommand::SetStencilFunc(StencilFunc::ALWAYS, 1, 0xFF);
 				RenderCommand::StencilMask(0xFF);
-				Renderer3D::DrawModel(transform.GetTransform(), camera.GetPosition(), mesh, (int)e);
+				mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Renderer3D::GeometryPipeline, (int)e);
 
 				RenderCommand::SetStencilFunc(StencilFunc::NOTEQUAL, 1, 0xFF);
 				RenderCommand::StencilMask(0x00);
 				if (!mesh.mMesh->bPlayAnim)
 					mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Library<Shader>::GetInstance().Get("NormalOutline"), (int)e);
-				//else
-					//mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Library<Shader>::GetInstance().Get("NormalOutline_anim"), (int)e);
+				else
+					mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Library<Shader>::GetInstance().Get("NormalOutline_anim"), (int)e);
 				
 				RenderCommand::StencilMask(0xFF);
 				RenderCommand::SetStencilFunc(StencilFunc::ALWAYS, 0, 0xFF);
 				RenderCommand::ClearStencil();
 			}
 			else
-				Renderer3D::DrawModel(transform.GetTransform(), camera.GetPosition(), mesh, (int)e);
+				mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Renderer3D::GeometryPipeline, (int)e);
 		}
 
 		Renderer3D::EndScene();

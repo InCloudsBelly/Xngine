@@ -5,6 +5,7 @@
 #include "Runtime/Renderer/IndexBuffer.h"
 #include "Runtime/Renderer/Shader.h"
 #include "Runtime/Renderer/Material.h"
+#include "Runtime/Renderer/Pipeline.h"
 
 #define MAX_BONE_INFLUENCE 4
 
@@ -48,6 +49,7 @@ namespace X
 		SubMesh(const std::vector<SkinnedVertex>& vertices, const std::vector<uint32_t> indices, const std::vector<MaterialTexture>& textures, uint32_t materialIndex = 0);
 
 		void Draw(const glm::mat4& transform, const glm::vec3& cameraPos, const Ref<Shader>& shader, int entityID, Mesh* model);
+		void Draw(const glm::mat4& transform, const glm::vec3& cameraPos, const Ref<Pipeline>& pipeline, int entityID, Mesh* model);
 		void Draw();
 
 	private:

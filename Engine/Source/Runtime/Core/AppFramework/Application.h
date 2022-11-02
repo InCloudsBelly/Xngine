@@ -45,7 +45,7 @@ namespace X
 		bool bRunning = true;
 		bool bMinimized = false;
 		LayerStack mLayerStack;
-		float m_LastFrameTime = 0.0f;
+		float mLastFrameTime = 0.0f;
 	private:
 		friend int ::main(int argc, char** argv);
 

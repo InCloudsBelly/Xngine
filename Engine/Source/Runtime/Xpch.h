@@ -22,7 +22,7 @@
 #include "Runtime/Core/Log/Log.h"
 #include "Runtime/Debug/Instrumentor.h"
 
-#ifdef X_PLATFORM_WINDOWS
+#ifdef X_PLATFORmWINDOWS
 	#include <Windows.h>
 #endif
 

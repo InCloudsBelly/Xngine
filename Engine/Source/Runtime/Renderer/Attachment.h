@@ -39,10 +39,10 @@
 //		Attachment(unsigned int width, unsigned int height, AttachmentType attachmentType, AttachmentFormat attachmentFormat, unsigned int orderID, uint32_t framebufferID);
 //		virtual ~Attachment();
 //
-//		inline uint32_t GetID() const { return m_ID; };
-//		inline uint32_t GetRendererID() const { return m_ID; };
-//		inline virtual uint32_t GetWidth() const override { return m_Width; };
-//		inline virtual uint32_t GetHeight() const override { return m_Height; };
+//		inline uint32_t GetID() const { return mID; };
+//		inline uint32_t GetRendererID() const { return mID; };
+//		inline virtual uint32_t GetWidth() const override { return mWidth; };
+//		inline virtual uint32_t GetHeight() const override { return mHeight; };
 //
 //		virtual void Bind(uint32_t slot) const = 0;
 //		virtual void Unbind() = 0;
@@ -57,14 +57,14 @@
 //		virtual std::pair<uint32_t, uint32_t> GetMipSize(uint32_t mip) const override;
 //
 //	protected:
-//		unsigned int m_ID;
-//		unsigned int m_Width;
-//		unsigned int m_Height;
-//		AttachmentType m_AttachmentType;
-//		AttachmentFormat m_AttachmentFormat;
-//		unsigned int m_OrderID; // used for color texture attachments GL_COLOR_ATTACHMENT0 + m_OrderID
+//		unsigned int mID;
+//		unsigned int mWidth;
+//		unsigned int mHeight;
+//		AttachmentType mAttachmentType;
+//		AttachmentFormat mAttachmentFormat;
+//		unsigned int mOrderID; // used for color texture attachments GL_COLOR_ATTACHMENT0 + mOrderID
 //
-//		uint32_t m_FramebufferID;
+//		uint32_t mFramebufferID;
 //
 //	};
 //}

@@ -20,7 +20,7 @@ namespace X
 		virtual void OnDetach() override;
 
 	private:
-		float m_Time = 0.0f;
+		float mTime = 0.0f;
 
 	};
 }

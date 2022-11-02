@@ -5,6 +5,7 @@
 #include "Runtime/Animation/animator.h"
 
 #include "Runtime/Renderer/Shader.h"
+#include "Runtime/Renderer/Pipeline.h"
 #include "Runtime/Mesh/SubMesh.h"
 #include "Runtime/Renderer/Texture.h"
 #include "Runtime/Renderer/Material.h"
@@ -39,6 +40,7 @@ namespace X
 		void SetShader(Ref<Shader> shader) { mMaterial[0]->SetShader(shader); };
 		void Draw(const glm::mat4& transform, const glm::vec3& cameraPos, int entityID);
 		void Draw(const glm::mat4& transform, const glm::vec3& cameraPos, Ref<Shader> shader, int entityID);
+		void Draw(const glm::mat4& transform, const glm::vec3& cameraPos, Ref<Pipeline> pipeline, int entityID);
 
 		void Draw();
 

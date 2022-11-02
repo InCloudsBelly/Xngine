@@ -27,11 +27,22 @@ namespace X
 			mSubMeshes[i].Draw(transform, cameraPos, mMaterial[0]->GetShader(), entityID, this);
 	}
 
+
+
 	void Mesh::Draw(const glm::mat4& transform, const glm::vec3& cameraPos, Ref<Shader> shader, int entityID)
 	{
 		for (unsigned int i = 0; i < mSubMeshes.size(); ++i)
 			mSubMeshes[i].Draw(transform, cameraPos, shader, entityID, this);
 	}
+
+
+	void Mesh::Draw(const glm::mat4& transform, const glm::vec3& cameraPos, Ref<Pipeline> pipeline, int entityID)
+	{
+		for (unsigned int i = 0; i < mSubMeshes.size(); ++i)
+			mSubMeshes[i].Draw(transform, cameraPos, pipeline, entityID, this);
+	}
+
+
 	void Mesh::Draw()
 	{
 		for (unsigned int i = 0; i < mSubMeshes.size(); ++i)
@@ -149,7 +160,7 @@ namespace X
 				vertex.Bitangent = glm::vec3{ 0.0f };
 			}
 
-			vertex.EntityID = -1;
+			//vertex.EntityID = -1;
 
 			vertices.push_back(vertex);
 		}

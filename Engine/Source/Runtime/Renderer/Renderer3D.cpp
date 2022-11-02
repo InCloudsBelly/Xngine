@@ -19,16 +19,95 @@
 namespace X
 {
 	Ref<Framebuffer> Renderer3D::lightFBO = nullptr;
+	Ref<Pipeline> Renderer3D::lightPipeline = nullptr;
+	Ref<Pipeline> Renderer3D::GeometryPipeline = nullptr;
 
 	void Renderer3D::Init()
 	{
-		FramebufferSpecification fbSpec;
-		fbSpec.Attachments = { FramebufferTextureFormat::DEPTH32F_TEX3D };
-		// light depth texture uses high resolution
-		fbSpec.Width = 4096;
-		fbSpec.Height = 4096;
+		//Directional light shadow pass
+		{
+			FramebufferSpecification fbSpec;
+			fbSpec.Attachments = { FramebufferTextureFormat::DEPTH32F_TEX3D };
+			// light depth texture uses high resolution
+			fbSpec.Width = 4096;
+			fbSpec.Height = 4096;
 
-		lightFBO = Framebuffer::Create(fbSpec);
+			lightFBO = Framebuffer::Create(fbSpec);
+
+			RenderPassSpecification ShadowPassSpec;
+			ShadowPassSpec.DebugName = "ShadowPass";
+			ShadowPassSpec.TargetFramebuffer = lightFBO;
+
+			PipelineSpecification pipelineSpec;
+			pipelineSpec.DebugName = ShadowPassSpec.DebugName;
+			pipelineSpec.Shader = Library<Shader>::GetInstance().Get("CSM_Depth");
+
+			pipelineSpec.StaticLayout = {
+				{ ShaderDataType::Float3, "a_Pos"},
+				{ ShaderDataType::Float3, "a_Normal"},
+				{ ShaderDataType::Float2, "a_TexCoord"},
+				{ ShaderDataType::Float3, "a_Tangent"},
+				{ ShaderDataType::Float3, "a_Bitangent"},
+				{ ShaderDataType::Int,	  "a_EntityID"},
+			};
+
+			pipelineSpec.AnimationLayout = {
+				{ ShaderDataType::Float3, "a_Pos"},
+				{ ShaderDataType::Float3, "a_Normal"},
+				{ ShaderDataType::Float2, "a_TexCoord"},
+				{ ShaderDataType::Float3, "a_Tangent"},
+				{ ShaderDataType::Float3, "a_Bitangent"},
+				{ ShaderDataType::Int,	  "a_EntityID"},
+				{ ShaderDataType::Int4,   "a_BoneIDs"},
+				{ ShaderDataType::Float4, "a_Weights"},
+			};
+
+
+			pipelineSpec.RenderPass = RenderPass::Create(ShadowPassSpec);
+			lightPipeline = Pipeline::Create(pipelineSpec);
+		}
+
+
+		//GeometryPipeline
+		{
+			FramebufferSpecification fbSpec;
+			fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::DEPTH24STENCIL8 };
+			fbSpec.Width = 1280;
+			fbSpec.Height = 720;
+			fbSpec.Samples = 4;
+			Ref<Framebuffer> GeoFramebuffer = Framebuffer::Create(fbSpec);
+
+			RenderPassSpecification geoSpec = { GeoFramebuffer, "MainPass" };
+
+			PipelineSpecification pipelineSpec;
+			pipelineSpec.DebugName = geoSpec.DebugName;
+			pipelineSpec.Shader = Library<Shader>::GetInstance().Get("BasePBR");
+			pipelineSpec.RenderPass = RenderPass::Create(geoSpec);
+			pipelineSpec.RenderPass->AddPostProcessing(PostProcessingType::MSAA);
+
+			pipelineSpec.StaticLayout = {
+				{ ShaderDataType::Float3, "a_Pos"},
+				{ ShaderDataType::Float3, "a_Normal"},
+				{ ShaderDataType::Float2, "a_TexCoord"},
+				{ ShaderDataType::Float3, "a_Tangent"},
+				{ ShaderDataType::Float3, "a_Bitangent"},
+				{ ShaderDataType::Int,	  "a_EntityID"},
+			};
+
+			pipelineSpec.AnimationLayout = {
+				{ ShaderDataType::Float3, "a_Pos"},
+				{ ShaderDataType::Float3, "a_Normal"},
+				{ ShaderDataType::Float2, "a_TexCoord"},
+				{ ShaderDataType::Float3, "a_Tangent"},
+				{ ShaderDataType::Float3, "a_Bitangent"},
+				{ ShaderDataType::Int,	  "a_EntityID"},
+				{ ShaderDataType::Int4,   "a_BoneIDs"},
+				{ ShaderDataType::Float4, "a_Weights"},
+			};
+
+			GeometryPipeline = Pipeline::Create(pipelineSpec);
+		}
+
 	}
 
 	void Renderer3D::Shutdown()

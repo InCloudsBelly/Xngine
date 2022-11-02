@@ -106,7 +106,7 @@ static void SetupVulkan(const char** extensions, uint32_t extensions_count)
         // Create Vulkan Instance without any debug feature
         err = vkCreateInstance(&create_info, g_Allocator, &g_Instance);
         check_vk_result(err);
-        IM_UNUSED(g_DebugReport);
+        ImUNUSED(g_DebugReport);
 #endif
     }
 

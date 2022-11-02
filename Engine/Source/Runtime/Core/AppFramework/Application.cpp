@@ -66,8 +66,8 @@ namespace X
 		while (bRunning)
 		{
 			float time = (float)glfwGetTime();
-			Timestep timestep = time - m_LastFrameTime;
-			m_LastFrameTime = time;
+			Timestep timestep = time - mLastFrameTime;
+			mLastFrameTime = time;
 
 			if (!bMinimized)
 			{

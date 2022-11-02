@@ -49,9 +49,9 @@ namespace X
         // Temp
         Ref<VertexArray> mSquareVA;
         Ref<Shader> mFlatColorShader;
-        Ref<Framebuffer> mFramebuffer;
+        Ref<Framebuffer> finalFramebuffer;
 
-        Ref<RenderPass> mRenderPass;
+        Ref<RenderPass> finalRenderPass;
 
         Ref<Level> mActiveScene;
         Ref<Level> mEditorScene;

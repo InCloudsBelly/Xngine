@@ -29,34 +29,34 @@
 //		void InvalidateOld(bool srgb, TextureWrap wrap, bool isHDR); // Temporary method
 //		virtual void Release() override;
 //
-//		virtual ImageFormat GetFormat() const override { return m_Format; }
-//		virtual uint32_t GetWidth() const override { return m_Width; }
-//		virtual uint32_t GetHeight() const override { return m_Height; }
+//		virtual ImageFormat GetFormat() const override { return mFormat; }
+//		virtual uint32_t GetWidth() const override { return mWidth; }
+//		virtual uint32_t GetHeight() const override { return mHeight; }
 //
-//		virtual float GetAspectRatio() const override { return (float)m_Specification.Width / (float)m_Specification.Height; }
+//		virtual float GetAspectRatio() const override { return (float)mSpecification.Width / (float)mSpecification.Height; }
 //
 //		void RT_Invalidate() {}
 //
-//		virtual Buffer GetBuffer() const override { return m_ImageData; }
-//		virtual Buffer& GetBuffer() override { return m_ImageData; }
+//		virtual Buffer GetBuffer() const override { return mImageData; }
+//		virtual Buffer& GetBuffer() override { return mImageData; }
 //
-//		virtual uint64_t GetHash() const override { return (uint64_t)m_RendererID; }
+//		virtual uint64_t GetHash() const override { return (uint64_t)mRendererID; }
 //
-//		uint32_t& GetRendererID() { return m_RendererID; }
-//		uint32_t GetRendererID() const { return m_RendererID; }
+//		uint32_t& GetRendererID() { return mRendererID; }
+//		uint32_t GetRendererID() const { return mRendererID; }
 //
-//		uint32_t& GetSamplerRendererID() { return m_SamplerRendererID; }
-//		uint32_t GetSamplerRendererID() const { return m_SamplerRendererID; }
+//		uint32_t& GetSamplerRendererID() { return mSamplerRendererID; }
+//		uint32_t GetSamplerRendererID() const { return mSamplerRendererID; }
 //
 //	private:
-//		ImageSpecification m_Specification;
+//		ImageSpecification mSpecification;
 //
-//		uint32_t m_RendererID = 0;
-//		uint32_t m_SamplerRendererID = 0;
-//		uint32_t m_Width, m_Height;
-//		ImageFormat m_Format;
+//		uint32_t mRendererID = 0;
+//		uint32_t mSamplerRendererID = 0;
+//		uint32_t mWidth, mHeight;
+//		ImageFormat mFormat;
 //
-//		Buffer m_ImageData;
+//		Buffer mImageData;
 //	};
 //
 //	namespace Utils {

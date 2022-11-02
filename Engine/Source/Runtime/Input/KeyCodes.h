@@ -213,7 +213,7 @@ namespace X
 #define X_KEY_END             ::X::Key::End
 #define X_KEY_CAPS_LOCK       ::X::Key::CapsLock
 #define X_KEY_SCROLL_LOCK     ::X::Key::ScrollLock
-#define X_KEY_NUM_LOCK        ::X::Key::NumLock
+#define X_KEY_NUmLOCK        ::X::Key::NumLock
 #define X_KEY_PRINT_SCREEN    ::X::Key::PrintScreen
 #define X_KEY_PAUSE           ::X::Key::Pause
 #define X_KEY_F1              ::X::Key::F1

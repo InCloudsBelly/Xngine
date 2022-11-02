@@ -12,7 +12,7 @@ target_include_directories(XngineRuntime
 )
 
 target_compile_definitions(XngineRuntime
-    PRIVATE X_PLATFORM_WINDOWS
+    PRIVATE X_PLATFORmWINDOWS
     PRIVATE X_BUILD_DLL
     PRIVATE GLFW_INCLUDE_NONE
     PRIVATE IMGUI_IMPL_OPENGL_LOADER_CUSTOM

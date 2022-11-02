@@ -21,7 +21,7 @@ namespace X
 		virtual void OnImGuiRender() override;
 
 	private:
-		float m_Time = 0.0f;
+		float mTime = 0.0f;
 
 	};
 }

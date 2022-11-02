@@ -9,17 +9,17 @@ namespace X
     {
         switch (type)
         {
-        case X::ShaderDataType::Float:     return GL_FLOAT;
-        case X::ShaderDataType::Float2:	 return GL_FLOAT;
-        case X::ShaderDataType::Float3:	 return GL_FLOAT;
-        case X::ShaderDataType::Float4:	 return GL_FLOAT;
-        case X::ShaderDataType::Mat3:		 return GL_FLOAT;
-        case X::ShaderDataType::Mat4:		 return GL_FLOAT;
-        case X::ShaderDataType::Int:		 return GL_INT;
-        case X::ShaderDataType::Int2:		 return GL_INT;
-        case X::ShaderDataType::Int3:		 return GL_INT;
-        case X::ShaderDataType::Int4:		 return GL_INT;
-        case X::ShaderDataType::Bool:		 return GL_BOOL;
+        case X::ShaderDataType::Float:		return GL_FLOAT;
+        case X::ShaderDataType::Float2:		return GL_FLOAT;
+        case X::ShaderDataType::Float3:		return GL_FLOAT;
+        case X::ShaderDataType::Float4:		return GL_FLOAT;
+        case X::ShaderDataType::Mat3:		return GL_FLOAT;
+        case X::ShaderDataType::Mat4:		return GL_FLOAT;
+        case X::ShaderDataType::Int:		return GL_INT;
+        case X::ShaderDataType::Int2:		return GL_INT;
+        case X::ShaderDataType::Int3:		return GL_INT;
+        case X::ShaderDataType::Int4:		return GL_INT;
+        case X::ShaderDataType::Bool:		return GL_BOOL;
         }
 
         X_CORE_ASSERT(false, "Unknown ShaderDataType!");

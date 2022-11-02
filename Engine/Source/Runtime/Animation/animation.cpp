@@ -32,11 +32,11 @@ namespace X
 		const aiScene* scene = importer.ReadFile(animationPath, s_MeshImportFlags);
 		assert(scene && scene->mRootNode);
 		auto animation = scene->mAnimations[0];
-		m_Duration = animation->mDuration;
-		m_TicksPerSecond = animation->mTicksPerSecond;
+		mDuration = animation->mDuration;
+		mTicksPerSecond = animation->mTicksPerSecond;
 		aiMatrix4x4 globalTransformation = scene->mRootNode->mTransformation;
 		globalTransformation = globalTransformation.Inverse();
-		ReadHeirarchyData(m_RootNode, scene->mRootNode);
+		ReadHeirarchyData(mRootNode, scene->mRootNode);
 		ReadMissingBones(animation, *model);
 	}
 
@@ -59,11 +59,11 @@ namespace X
 				boneInfoMap[boneName].id = boneCount;
 				boneCount++;
 			}
-			m_Bones.push_back(Bone(channel->mNodeName.data,
+			mBones.push_back(Bone(channel->mNodeName.data,
 				boneInfoMap[channel->mNodeName.data].id, channel));
 		}
 
-		m_BoneInfoMap = boneInfoMap;
+		mBoneInfoMap = boneInfoMap;
 	}
 
 	void Animation::ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src)

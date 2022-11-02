@@ -67,16 +67,8 @@ namespace X
 
     void EditorLayer::OnAttach()
     {
-        FramebufferSpecification fbSpec;
-		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::DEPTH24STENCIL8 };
-		fbSpec.Width = 1280;
-        fbSpec.Height = 720;
-		fbSpec.Samples = 4;
-		mFramebuffer = Framebuffer::Create(fbSpec);
-
-		RenderPassSpecification rpSpec = { mFramebuffer, "MainPass" };
-		mRenderPass = RenderPass::Create(rpSpec);
-		mRenderPass->AddPostProcessing(PostProcessingType::MSAA); // default
+		finalRenderPass = Renderer3D::GeometryPipeline->GetSpecification().RenderPass;
+		finalFramebuffer = finalRenderPass->GetSpecification().TargetFramebuffer;
 
 		mActiveScene = CreateRef<Level>();
 
@@ -92,11 +84,11 @@ namespace X
         X_PROFILE_FUNCTION();
 
 		// Resize
-		if (FramebufferSpecification spec = mFramebuffer->GetSpecification();
+		if (FramebufferSpecification spec = finalFramebuffer->GetSpecification();
 			ConfigManager::mViewportSize.x > 0.0f && ConfigManager::mViewportSize.y > 0.0f && // zero sized framebuffer is invalid
 			(spec.Width != ConfigManager::mViewportSize.x || spec.Height != ConfigManager::mViewportSize.y))
 		{
-			mFramebuffer->Resize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
+			finalFramebuffer->Resize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
 			mEditorCamera.SetViewportSize(ConfigManager::mViewportSize.x, ConfigManager::mViewportSize.y);
 			mActiveScene->OnViewportResize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
 			PostProcessing::mFramebuffer->Resize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
@@ -104,12 +96,14 @@ namespace X
 
         // Render
         Renderer2D::ResetStats();
-        mFramebuffer->Bind();
+        
+		finalFramebuffer->Bind();
+		
 		RenderCommand::SetClearColor({ 0.4f, 0.4f, 0.4f, 1 });
 		RenderCommand::Clear();
 
 		// Clear out entity ID attachment to -1
-		mFramebuffer->ClearAttachment(1, -1);
+		finalFramebuffer->ClearAttachment(1, -1);
 
 		if (ModeManager::IsEditState())
 		{
@@ -133,7 +127,7 @@ namespace X
 
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
 		{
-			int pixelData = mFramebuffer->ReadPixel(1, mouseX, mouseY);
+			int pixelData = finalFramebuffer->ReadPixel(1, mouseX, mouseY);
 			mHoveredEntity = pixelData == -1 ? Entity{} : Entity{ (entt::entity)pixelData, mActiveScene.get() };
 		}
 
@@ -152,7 +146,7 @@ namespace X
 
 		//OnOverlayRender();
 
-        mFramebuffer->Unbind();
+		finalFramebuffer->Unbind();
     }
 
     void EditorLayer::OnImGuiRender()
@@ -330,49 +324,49 @@ namespace X
 				{
 					if (ImGui::MenuItem("Outline"))
 					{
-						mRenderPass->AddPostProcessing(PostProcessingType::Outline);
+						finalRenderPass->AddPostProcessing(PostProcessingType::Outline);
 						ImGui::CloseCurrentPopup();
 					}
 
 					if (ImGui::MenuItem("Cartoon"))
 					{
-						mRenderPass->AddPostProcessing(PostProcessingType::Cartoon);
+						finalRenderPass->AddPostProcessing(PostProcessingType::Cartoon);
 						ImGui::CloseCurrentPopup();
 					}
 
 					if (ImGui::MenuItem("GrayScale"))
 					{
-						mRenderPass->AddPostProcessing(PostProcessingType::GrayScale);
+						finalRenderPass->AddPostProcessing(PostProcessingType::GrayScale);
 						ImGui::CloseCurrentPopup();
 					}
 
 					if (ImGui::MenuItem("GaussianBlur"))
 					{
-						mRenderPass->AddPostProcessing(PostProcessingType::GaussianBlur);
+						finalRenderPass->AddPostProcessing(PostProcessingType::GaussianBlur);
 						ImGui::CloseCurrentPopup();
 					}
 					if (ImGui::MenuItem("ComputeTest"))
 					{
-						mRenderPass->AddPostProcessing(PostProcessingType::ComputeTest);
+						finalRenderPass->AddPostProcessing(PostProcessingType::ComputeTest);
 						ImGui::CloseCurrentPopup();
 					}
 
 					ImGui::EndPopup();
 				}
 
-				for (size_t i = 1; i < mRenderPass->GetPostProcessings().size(); i++)
+				for (size_t i = 1; i < finalRenderPass->GetPostProcessings().size(); i++)
 				{
-					ImGui::Selectable(PostProcessing::PostTypeToString(mRenderPass->GetPostProcessings()[i]->mType).c_str());
+					ImGui::Selectable(PostProcessing::PostTypeToString(finalRenderPass->GetPostProcessings()[i]->mType).c_str());
 					
 					// imgui demo: Drag to reorder items (simple)
 					if (ImGui::IsItemActive() && !ImGui::IsItemHovered())
 					{
 						int next = i + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
-						if (next >= 1 && next < mRenderPass->GetPostProcessings().size())
+						if (next >= 1 && next < finalRenderPass->GetPostProcessings().size())
 						{
-							PostProcessingType tempType = mRenderPass->GetPostProcessings()[i]->mType;
-							mRenderPass->GetPostProcessings()[i]->mType = mRenderPass->GetPostProcessings()[next]->mType;
-							mRenderPass->GetPostProcessings()[next]->mType = tempType;
+							PostProcessingType tempType = finalRenderPass->GetPostProcessings()[i]->mType;
+							finalRenderPass->GetPostProcessings()[i]->mType = finalRenderPass->GetPostProcessings()[next]->mType;
+							finalRenderPass->GetPostProcessings()[next]->mType = tempType;
 							ImGui::ResetMouseDragDelta();
 						}
 					}
@@ -380,7 +374,7 @@ namespace X
 					if (ImGui::BeginPopupContextItem())
 					{
 						if (ImGui::MenuItem("Delete"))
-							mRenderPass->GetPostProcessings().erase(mRenderPass->GetPostProcessings().begin() + i);
+							finalRenderPass->GetPostProcessings().erase(finalRenderPass->GetPostProcessings().begin() + i);
 
 						ImGui::EndPopup();
 					}
@@ -413,9 +407,9 @@ namespace X
 			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 			ConfigManager::mViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
-			uint32_t textureID = mFramebuffer->GetColorAttachmentRendererID();
+			uint32_t textureID = finalFramebuffer->GetColorAttachmentRendererID();
 
-			textureID = mRenderPass->ExcuteAndReturnFinalTex();
+			textureID = finalRenderPass->ExcuteAndReturnFinalTex();
 
 			ImGui::Image((void*)(intptr_t)textureID, ImVec2{ ConfigManager::mViewportSize.x, ConfigManager::mViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
