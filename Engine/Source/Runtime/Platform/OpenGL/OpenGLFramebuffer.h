@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Runtime/Renderer/Framebuffer.h"
+#include "Runtime/Renderer/Texture.h"
 
 namespace X
 {
@@ -15,8 +16,8 @@ namespace X
 
         virtual void Bind() override;
         virtual void Unbind() override;
-        virtual void BindReadFramebuffer() override;
-        virtual void BindDrawFramebuffer() override;
+        virtual void BindReadFramebuffer(uint32_t index = 0) override;
+        virtual void BindDrawFramebuffer(uint32_t index = 0) override;
 
         virtual void Resize(uint32_t width, uint32_t height) override;
         virtual int ReadPixel(uint32_t attachmentIndex, int x, int y) override;

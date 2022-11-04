@@ -71,10 +71,10 @@ namespace X
 		//GeometryPipeline
 		{
 			FramebufferSpecification fbSpec;
-			fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::DEPTH24STENCIL8 };
+			fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::RGBA8,  FramebufferTextureFormat::DEPTH24STENCIL8 };
 			fbSpec.Width = 1280;
 			fbSpec.Height = 720;
-			fbSpec.Samples = 4;
+			fbSpec.Samples = 1;
 			Ref<Framebuffer> GeoFramebuffer = Framebuffer::Create(fbSpec);
 
 			RenderPassSpecification geoSpec = { GeoFramebuffer, "MainPass" };
@@ -83,7 +83,9 @@ namespace X
 			pipelineSpec.DebugName = geoSpec.DebugName;
 			pipelineSpec.Shader = Library<Shader>::GetInstance().Get("BasePBR");
 			pipelineSpec.RenderPass = RenderPass::Create(geoSpec);
-			pipelineSpec.RenderPass->AddPostProcessing(PostProcessingType::MSAA);
+
+			if (pipelineSpec.RenderPass->GetSpecification().TargetFramebuffer->GetSpecification().Samples > 1)
+				pipelineSpec.RenderPass->AddPostProcessing(PostProcessingType::MSAA);
 
 			pipelineSpec.StaticLayout = {
 				{ ShaderDataType::Float3, "a_Pos"},

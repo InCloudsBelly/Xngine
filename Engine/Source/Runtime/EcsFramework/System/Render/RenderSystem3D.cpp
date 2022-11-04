@@ -251,7 +251,6 @@ namespace X
 			}
 		}
 
-		uint32_t mainFramebuffer = RenderCommand::GetDrawFrameBuffer();
 
 		// Light Depth pass
 		
@@ -286,8 +285,10 @@ namespace X
 
 
 		// Render pass
-		Renderer3D::GeometryPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer->Bind();
-		RenderCommand::SetViewport(0, 0, ConfigManager::mViewportSize.x, ConfigManager::mViewportSize.y);
+		Ref<Framebuffer> geofb = Renderer3D::GeometryPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+		geofb->Bind();
+
+		RenderCommand::SetViewport(0, 0, geofb->GetSpecification().Width, geofb->GetSpecification().Height);
 
 		auto view = mLevel->mRegistry.view<TransformComponent, MeshComponent>();
 		for (auto e : view)

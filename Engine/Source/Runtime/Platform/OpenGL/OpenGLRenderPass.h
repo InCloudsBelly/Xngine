@@ -20,7 +20,7 @@ namespace X
 
 		virtual void AddPostProcessing(PostProcessingType type) override;
 
-		virtual uint32_t ExcuteAndReturnFinalTex() override;
+		virtual uint32_t ExcuteAndReturnFinalTex(const uint32_t& colorIndex) override;
 
 	private:
 		RenderPassSpecification mSpecification;

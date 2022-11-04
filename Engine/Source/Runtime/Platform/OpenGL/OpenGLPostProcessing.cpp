@@ -8,14 +8,21 @@
 
 namespace X
 {
-    uint32_t OpenGLPostProcessing::DoMSAA(const Ref<Framebuffer>& fb)
+    uint32_t OpenGLPostProcessing::DoMSAA(const Ref<Framebuffer>& fb, const uint32_t& colorIndex)
     {
         uint32_t width = fb->GetSpecification().Width;
         uint32_t height = fb->GetSpecification().Height;
        
         mFramebuffer->Bind();
 
-        fb->BindReadFramebuffer();
+        if (!mAlreadyProcessed)
+        {
+            fb->BindReadFramebuffer(colorIndex);
+            mAlreadyProcessed = true;
+        }
+        else
+            mFramebuffer->BindReadFramebuffer();
+
         mFramebuffer->BindDrawFramebuffer();
 
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -23,14 +30,21 @@ namespace X
         return mFramebuffer->GetColorAttachmentRendererID();
     }
 
-    uint32_t OpenGLPostProcessing::DoPostWithShader(const Ref<Framebuffer>& fb, const Ref<Shader>& shader)
+    uint32_t OpenGLPostProcessing::DoPostWithShader(const Ref<Framebuffer>& fb, const Ref<Shader>& shader, const uint32_t& colorIndex)
     {
         uint32_t width = fb->GetSpecification().Width;
         uint32_t height = fb->GetSpecification().Height;
         mFramebuffer->Bind();
 
         // copy the framebuffer to the intermediate screen texture
-        mFramebuffer->BindReadFramebuffer();
+        if (!mAlreadyProcessed)
+        {
+            fb->BindReadFramebuffer(colorIndex);
+            mAlreadyProcessed = true;
+        }
+        else
+            mFramebuffer->BindReadFramebuffer();
+
         mIntermediateScreenTex->Bind();
         glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
@@ -45,14 +59,21 @@ namespace X
         return mFramebuffer->GetColorAttachmentRendererID();
     }
 
-    uint32_t OpenGLPostProcessing::DoPostWithComputeShader(const Ref<Framebuffer>& fb, const Ref<Shader>& shader)
+    uint32_t OpenGLPostProcessing::DoPostWithComputeShader(const Ref<Framebuffer>& fb, const Ref<Shader>& shader,const uint32_t& colorIndex)
     {
         uint32_t width = fb->GetSpecification().Width;
         uint32_t height = fb->GetSpecification().Height;
         mFramebuffer->Bind();
 
         // copy the framebuffer to the intermediate screen texture
-        mFramebuffer->BindReadFramebuffer();
+        if (!mAlreadyProcessed)
+        {
+            fb->BindReadFramebuffer(colorIndex);
+            mAlreadyProcessed = true;
+        }
+        else
+            mFramebuffer->BindReadFramebuffer();
+
         mIntermediateScreenTex->Bind();
 
         glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
@@ -75,7 +96,7 @@ namespace X
 
 
 
-    uint32_t OpenGLPostProcessing::ExcuteAndReturnFinalTex(const Ref<Framebuffer>& fb)
+    uint32_t OpenGLPostProcessing::ExcuteAndReturnFinalTex(const Ref<Framebuffer>& fb, const uint32_t& colorIndex)
     {
         uint32_t re = 0;
         switch (mType)
@@ -84,22 +105,22 @@ namespace X
             return 0;
             break;
         case PostProcessingType::MSAA:
-            re = DoMSAA(fb);
+            re = DoMSAA(fb, colorIndex);
             break;
         case PostProcessingType::Outline:
-            re = DoPostWithShader(fb, Library<Shader>::GetInstance().Get("Post_Outline"));
+            re = DoPostWithShader(fb, Library<Shader>::GetInstance().Get("Post_Outline") ,colorIndex);
             break;
         case PostProcessingType::Cartoon:
-            re = DoPostWithShader(fb, Library<Shader>::GetInstance().Get("Post_Cartoon"));
+            re = DoPostWithShader(fb, Library<Shader>::GetInstance().Get("Post_Cartoon"),colorIndex);
             break;
         case PostProcessingType::GrayScale:
-            re = DoPostWithShader(fb, Library<Shader>::GetInstance().Get("Post_GrayScale"));
+            re = DoPostWithShader(fb, Library<Shader>::GetInstance().Get("Post_GrayScale"),colorIndex);
             break;
         case PostProcessingType::GaussianBlur:
-            re = DoPostWithShader(fb, Library<Shader>::GetInstance().Get("Post_GaussianBlur"));
+            re = DoPostWithShader(fb, Library<Shader>::GetInstance().Get("Post_GaussianBlur"),colorIndex);
             break;
         case PostProcessingType::ComputeTest:
-            re = DoPostWithComputeShader(fb, Library<Shader>::GetInstance().Get("ComputeTest"));
+            re = DoPostWithComputeShader(fb, Library<Shader>::GetInstance().Get("ComputeTest"),colorIndex);
             break;
         default:
             return 0;

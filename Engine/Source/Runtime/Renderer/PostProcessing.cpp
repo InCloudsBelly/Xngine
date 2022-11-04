@@ -10,7 +10,10 @@ namespace X
     Ref<VertexArray>  PostProcessing::mScreenQuadVAO = nullptr;
     Ref<VertexBuffer> PostProcessing::mScreenQuadVBO = nullptr;
     Ref<IndexBuffer>  PostProcessing::mScreenQuadIBO = nullptr;
+
+    bool              PostProcessing::mAlreadyProcessed = false;
     Ref<Framebuffer>  PostProcessing::mFramebuffer = nullptr;
+    
     Ref<Texture2D>    PostProcessing::mIntermediateScreenTex = nullptr;
 
 
@@ -79,6 +82,10 @@ namespace X
         return std::string();
     }
 
+    void PostProcessing::ResetPostProcessing()
+    {
+        mAlreadyProcessed = false;
+    }
 
     void PostProcessing::DoPostProcessing()
     {

@@ -2,6 +2,7 @@
 
 #include "Runtime/Platform/OpenGL/OpenGLFramebuffer.h"
 #include "Runtime/Platform/OpenGL/OpenGLTexture.h"
+#include "Runtime/Renderer/Texture.h"
 
 #include <glad/glad.h>
 
@@ -241,14 +242,16 @@ namespace X
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-	void OpenGLFramebuffer::BindReadFramebuffer()
+	void OpenGLFramebuffer::BindReadFramebuffer(uint32_t index)
 	{
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, mRendererID);
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + index);
 	}
 
-	void OpenGLFramebuffer::BindDrawFramebuffer()
+	void OpenGLFramebuffer::BindDrawFramebuffer(uint32_t index)
 	{
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mRendererID);
+		glDrawBuffer(GL_COLOR_ATTACHMENT0 + index);
 	}
 
 
@@ -346,6 +349,7 @@ namespace X
 	{
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + slot, GL_TEXTURE_CUBE_MAP_POSITIVE_X + cubemapIndex, cubemapID, 0);
 	}
+
 
 
 	Ref<Texture3D> OpenGLFramebuffer::GetDepthTex3D() const

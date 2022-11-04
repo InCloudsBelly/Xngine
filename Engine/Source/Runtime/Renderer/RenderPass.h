@@ -24,8 +24,8 @@ namespace X
 
 		virtual void AddPostProcessing(PostProcessingType type) = 0;
 
-		virtual uint32_t ExcuteAndReturnFinalTex() = 0;
-
+		virtual uint32_t ExcuteAndReturnFinalTex(const uint32_t& colorIndex) = 0;
+		/*virtual uint32_t GetTex2DFromMultiSampleTex2D() = 0;*/
 
 		static Ref<RenderPass> Create(const RenderPassSpecification& spec);
 	};
