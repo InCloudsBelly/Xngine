@@ -28,6 +28,8 @@ namespace X
         Add("CSM_Depth", Shader::CreateNative(AssetManager::GetFullPath("Shaders/Shadow/CSM_Depth.glsl")));
         Add("Debug_Depth", Shader::CreateNative(AssetManager::GetFullPath("Shaders/Shadow/Debug_Depth.glsl")));
 
+        Add("Gbuffer", Shader::CreateNative(AssetManager::GetFullPath("Shaders/Gbuffer.glsl")));
+
     }
 
     Ref<Shader> Library<Shader>::GetDefaultShader()

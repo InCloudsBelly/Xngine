@@ -26,7 +26,9 @@ namespace X
     public:
         // shadow pass
         static Ref<class Framebuffer> lightFBO;
-        static Ref<class Pipeline> lightPipeline ;
-        static Ref<class Pipeline> GeometryPipeline;
+
+        static Ref<Pipeline>GbufferPipeline;
+        static Ref<Pipeline> lightPipeline ;
+        static Ref<Pipeline> GeometryPipeline;
     };
 }

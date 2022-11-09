@@ -18,12 +18,57 @@
 
 namespace X
 {
+	Ref<Pipeline> Renderer3D::GbufferPipeline = nullptr;
 	Ref<Framebuffer> Renderer3D::lightFBO = nullptr;
 	Ref<Pipeline> Renderer3D::lightPipeline = nullptr;
 	Ref<Pipeline> Renderer3D::GeometryPipeline = nullptr;
 
 	void Renderer3D::Init()
 	{
+		//Gbuffer pass
+		{
+			FramebufferSpecification fbSpec;
+			fbSpec.Attachments = { FramebufferTextureFormat::RGBA8,FramebufferTextureFormat::RGBA8 ,FramebufferTextureFormat::RGBA8};
+			fbSpec.Width = 1280;
+			fbSpec.Height = 720;
+			fbSpec.Samples = 1;
+			Ref<Framebuffer> GbufferFB = Framebuffer::Create(fbSpec);
+
+			RenderPassSpecification GbufferPassSpec;
+			GbufferPassSpec.DebugName = "GbufferPass";
+			GbufferPassSpec.TargetFramebuffer = GbufferFB;
+
+			PipelineSpecification pipelineSpec;
+			pipelineSpec.DebugName = GbufferPassSpec.DebugName;
+			pipelineSpec.Shader = Library<Shader>::GetInstance().Get("Gbuffer");
+			pipelineSpec.RenderPass = RenderPass::Create(GbufferPassSpec);
+			pipelineSpec.RenderPass->AddPostProcessing(PostProcessingType::MSAA);
+
+			pipelineSpec.StaticLayout = {
+				{ ShaderDataType::Float3, "a_Pos"},
+				{ ShaderDataType::Float3, "a_Normal"},
+				{ ShaderDataType::Float2, "a_TexCoord"},
+				{ ShaderDataType::Float3, "a_Tangent"},
+				{ ShaderDataType::Float3, "a_Bitangent"},
+				{ ShaderDataType::Int,	  "a_EntityID"},
+			};
+
+			pipelineSpec.AnimationLayout = {
+				{ ShaderDataType::Float3, "a_Pos"},
+				{ ShaderDataType::Float3, "a_Normal"},
+				{ ShaderDataType::Float2, "a_TexCoord"},
+				{ ShaderDataType::Float3, "a_Tangent"},
+				{ ShaderDataType::Float3, "a_Bitangent"},
+				{ ShaderDataType::Int,	  "a_EntityID"},
+				{ ShaderDataType::Int4,   "a_BoneIDs"},
+				{ ShaderDataType::Float4, "a_Weights"},
+			};
+
+
+			GbufferPipeline = Pipeline::Create(pipelineSpec);
+		}
+
+
 		//Directional light shadow pass
 		{
 			FramebufferSpecification fbSpec;
@@ -74,7 +119,7 @@ namespace X
 			fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::RGBA8,  FramebufferTextureFormat::DEPTH24STENCIL8 };
 			fbSpec.Width = 1280;
 			fbSpec.Height = 720;
-			fbSpec.Samples = 1;
+			fbSpec.Samples = 4;
 			Ref<Framebuffer> GeoFramebuffer = Framebuffer::Create(fbSpec);
 
 			RenderPassSpecification geoSpec = { GeoFramebuffer, "MainPass" };

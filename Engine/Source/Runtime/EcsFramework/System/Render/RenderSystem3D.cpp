@@ -10,6 +10,7 @@
 #include "Runtime/Renderer/Framebuffer.h"
 #include "Runtime/Renderer/UniformBuffer.h"
 #include "Runtime/Library/ShaderLibrary.h"
+#include "Runtime/Library/UniformBufferLibrary.h"
 #include "Runtime/Resource/ConfigManager/ConfigManager.h"
 #include "Runtime/Resource/ModeManager/ModeManager.h"
 
@@ -175,6 +176,36 @@ namespace X
 		//}
 		defaultShader->SetFloat3("lightDir", glm::vec3(0.0f));
 
+		//Gbuffer Pass
+		{
+			Ref<Framebuffer> gfb = Renderer3D::GbufferPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+			gfb->Bind();
+
+			RenderCommand::SetViewport(0, 0, gfb->GetSpecification().Width, gfb->GetSpecification().Height);
+			//RenderCommand::SetClearColor({ 0.4f, 0.4f, 0.4f, 1 });
+			RenderCommand::Clear();
+
+
+			auto view = mLevel->mRegistry.view<TransformComponent, MeshComponent>();
+			for (auto e : view)
+			{
+				Entity entity = { e, mLevel };
+				auto& transform = entity.GetComponent<TransformComponent>();
+				auto& mesh = entity.GetComponent<MeshComponent>();
+
+				Ref<Shader> gShader = Renderer3D::GbufferPipeline->GetSpecification().Shader;
+
+				gShader->Bind();
+				if (mesh.mMesh->bPlayAnim)
+					gShader->SetBool("u_Animated", true);
+				else
+					gShader->SetBool("u_Animated", false);
+				gShader->SetMat4("u_ViewProjection", camera.GetViewProjection());
+
+				mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Renderer3D::GbufferPipeline, (int)e);
+			}
+			gfb->Unbind();
+		}
 
 
 		//Point Light
@@ -253,7 +284,6 @@ namespace X
 
 
 		// Light Depth pass
-		
 		{
 			Ref<Framebuffer> shadowfb = Renderer3D::lightPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
 			shadowfb->Bind();
@@ -285,37 +315,46 @@ namespace X
 
 
 		// Render pass
-		Ref<Framebuffer> geofb = Renderer3D::GeometryPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
-		geofb->Bind();
-
-		RenderCommand::SetViewport(0, 0, geofb->GetSpecification().Width, geofb->GetSpecification().Height);
-
-		auto view = mLevel->mRegistry.view<TransformComponent, MeshComponent>();
-		for (auto e : view)
 		{
-			Entity entity = { e, mLevel };
-			auto& transform = entity.GetComponent<TransformComponent>();
-			auto& mesh = entity.GetComponent<MeshComponent>();
+			Ref<Framebuffer> geofb = Renderer3D::GeometryPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+			geofb->Bind();
 
-			if ((int)e == ConfigManager::selectedEntity)
+			RenderCommand::SetViewport(0, 0, geofb->GetSpecification().Width, geofb->GetSpecification().Height);
+
+			auto view = mLevel->mRegistry.view<TransformComponent, MeshComponent>();
+			for (auto e : view)
 			{
-				RenderCommand::SetStencilFunc(StencilFunc::ALWAYS, 1, 0xFF);
-				RenderCommand::StencilMask(0xFF);
-				mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Renderer3D::GeometryPipeline, (int)e);
+				Entity entity = { e, mLevel };
+				auto& transform = entity.GetComponent<TransformComponent>();
+				auto& mesh = entity.GetComponent<MeshComponent>();
 
-				RenderCommand::SetStencilFunc(StencilFunc::NOTEQUAL, 1, 0xFF);
-				RenderCommand::StencilMask(0x00);
-				if (!mesh.mMesh->bPlayAnim)
-					mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Library<Shader>::GetInstance().Get("NormalOutline"), (int)e);
+				Ref<Shader> mainShader = Renderer3D::GeometryPipeline->GetSpecification().Shader;
+				mainShader->Bind();
+				if (mesh.mMesh->bPlayAnim)
+					mainShader->SetBool("u_Animated", true);
 				else
-					mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Library<Shader>::GetInstance().Get("NormalOutline_anim"), (int)e);
-				
-				RenderCommand::StencilMask(0xFF);
-				RenderCommand::SetStencilFunc(StencilFunc::ALWAYS, 0, 0xFF);
-				RenderCommand::ClearStencil();
+					mainShader->SetBool("u_Animated", false);
+
+				if ((int)e == ConfigManager::selectedEntity)
+				{
+					RenderCommand::SetStencilFunc(StencilFunc::ALWAYS, 1, 0xFF);
+					RenderCommand::StencilMask(0xFF);
+					mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Renderer3D::GeometryPipeline, (int)e);
+
+					RenderCommand::SetStencilFunc(StencilFunc::NOTEQUAL, 1, 0xFF);
+					RenderCommand::StencilMask(0x00);
+					if (!mesh.mMesh->bPlayAnim)
+						mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Library<Shader>::GetInstance().Get("NormalOutline"), (int)e);
+					else
+						mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Library<Shader>::GetInstance().Get("NormalOutline_anim"), (int)e);
+
+					RenderCommand::StencilMask(0xFF);
+					RenderCommand::SetStencilFunc(StencilFunc::ALWAYS, 0, 0xFF);
+					RenderCommand::ClearStencil();
+				}
+				else
+					mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Renderer3D::GeometryPipeline, (int)e);
 			}
-			else
-				mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Renderer3D::GeometryPipeline, (int)e);
 		}
 
 		Renderer3D::EndScene();
