@@ -2,9 +2,9 @@
 ### Xngine: A Personal Rendering Engine
 
 <div align=center>
-<img src="pic/1.png"> 
+<img src="Picture/XngineShowing.png"> 
 
-图1 算法步骤
+图1 引擎面板
 </div>
 
 
