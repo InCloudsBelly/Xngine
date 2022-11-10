@@ -163,6 +163,7 @@ namespace X
 		Renderer3D::BeginScene(camera);
 
 		Ref<Shader> defaultShader = Library<Shader>::GetInstance().GetDefaultShader();
+	
 		if (ModeManager::bHdrUse)
 			defaultShader->SetFloat("exposure", EnvironmentSystem::environmentSettings.exposure);
 		else
@@ -184,8 +185,10 @@ namespace X
 			RenderCommand::SetViewport(0, 0, gfb->GetSpecification().Width, gfb->GetSpecification().Height);
 			//RenderCommand::SetClearColor({ 0.4f, 0.4f, 0.4f, 1 });
 			RenderCommand::Clear();
+			gfb->ClearAttachment(1, -1);
 
 
+			Ref<Shader> gShader = Renderer3D::GbufferPipeline->GetSpecification().Shader;
 			auto view = mLevel->mRegistry.view<TransformComponent, MeshComponent>();
 			for (auto e : view)
 			{
@@ -193,14 +196,12 @@ namespace X
 				auto& transform = entity.GetComponent<TransformComponent>();
 				auto& mesh = entity.GetComponent<MeshComponent>();
 
-				Ref<Shader> gShader = Renderer3D::GbufferPipeline->GetSpecification().Shader;
 
 				gShader->Bind();
 				if (mesh.mMesh->bPlayAnim)
 					gShader->SetBool("u_Animated", true);
 				else
 					gShader->SetBool("u_Animated", false);
-				gShader->SetMat4("u_ViewProjection", camera.GetViewProjection());
 
 				mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Renderer3D::GbufferPipeline, (int)e);
 			}

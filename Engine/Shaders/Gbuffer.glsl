@@ -16,18 +16,19 @@ uniform bool u_Animated;
 
 struct VertexOutput
 {
-	vec3 Normal;
-	vec3 WorldPos;
-	vec2 TexCoord;
+    vec3 Normal;
+    vec3 WorldPos;
+    vec2 TexCoord;
 };
 
-layout (location = 0) out VertexOutput Output;
-layout (location = 3) out flat int v_EntityID;
+layout(location = 0) out VertexOutput Output;
+//layout(location = 3) out flat int v_EntityID;
 
-layout(std140, binding = 0) uniform Camera
+layout(binding = 0) uniform Camera
 {
     mat4 u_ViewProjection;
 };
+
 
 uniform mat4 model;
 
@@ -52,14 +53,14 @@ void main()
         vec4 WorldPos = model * localPosition;
         Output.WorldPos = WorldPos.xyz;
         Output.Normal = mat3(boneTransform) * a_Normal;
-        v_EntityID = a_EntityID;
+        //v_EntityID = a_EntityID;
         gl_Position = u_ViewProjection * WorldPos;
     }
     else
     {
         Output.WorldPos = vec3(model * vec4(a_Pos, 1.0));
-        Output.Normal = mat3(model) * a_Normal;
-        v_EntityID = a_EntityID;
+        Output.Normal =normalize(transpose(inverse(mat3(model))) * a_Normal);
+        //v_EntityID = a_EntityID;
 
         gl_Position = u_ViewProjection * vec4(Output.WorldPos, 1.0);
     }
@@ -68,56 +69,66 @@ void main()
 #type fragment
 #version 450 core
 
-out vec4 _Albedo;
-out vec4 _Position;
-out vec4 _Normal;
+out vec4 Position_;
+out vec4 Albedo_;
+out vec4 Normal_;
 
 struct VertexOutput
 {
-	vec3 Normal;
-	vec3 WorldPos;
-	vec2 TexCoord;
+    vec3 Normal;
+    vec3 WorldPos;
+    vec2 TexCoord;
 };
 
-layout (location = 0) in VertexOutput Input;
+layout(location = 0) in VertexOutput Input;
+//layout(location = 3) in flat int v_EntityID;
+
 
 // material parameters
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
-uniform sampler2D metallicMap;
-uniform sampler2D roughnessMap;
-uniform sampler2D aoMap;
 
 
-// --------------------------PBR Function--------------------------------------
+uniform vec3 camPos;
 
-// ----------------------------------------------------------------------------
-// Easy trick to get tangent-normals to world-space to keep PBR code simplified.
-// Don't worry if you don't get what's going on; you generally want to do normal 
-// mapping the usual way for performance anways; I do plan make a note of this 
-// technique somewhere later in the normal mapping tutorial.
+
+
+//layout(std140, binding = 1) uniform LightSpaceMatrices
+//{
+//     mat4 lightSpaceMatrices[16];
+//};
+
+
 vec3 getNormalFromMap()
 {
     vec3 tangentNormal = texture(normalMap, Input.TexCoord).xyz * 2.0 - 1.0;
 
-    vec3 Q1  = dFdx(Input.WorldPos);
-    vec3 Q2  = dFdy(Input.WorldPos);
+    vec3 Q1 = dFdx(Input.WorldPos);
+    vec3 Q2 = dFdy(Input.WorldPos);
     vec2 st1 = dFdx(Input.TexCoord);
     vec2 st2 = dFdy(Input.TexCoord);
 
-    vec3 N   = normalize(Input.Normal);
-    vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
-    vec3 B  = -normalize(cross(N, T));
+    vec3 N = normalize(Input.Normal);
+    vec3 T = normalize(Q1 * st2.t - Q2 * st1.t);
+    vec3 B = -normalize(cross(N, T));
     mat3 TBN = mat3(T, B, N);
 
     return normalize(TBN * tangentNormal);
 }
 
 
+// --------------------------End PBR Function----------------------------------
+
 void main()
 {
-    vec4 _Albedo = vec4(pow(texture(albedoMap, Input.TexCoord).rgb, vec3(2.2)),1.0);
-    _Albedo = vec4(1.0, 1.0, 0, 0);
-    vec4 _Normal = vec4(getNormalFromMap(),1.0);
-    vec4 _Position = vec4(Input.WorldPos,1.0);
+    // material properties
+    vec3 albedo = pow(texture(albedoMap, Input.TexCoord).rgb, vec3(2.2));
+
+    // input lighting data
+    vec3 N = getNormalFromMap();
+    
+
+    Position_ = vec4(Input.WorldPos, 1.0);
+    Albedo_ = vec4(albedo, 1.0);
+    Normal_ = vec4(N, 1.0);
 }

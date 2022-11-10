@@ -28,7 +28,7 @@ namespace X
 		//Gbuffer pass
 		{
 			FramebufferSpecification fbSpec;
-			fbSpec.Attachments = { FramebufferTextureFormat::RGBA8,FramebufferTextureFormat::RGBA8 ,FramebufferTextureFormat::RGBA8};
+			fbSpec.Attachments = { FramebufferTextureFormat::RGBA8,FramebufferTextureFormat::RGBA8 ,FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::DEPTH24STENCIL8 };
 			fbSpec.Width = 1280;
 			fbSpec.Height = 720;
 			fbSpec.Samples = 1;
@@ -42,7 +42,7 @@ namespace X
 			pipelineSpec.DebugName = GbufferPassSpec.DebugName;
 			pipelineSpec.Shader = Library<Shader>::GetInstance().Get("Gbuffer");
 			pipelineSpec.RenderPass = RenderPass::Create(GbufferPassSpec);
-			pipelineSpec.RenderPass->AddPostProcessing(PostProcessingType::MSAA);
+			//pipelineSpec.RenderPass->AddPostProcessing(PostProcessingType::MSAA);
 
 			pipelineSpec.StaticLayout = {
 				{ ShaderDataType::Float3, "a_Pos"},
