@@ -5,6 +5,7 @@
 #include "Runtime/Renderer/Texture.h"
 #include "RenderPass.h"
 #include "Pipeline.h"
+
 namespace X
 {
     class Renderer3D
@@ -24,10 +25,8 @@ namespace X
 
 
     public:
-        // shadow pass
-        static Ref<class Framebuffer> lightFBO;
 
-        static Ref<Pipeline>GbufferPipeline;
+        static Ref<Pipeline> GbufferPipeline;
         static Ref<Pipeline> lightPipeline ;
         static Ref<Pipeline> GeometryPipeline;
     };

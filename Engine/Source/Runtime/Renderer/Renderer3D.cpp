@@ -19,7 +19,6 @@
 namespace X
 {
 	Ref<Pipeline> Renderer3D::GbufferPipeline = nullptr;
-	Ref<Framebuffer> Renderer3D::lightFBO = nullptr;
 	Ref<Pipeline> Renderer3D::lightPipeline = nullptr;
 	Ref<Pipeline> Renderer3D::GeometryPipeline = nullptr;
 
@@ -74,10 +73,10 @@ namespace X
 			FramebufferSpecification fbSpec;
 			fbSpec.Attachments = { FramebufferTextureFormat::DEPTH32F_TEX3D };
 			// light depth texture uses high resolution
-			fbSpec.Width = 4096;
-			fbSpec.Height = 4096;
+			fbSpec.Width = 2048;
+			fbSpec.Height = 2048;
 
-			lightFBO = Framebuffer::Create(fbSpec);
+			Ref<Framebuffer> lightFBO = Framebuffer::Create(fbSpec);
 
 			RenderPassSpecification ShadowPassSpec;
 			ShadowPassSpec.DebugName = "ShadowPass";

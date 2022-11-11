@@ -121,12 +121,48 @@ uniform sampler2DArray shadowMap;
 
 uniform float cascadePlaneDistances[16];
 uniform int cascadeCount;   // number of frusta - 1
+
+const int NUM_SAMPLES = 60;
+const int NUM_RINGS = 10;
 // End Shadow
 
 const float F0_NON_METAL = 0.04f;
 const float PI = 3.14159265359;
+const float PI2 = 6.283185307179586;
 
 // --------------------------Shadow Function-----------------------------------
+
+highp float rand_1to1(highp float x ) { 
+  // -1 -1
+  return fract(sin(x)*10000.0);
+}
+
+highp float rand_2to1(vec2 uv ) { 
+  // 0 - 1
+	const highp float a = 12.9898, b = 78.233, c = 43758.5453;
+	highp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, PI );
+	return fract(sin(sn) * c);
+}
+
+vec2 poissonDisk[NUM_SAMPLES];
+
+void poissonDiskSamples( const in vec2 randomSeed ) {
+
+  float ANGLE_STEP = PI2 * float( NUM_RINGS ) / float( NUM_SAMPLES );
+  float INV_NUM_SAMPLES = 1.0 / float( NUM_SAMPLES );
+
+  float angle = rand_2to1( randomSeed ) * PI2;
+  float radius = INV_NUM_SAMPLES;
+  float radiusStep = radius;
+
+  for( int i = 0; i < NUM_SAMPLES; i ++ ) {
+    poissonDisk[i] = vec2( cos( angle ), sin( angle ) ) * pow( radius, 0.75 );
+    radius += radiusStep;
+    angle += ANGLE_STEP;
+  }
+}
+
+
 float ShadowCalculation(vec3 fragPosWorldSpace)
 {
     // select cascade layer
@@ -172,16 +208,16 @@ float ShadowCalculation(vec3 fragPosWorldSpace)
     }
     // PCF
     float shadow = 0.0;
-    vec2 texelSize = 1.0 / vec2(textureSize(shadowMap, 0));
-    for (int x = -1; x <= 1; ++x)
+    poissonDiskSamples(projCoords.xy);
+  //uniformDiskSamples(projCoords.xy);
+    vec2 texelSize = 50.0 / (vec2(textureSize(shadowMap, 0)*(layer+1)*(layer+1)));
+
+    for(int i = 0 ; i < NUM_SAMPLES; ++i)
     {
-        for (int y = -1; y <= 1; ++y)
-        {
-            float pcfDepth = texture(shadowMap, vec3(projCoords.xy + vec2(x, y) * texelSize, layer)).r;
-            shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;
-        }
+        float pcfDepth = texture(shadowMap, vec3(projCoords.xy + poissonDisk[i] * texelSize, layer)).r;
+        shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;
     }
-    shadow /= 9.0;
+    shadow /= NUM_SAMPLES;
 
     return shadow;
 }
