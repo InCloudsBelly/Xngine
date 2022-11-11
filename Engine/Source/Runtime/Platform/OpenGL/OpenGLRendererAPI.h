@@ -48,6 +48,6 @@ namespace X
 
 		virtual void CopyTexture(uint32_t& width, uint32_t& height) override;
 		
-
+		virtual void BlitFramebuffer(uint32_t& width, uint32_t& height) override;
     };
 }

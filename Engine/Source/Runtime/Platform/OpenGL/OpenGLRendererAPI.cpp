@@ -213,4 +213,8 @@ namespace X
 	{
 		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
 	}
+	void OpenGLRendererAPI::BlitFramebuffer(uint32_t & width, uint32_t & height)
+	{
+		glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	}
 }

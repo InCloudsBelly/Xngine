@@ -363,6 +363,11 @@ namespace X
 		//QuadPass
 		{
 			Ref<Framebuffer> quadFb = Renderer3D::QuadPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+			Ref<Framebuffer> showFb = Renderer3D::GeometryPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+			X_ASSERT(showFb->GetSpecification().Height == quadFb->GetSpecification().Height && showFb->GetSpecification().Width == quadFb->GetSpecification().Width, "U forget resize framebuffer!");
+			
+			uint32_t colorAttachmentIndex = 0;
+
 			Ref<Shader> quadShader = Renderer3D::QuadPipeline->GetSpecification().Shader;
 
 			quadFb->Bind();
@@ -371,12 +376,23 @@ namespace X
 			uint32_t width = quadFb->GetSpecification().Width;
 			uint32_t height = quadFb->GetSpecification().Height;
 
-			Renderer3D::GbufferPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer->BindColorTex2D(0,2);
 
-			quadShader->Bind();
-			quadShader->SetInt("ComTexture", 0);
-			Renderer3D::QuadPipeline->DrawQuad();
+			if (showFb->GetSpecification().Samples > 1)
+			{
+				showFb->BindReadFramebuffer(colorAttachmentIndex);
+				quadFb->BindDrawFramebuffer();
+				RenderCommand::BlitFramebuffer(width,height);
 
+				RenderCommand::UnbindDrawBuffer();
+				RenderCommand::UnbindReadBuffer();
+			}
+			else
+			{
+				Renderer3D::GeometryPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer->BindColorTex2D(0, 0);
+				quadShader->Bind();
+				quadShader->SetInt("ComTexture", 0);
+				Renderer3D::QuadPipeline->DrawQuad();
+			}
 			quadFb->Unbind();
 		}
 		Renderer3D::GeometryPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer->Bind();

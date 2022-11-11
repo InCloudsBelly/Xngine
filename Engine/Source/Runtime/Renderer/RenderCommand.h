@@ -131,6 +131,10 @@ namespace X
 		{
 			sRendererAPI->UnbindDrawBuffer();
 		}
+		static void BlitFramebuffer(uint32_t& width, uint32_t& height)
+		{
+			sRendererAPI->BlitFramebuffer(width, height);
+		}
 
     private:
         static Scope<RendererAPI> sRendererAPI;

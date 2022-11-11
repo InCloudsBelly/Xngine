@@ -79,7 +79,7 @@ namespace X
         virtual void UnbindDrawBuffer() = 0;
 
         virtual void CopyTexture(uint32_t& width, uint32_t& height) = 0;
-
+        virtual void BlitFramebuffer(uint32_t& width, uint32_t& height) = 0;
     private:
         static inline RendererAPIType sCurrentRendererAPI = RendererAPIType::OpenGL;
     };
