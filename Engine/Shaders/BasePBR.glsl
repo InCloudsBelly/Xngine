@@ -206,11 +206,41 @@ float ShadowCalculation(vec3 fragPosWorldSpace)
     {
         bias *= 1 / (cascadePlaneDistances[layer] * biasModifier);
     }
-    // PCF
+   
+   
+    /****************************************/
+    /***************** PCSS *****************/
+    /****************************************/
     float shadow = 0.0;
     poissonDiskSamples(projCoords.xy);
-  //uniformDiskSamples(projCoords.xy);
-    vec2 texelSize = 50.0 / (vec2(textureSize(shadowMap, 0)*(layer+1)*(layer+1)));
+
+    //Setp1 :: avgblocker depth
+    float zBlocker;
+
+    vec2 filterRange = 100.0/vec2(textureSize(shadowMap, 0));
+    int numPointShadowed = 0;
+    float blockDepth = 0.0;
+    for(int i = 0 ; i < NUM_SAMPLES; ++i)
+    {
+        float pcfDepth = texture(shadowMap, vec3(projCoords.xy + poissonDisk[i] * filterRange, layer)).r;
+        if((currentDepth - bias) > pcfDepth)
+        {
+            blockDepth += pcfDepth;
+            numPointShadowed ++ ;
+        }
+    }
+    if(numPointShadowed == NUM_SAMPLES)
+        zBlocker = 2.0;
+    else
+        zBlocker = blockDepth / numPointShadowed;
+
+    //Step 2: penumbra size
+    const float wLight = 1.0;
+    float penumbra = max(0.0, (currentDepth - zBlocker) * wLight/zBlocker);
+
+    
+    //Step 3: PCF 
+    vec2 texelSize = 100*penumbra / (vec2(textureSize(shadowMap, 0)));
 
     for(int i = 0 ; i < NUM_SAMPLES; ++i)
     {
