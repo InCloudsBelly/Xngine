@@ -25,10 +25,17 @@ namespace X
 		virtual void BindAnimation() override;
 
 		virtual void Unbind() override;
+
+		void InitQuad();
+		virtual void DrawQuad() override;
+
 	private:
 		PipelineSpecification mSpecification;
 		uint32_t mVertexArrayRendererID = 0;
-
+		
+	protected:
+		static Ref<VertexArray> mQuadVAO;
+		bool bQuadInited = false;
 	};
 
 }

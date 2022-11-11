@@ -119,6 +119,19 @@ namespace X
 			sRendererAPI->BindFrameBuffer(framebufferID);
 		}
 
+		static void CopyTexture(uint32_t& width, uint32_t& height)
+		{
+			sRendererAPI->CopyTexture(width,height);
+		}
+		static void UnbindReadBuffer()
+		{
+			sRendererAPI->UnbindReadBuffer();
+		}
+		static void UnbindDrawBuffer()
+		{
+			sRendererAPI->UnbindDrawBuffer();
+		}
+
     private:
         static Scope<RendererAPI> sRendererAPI;
     };

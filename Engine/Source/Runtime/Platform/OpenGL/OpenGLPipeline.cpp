@@ -10,6 +10,8 @@
 namespace X
 {
 
+	Ref<VertexArray>  OpenGLPipeline::mQuadVAO = nullptr;
+
 	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
 	{
 		switch (type)
@@ -141,4 +143,36 @@ namespace X
 		glBindVertexArray(0);
 	}
 
+	void OpenGLPipeline::InitQuad()
+	{
+		mQuadVAO = VertexArray::Create();
+		float screenQuadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+			// positions   // texCoords
+			-1.0f,  1.0f, /* 0.0f, 1.0f,*/
+			-1.0f, -1.0f, /* 0.0f, 0.0f,*/
+			 1.0f, -1.0f, /* 1.0f, 0.0f,*/
+			 1.0f,  1.0f, /* 1.0f, 1.0f*/
+		};
+		uint32_t screenQuadIndices[] = {
+			0, 1, 2, 0, 2, 3
+		};
+		Ref<IndexBuffer> ScreenQuadIBO = IndexBuffer::Create(screenQuadIndices, 6);
+		Ref<VertexBuffer> ScreenQuadVBO = VertexBuffer::Create(screenQuadVertices, sizeof(screenQuadVertices));
+		ScreenQuadVBO->SetLayout({
+			{ ShaderDataType::Float2,	"a_Position" },
+			});
+		mQuadVAO->AddVertexBuffer(ScreenQuadVBO);
+		mQuadVAO->SetIndexBuffer(ScreenQuadIBO);
+	}
+
+	void OpenGLPipeline::DrawQuad()
+	{
+		if (!bQuadInited)
+		{
+			InitQuad();
+			bQuadInited = true;
+		}
+
+		RenderCommand::DrawIndexed(mQuadVAO);
+	}
 }

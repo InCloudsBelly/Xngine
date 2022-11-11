@@ -29,5 +29,6 @@ namespace X
         static Ref<Pipeline> GbufferPipeline;
         static Ref<Pipeline> lightPipeline ;
         static Ref<Pipeline> GeometryPipeline;
+        static Ref<Pipeline> QuadPipeline;
     };
 }

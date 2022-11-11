@@ -92,6 +92,7 @@ namespace X
 			mActiveScene->OnViewportResize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
 			PostProcessing::mFramebuffer->Resize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
 			Renderer3D::GbufferPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer->Resize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
+			Renderer3D::QuadPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer->Resize((uint32_t)ConfigManager::mViewportSize.x, (uint32_t)ConfigManager::mViewportSize.y);
 		}
 
         // Render
@@ -416,14 +417,14 @@ namespace X
 			uint32_t textureID;
 			uint32_t AttachIndex = 0; // By changing this can we select which ColorAttachment to show	;
 
-			/*Ref<Framebuffer> gBufferTestfb = Renderer3D::GbufferPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
-			textureID = gBufferTestfb->GetColorAttachmentRendererID(AttachIndex);*/
+			Ref<Framebuffer> gBufferTestfb = Renderer3D::QuadPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+			textureID = gBufferTestfb->GetColorAttachmentRendererID(AttachIndex);
 
 
-			if (mShowFramebuffer->GetSpecification().Samples > 1 || mShowPass->GetPostProcessings().size() > 0) // At least have MSAA post processing;
-				textureID = mShowPass->ExcuteAndReturnFinalTex(AttachIndex);
-			else
-				textureID = mShowFramebuffer->GetColorAttachmentRendererID(AttachIndex);
+			//if (mShowFramebuffer->GetSpecification().Samples > 1 || mShowPass->GetPostProcessings().size() > 0) // At least have MSAA post processing;
+			//	textureID = mShowPass->ExcuteAndReturnFinalTex(AttachIndex);
+			//else
+			//	textureID = mShowFramebuffer->GetColorAttachmentRendererID(AttachIndex);
 
 			ImGui::Image((void*)(intptr_t)textureID, ImVec2{ ConfigManager::mViewportSize.x, ConfigManager::mViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 

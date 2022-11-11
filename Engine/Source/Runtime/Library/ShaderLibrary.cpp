@@ -29,6 +29,7 @@ namespace X
         Add("Debug_Depth", Shader::CreateNative(AssetManager::GetFullPath("Shaders/Shadow/Debug_Depth.glsl")));
 
         Add("Gbuffer", Shader::CreateNative(AssetManager::GetFullPath("Shaders/Gbuffer.glsl")));
+        Add("SimpleQuad", Shader::CreateNative(AssetManager::GetFullPath("Shaders/SimpleQuad.glsl")));
 
     }
 

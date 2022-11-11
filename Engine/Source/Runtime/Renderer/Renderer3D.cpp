@@ -21,6 +21,7 @@ namespace X
 	Ref<Pipeline> Renderer3D::GbufferPipeline = nullptr;
 	Ref<Pipeline> Renderer3D::lightPipeline = nullptr;
 	Ref<Pipeline> Renderer3D::GeometryPipeline = nullptr;
+	Ref<Pipeline> Renderer3D::QuadPipeline = nullptr;
 
 	void Renderer3D::Init()
 	{
@@ -106,7 +107,6 @@ namespace X
 				{ ShaderDataType::Float4, "a_Weights"},
 			};
 
-
 			pipelineSpec.RenderPass = RenderPass::Create(ShadowPassSpec);
 			lightPipeline = Pipeline::Create(pipelineSpec);
 		}
@@ -152,6 +152,32 @@ namespace X
 			};
 
 			GeometryPipeline = Pipeline::Create(pipelineSpec);
+		}
+
+		//QuadPipeline
+		{
+			FramebufferSpecification fbSpec;
+			fbSpec.Attachments = { FramebufferTextureFormat::RGBA8 };
+			fbSpec.Width = 1280;
+			fbSpec.Height = 720;
+			Ref<Framebuffer> GeoFramebuffer = Framebuffer::Create(fbSpec);
+
+			RenderPassSpecification QuadSpec = { GeoFramebuffer, "SimpleQuad" };
+
+			PipelineSpecification pipelineSpec;
+			pipelineSpec.DebugName = QuadSpec.DebugName;
+			pipelineSpec.Shader = Library<Shader>::GetInstance().Get("SimpleQuad");
+			pipelineSpec.RenderPass = RenderPass::Create(QuadSpec);
+
+			pipelineSpec.StaticLayout = {
+				{ ShaderDataType::Float3, "a_Pos"},
+			};
+
+			pipelineSpec.AnimationLayout = {
+				{ ShaderDataType::Float3, "a_Pos"},
+			};
+
+			QuadPipeline = Pipeline::Create(pipelineSpec);
 		}
 
 	}

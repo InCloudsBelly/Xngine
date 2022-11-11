@@ -75,6 +75,10 @@ namespace X
         [[nodiscard]] static RendererAPIType Current() { return sCurrentRendererAPI; }
         
         virtual void BindFrameBuffer(uint32_t framebufferID) = 0;
+        virtual void UnbindReadBuffer() = 0;
+        virtual void UnbindDrawBuffer() = 0;
+
+        virtual void CopyTexture(uint32_t& width, uint32_t& height) = 0;
 
     private:
         static inline RendererAPIType sCurrentRendererAPI = RendererAPIType::OpenGL;

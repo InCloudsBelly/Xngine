@@ -360,6 +360,28 @@ namespace X
 			}
 		}
 
+		//QuadPass
+		{
+			Ref<Framebuffer> quadFb = Renderer3D::QuadPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+			Ref<Shader> quadShader = Renderer3D::QuadPipeline->GetSpecification().Shader;
+
+			quadFb->Bind();
+			RenderCommand::Clear();
+
+			uint32_t width = quadFb->GetSpecification().Width;
+			uint32_t height = quadFb->GetSpecification().Height;
+
+			Renderer3D::GbufferPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer->BindColorTex2D(0,2);
+
+			quadShader->Bind();
+			quadShader->SetInt("ComTexture", 0);
+			Renderer3D::QuadPipeline->DrawQuad();
+
+			quadFb->Unbind();
+		}
+		Renderer3D::GeometryPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer->Bind();
+		defaultShader->Bind();
+
 		Renderer3D::EndScene();
 	}
 }

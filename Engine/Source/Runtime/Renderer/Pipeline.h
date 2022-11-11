@@ -81,6 +81,8 @@ namespace X
 
 		virtual void Unbind() = 0;
 
+		virtual void DrawQuad() = 0;
+
 		static Ref<Pipeline> Create(const PipelineSpecification& spec);
 
 	};

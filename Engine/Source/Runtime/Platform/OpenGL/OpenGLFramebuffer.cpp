@@ -358,6 +358,17 @@ namespace X
 	}
 
 	
+	void OpenGLFramebuffer::BindColorTex2D(uint32_t slot, uint32_t attachmentIndex)
+	{
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_2D, mColorAttachments[attachmentIndex]);
+	}
+	void OpenGLFramebuffer::UnbindColorTex2D(uint32_t slot)
+	{
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
 
 	void OpenGLFramebuffer::BindDepthTex3D(uint32_t slot)
 	{

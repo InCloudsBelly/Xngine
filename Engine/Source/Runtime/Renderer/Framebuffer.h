@@ -70,6 +70,9 @@ namespace X
 
 		[[nodiscard]] virtual Ref<class Texture3D> GetDepthTex3D() const = 0;
 		
+		virtual void BindColorTex2D(uint32_t slot, uint32_t attachmentIndex = 0) = 0;
+		virtual void UnbindColorTex2D(uint32_t slot) = 0;
+
 		virtual void BindDepthTex3D(uint32_t slot) = 0;
 		virtual void UnBindDepthTex3D(uint32_t slot) = 0;
 

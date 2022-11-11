@@ -201,4 +201,16 @@ namespace X
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
 	}
+	void OpenGLRendererAPI::UnbindReadBuffer()
+	{
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	}
+	void OpenGLRendererAPI::UnbindDrawBuffer()
+	{
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	}
+	void OpenGLRendererAPI::CopyTexture(uint32_t& width, uint32_t& height)
+	{
+		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
+	}
 }

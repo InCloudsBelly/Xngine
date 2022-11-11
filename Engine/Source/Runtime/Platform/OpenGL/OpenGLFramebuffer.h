@@ -32,6 +32,9 @@ namespace X
 
         virtual Ref<class Texture3D> GetDepthTex3D() const override; // have bugs
         
+        virtual void BindColorTex2D(uint32_t slot, uint32_t attachmentIndex = 0) override;
+        virtual void UnbindColorTex2D(uint32_t slot) override;
+
         virtual void BindDepthTex3D(uint32_t slot) override;
         virtual void UnBindDepthTex3D(uint32_t slot) override;
 

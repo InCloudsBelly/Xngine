@@ -42,5 +42,12 @@ namespace X
 		virtual int GetDrawFrameBuffer() override;
 
 		virtual void BindFrameBuffer(uint32_t framebufferID) override;
+
+		virtual void UnbindReadBuffer() override;
+		virtual void UnbindDrawBuffer() override;
+
+		virtual void CopyTexture(uint32_t& width, uint32_t& height) override;
+		
+
     };
 }
