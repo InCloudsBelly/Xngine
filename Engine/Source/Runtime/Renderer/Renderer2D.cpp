@@ -172,9 +172,9 @@ namespace X
         for (uint32_t i = 0; i < sData.MaxTextureSlots; i++)
             samplers[i] = i;
 
-        sData.QuadShader = Shader::Create(AssetManager::GetFullPath("Shaders/Renderer2D_Quad.glsl"));
-        sData.CircleShader = Shader::Create(AssetManager::GetFullPath("Shaders/Renderer2D_Circle.glsl"));
-        sData.LineShader = Shader::Create(AssetManager::GetFullPath("Shaders/Renderer2D_Line.glsl"));
+        sData.QuadShader = Shader::CreateNative(AssetManager::GetFullPath("Shaders/Renderer2D_Quad.glsl"));
+        sData.CircleShader = Shader::CreateNative(AssetManager::GetFullPath("Shaders/Renderer2D_Circle.glsl"));
+        sData.LineShader = Shader::CreateNative(AssetManager::GetFullPath("Shaders/Renderer2D_Line.glsl"));
 
         sData.QuadShader->Bind();
         sData.QuadShader->SetIntArray("u_Textures", samplers, sData.MaxTextureSlots);

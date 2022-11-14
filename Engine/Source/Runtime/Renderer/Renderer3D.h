@@ -26,9 +26,14 @@ namespace X
 
     public:
 
-        static Ref<Pipeline> GbufferPipeline;
         static Ref<Pipeline> lightPipeline ;
         static Ref<Pipeline> GeometryPipeline;
         static Ref<Pipeline> QuadPipeline;
+
+        static Ref<Pipeline> HBAOGbufferPipeline;
+        static Ref<Texture2D> TextureConfigNoise;
+        static Ref<Pipeline> HBAOPipeline;
+        static Ref<Pipeline> HBAOBlurPipeline;
+        static Ref<Pipeline> HBAOQuadPipeline;
     };
 }

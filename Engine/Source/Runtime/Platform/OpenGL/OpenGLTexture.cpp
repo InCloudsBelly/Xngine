@@ -13,6 +13,7 @@ namespace X
     static GLenum GetOpenGLFilterType(FilterType& type)
     {
         if (type == FilterType::Linear) return GL_LINEAR;
+        if (type == FilterType::Nearest) return GL_NEAREST;
         
         X_CORE_ASSERT(false, "Unknown Image FilterType");
         return 0;
@@ -32,10 +33,13 @@ namespace X
     {
         switch (format)
         {
+        case DataFormat::FLOAT:     return GL_FLOAT;
         case DataFormat::Alpha:     return GL_ALPHA;
         case DataFormat::RGB:       return GL_RGB;
         case DataFormat::RGBA:      return GL_RGBA;
         case DataFormat::RGBA8:     return GL_RGBA8;
+        case DataFormat::RGBA16F:   return GL_RGBA16F;
+        case DataFormat::UNSIGNED_BYTE: return GL_UNSIGNED_BYTE;
         }
         X_CORE_ASSERT(false, "Unknown Data Format!");
         return 0;
@@ -125,12 +129,13 @@ namespace X
         glDeleteTextures(1, &mRendererID);
     }
 
-    void OpenGLTexture2D::SetData(void* data, uint32_t size)
+    void OpenGLTexture2D::SetData(void* data, uint32_t size, DataFormat format)
     {
         uint32_t bpp = mDataFormat == GL_RGBA ? 4 : 3;  // bytes per pixel
         X_CORE_ASSERT(size == mWidth * mHeight * bpp, "Data must be entire texture!");
-        glTextureSubImage2D(mRendererID, 0, 0, 0, mWidth, mHeight, mDataFormat, GL_UNSIGNED_BYTE, data);
+        glTextureSubImage2D(mRendererID, 0, 0, 0, mWidth, mHeight, mDataFormat, GetOpenGLDataFormat(format), data);
     }
+
 
     void OpenGLTexture2D::Bind(uint32_t slot) const
     {

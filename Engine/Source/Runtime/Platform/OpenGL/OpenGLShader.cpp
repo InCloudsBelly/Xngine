@@ -656,6 +656,10 @@ namespace X
 	{
 		UploadUniformIntArray(name, values, count);
 	}
+	void OpenGLShader::SetFloat2(const std::string& name, const glm::vec2& value)
+	{
+		UploadUniformFloat2(name, value);
+	}
 
 	void OpenGLShader::SetFloat(const std::string& name, float value)
 	{

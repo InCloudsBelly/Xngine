@@ -6,13 +6,15 @@ namespace X
 {
 	enum class FramebufferTextureFormat
 	{
-		None = 0, 
+		None = 0,
 
 		// Color
 		RGBA8,
+		R8,
 		RED_INTEGER,
 
 		// Depth/stencil
+		DEPTH32F_TEX2D,
 		DEPTH32F_TEX3D,
 		DEPTH24STENCIL8,
 
@@ -72,7 +74,8 @@ namespace X
 		
 		virtual void BindColorTex2D(uint32_t slot, uint32_t attachmentIndex = 0) = 0;
 		virtual void UnbindColorTex2D(uint32_t slot) = 0;
-
+		virtual void BindDepthTex2D(uint32_t slot) = 0;
+		virtual void UnbindDepthTex2D(uint32_t slot) = 0;
 		virtual void BindDepthTex3D(uint32_t slot) = 0;
 		virtual void UnBindDepthTex3D(uint32_t slot) = 0;
 

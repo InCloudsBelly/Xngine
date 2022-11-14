@@ -179,35 +179,120 @@ namespace X
 		//}
 		defaultShader->SetFloat3("lightDir", glm::vec3(0.0f));
 
-		//Gbuffer Pass
+
+		//HBAO
 		{
-			Ref<Framebuffer> gfb = Renderer3D::GbufferPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
-			gfb->Bind();
-
-			RenderCommand::SetViewport(0, 0, gfb->GetSpecification().Width, gfb->GetSpecification().Height);
-			//RenderCommand::SetClearColor({ 0.4f, 0.4f, 0.4f, 1 });
-			RenderCommand::Clear();
-			gfb->ClearAttachment(1, -1);
-
-
-			Ref<Shader> gShader = Renderer3D::GbufferPipeline->GetSpecification().Shader;
-			auto view = mLevel->mRegistry.view<TransformComponent, MeshComponent>();
-			for (auto e : view)
+			//Gbuffer Pass
 			{
-				Entity entity = { e, mLevel };
-				auto& transform = entity.GetComponent<TransformComponent>();
-				auto& mesh = entity.GetComponent<MeshComponent>();
+				Ref<Framebuffer> gfb = Renderer3D::HBAOGbufferPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+				gfb->Bind();
+
+				RenderCommand::SetViewport(0, 0, gfb->GetSpecification().Width, gfb->GetSpecification().Height);
+				//RenderCommand::SetClearColor({ 0.4f, 0.4f, 0.4f, 1 });
+				RenderCommand::Clear();
+
+				RenderCommand::DepthTest(true);
+				/*	RenderCommand::Cull(true);
+					RenderCommand::CullFrontOrBack(false);*/
+
+				Ref<Shader> gShader = Renderer3D::HBAOGbufferPipeline->GetSpecification().Shader;
+				auto view = mLevel->mRegistry.view<TransformComponent, MeshComponent>();
+				for (auto e : view)
+				{
+					Entity entity = { e, mLevel };
+					auto& transform = entity.GetComponent<TransformComponent>();
+					auto& mesh = entity.GetComponent<MeshComponent>();
 
 
-				gShader->Bind();
-				if (mesh.mMesh->bPlayAnim)
-					gShader->SetBool("u_Animated", true);
-				else
-					gShader->SetBool("u_Animated", false);
+					gShader->Bind();
 
-				mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Renderer3D::GbufferPipeline, (int)e);
+					//
+					gShader->SetMat4("view", camera.GetViewMatrix());
+					gShader->SetFloat("u_Near", camera.GetNearPlane());
+					gShader->SetFloat("u_Far", camera.GetFarPlane());
+					//
+
+					if (mesh.mMesh->bPlayAnim)
+						gShader->SetBool("u_Animated", true);
+					else
+						gShader->SetBool("u_Animated", false);
+
+					mesh.mMesh->Draw(transform.GetTransform(), camera.GetPosition(), Renderer3D::HBAOGbufferPipeline, (int)e);
+				}				
+				gfb->Unbind();
 			}
-			gfb->Unbind();
+
+			//HBAO
+			{
+				Ref<Framebuffer> hbaofb = Renderer3D::HBAOPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+				Ref<Framebuffer> gfb = Renderer3D::HBAOGbufferPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+				X_ASSERT(hbaofb->GetSpecification().Height == gfb->GetSpecification().Height && hbaofb->GetSpecification().Width == gfb->GetSpecification().Width, "U forget resize framebuffer!");
+
+				uint32_t colorAttachmentIndex = 0;
+
+				Ref<Shader> hbaoShader = Renderer3D::HBAOPipeline->GetSpecification().Shader;
+
+				hbaofb->Bind();
+				RenderCommand::Clear();
+
+				uint32_t width = hbaofb->GetSpecification().Width;
+				uint32_t height = hbaofb->GetSpecification().Height;
+
+
+				//Normal Tex
+				gfb->BindColorTex2D(0, 2);
+				//Depth Tex
+				gfb->BindDepthTex2D(1);
+				//Nosie Tex
+				Renderer3D::TextureConfigNoise->Bind(2);
+
+				glm::vec2 FocalLen;
+				float fovRad = glm::radians(camera.GetFOV());
+				FocalLen[0] = 1.0f / tanf(fovRad * 0.5f) * ((float)height / (float)width);
+				FocalLen[1] = 1.0f / tanf(fovRad * 0.5f);
+
+				hbaoShader->Bind();
+				hbaoShader->SetInt("u_NormalTexture", 0);
+				hbaoShader->SetInt("u_DepthTexture", 1);
+				hbaoShader->SetInt("u_NoiseTexture", 2);
+
+				hbaoShader->SetFloat("u_Near", camera.GetNearPlane());
+				hbaoShader->SetFloat("u_Far", camera.GetFarPlane());
+				hbaoShader->SetFloat("u_Fov", camera.GetFOV());
+				hbaoShader->SetFloat2("u_FocalLen", FocalLen);
+				hbaoShader->SetFloat("u_WindowWidth", width);
+				hbaoShader->SetFloat("u_WindowHeight", height);
+
+				Renderer3D::HBAOPipeline->DrawQuad();
+				hbaofb->Unbind();
+			}
+
+			//HBAO Blur
+			{
+				Ref<Framebuffer> hbaoBlurfb = Renderer3D::HBAOBlurPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+				Ref<Framebuffer> hbaofb = Renderer3D::HBAOPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+				X_ASSERT(hbaoBlurfb->GetSpecification().Height == hbaofb->GetSpecification().Height && hbaoBlurfb->GetSpecification().Width == hbaofb->GetSpecification().Width, "U forget resize framebuffer!");
+
+				uint32_t colorAttachmentIndex = 0;
+
+				Ref<Shader> hbaoBlurShader = Renderer3D::HBAOBlurPipeline->GetSpecification().Shader;
+
+				hbaoBlurfb->Bind();
+				RenderCommand::Clear();
+
+				uint32_t width = hbaoBlurfb->GetSpecification().Width;
+				uint32_t height = hbaoBlurfb->GetSpecification().Height;
+
+				//HBAO Tex
+				hbaofb->BindColorTex2D(0, 0);
+
+				hbaoBlurShader->Bind();
+				hbaoBlurShader->SetInt("u_HBAOTexture", 0);
+
+				Renderer3D::HBAOBlurPipeline->DrawQuad();
+				hbaoBlurfb->Unbind();
+			}
+
 		}
 
 
@@ -362,13 +447,15 @@ namespace X
 
 		//QuadPass
 		{
-			Ref<Framebuffer> quadFb = Renderer3D::QuadPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+			Ref<Framebuffer> quadFb = Renderer3D::HBAOQuadPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
 			Ref<Framebuffer> showFb = Renderer3D::GeometryPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
 			X_ASSERT(showFb->GetSpecification().Height == quadFb->GetSpecification().Height && showFb->GetSpecification().Width == quadFb->GetSpecification().Width, "U forget resize framebuffer!");
-			
+			//HBAO
+			Ref<Framebuffer> hbaoBlurFb = Renderer3D::HBAOBlurPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer;
+
 			uint32_t colorAttachmentIndex = 0;
 
-			Ref<Shader> quadShader = Renderer3D::QuadPipeline->GetSpecification().Shader;
+			Ref<Shader> quadShader = Renderer3D::HBAOQuadPipeline->GetSpecification().Shader;
 
 			quadFb->Bind();
 			RenderCommand::Clear();
@@ -383,14 +470,29 @@ namespace X
 				quadFb->BindDrawFramebuffer();
 				RenderCommand::BlitFramebuffer(width,height);
 
-				RenderCommand::UnbindDrawBuffer();
 				RenderCommand::UnbindReadBuffer();
+
+				quadShader->Bind();
+				quadFb->BindColorTex2D(0, 0);
+				hbaoBlurFb->BindColorTex2D(1, 0);
+				//Basic quad
+				quadShader->SetInt("ComTexture", 0);
+				//HBAO tes
+				quadShader->SetInt("HBAOBlur", 1);
+				Renderer3D::QuadPipeline->DrawQuad();
+				RenderCommand::UnbindDrawBuffer();
+
 			}
 			else
 			{
-				Renderer3D::GeometryPipeline->GetSpecification().RenderPass->GetSpecification().TargetFramebuffer->BindColorTex2D(0, 0);
 				quadShader->Bind();
+				showFb->BindColorTex2D(0, 0);
+				hbaoBlurFb->BindColorTex2D(1, 0);
+
+				//Basic quad
 				quadShader->SetInt("ComTexture", 0);
+				//HBAO tes
+				quadShader->SetInt("HBAOBlur", 1);
 				Renderer3D::QuadPipeline->DrawQuad();
 			}
 			quadFb->Unbind();

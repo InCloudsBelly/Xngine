@@ -8,7 +8,7 @@ namespace X
     Library<Shader>::Library()
     {
         Add("BasePBR", Shader::CreateNative(AssetManager::GetFullPath("Shaders/BasePBR.glsl")));
-        Add("SkyBox", Shader::Create(AssetManager::GetFullPath("Shaders/SkyBox.glsl")));
+        Add("SkyBox", Shader::CreateNative(AssetManager::GetFullPath("Shaders/SkyBox.glsl")));
         
         Add("ComputeTest", Shader::CreateNative(AssetManager::GetFullPath("Shaders/ComputeTest.glsl")));
 
@@ -30,6 +30,12 @@ namespace X
 
         Add("Gbuffer", Shader::CreateNative(AssetManager::GetFullPath("Shaders/Gbuffer.glsl")));
         Add("SimpleQuad", Shader::CreateNative(AssetManager::GetFullPath("Shaders/SimpleQuad.glsl")));
+
+        //HBAO
+        Add("HBAOGbuffer", Shader::CreateNative(AssetManager::GetFullPath("Shaders/HBAO/HBAO_Gbuffer.glsl")));
+        Add("HBAO", Shader::CreateNative(AssetManager::GetFullPath("Shaders/HBAO/HBAO.glsl")));
+        Add("HBAOBlur", Shader::CreateNative(AssetManager::GetFullPath("Shaders/HBAO/HBAO_Blur.glsl")));
+        Add("HBAOQuad", Shader::CreateNative(AssetManager::GetFullPath("Shaders/HBAO/HBAO_Quad.glsl")));
 
     }
 

@@ -23,29 +23,12 @@ namespace X
         TextureCube
     };
 
-    class Texture
-    {
-    public:
-        virtual ~Texture() = default;
-
-        [[nodiscard]] virtual uint32_t GetWidth() const = 0;
-        [[nodiscard]] virtual uint32_t GetHeight() const = 0;
-        [[nodiscard]] virtual uint32_t GetRendererID() const = 0;
-
-        virtual void SetData(void* data, uint32_t size) {};
-
-        virtual void Bind(uint32_t slot = 0) const = 0;
-        virtual void UnBind() const = 0;
-
-        virtual bool IsLoaded() const { return false; };
-
-        virtual bool operator==(const Texture& other) const = 0;
-    };
 
     enum class FilterType
     {
         None = 0,
         Linear,
+        Nearest,
     };
     enum class WrapType
     {
@@ -57,12 +40,35 @@ namespace X
 
     enum class DataFormat
     {
-        None =0,
+        None = 0,
+        UNSIGNED_BYTE,
+        FLOAT,
         RGBA,
         RGBA8,
+        RGBA16F,
         RGB,
         Alpha,
 
+    };
+
+
+    class Texture
+    {
+    public:
+        virtual ~Texture() = default;
+
+        [[nodiscard]] virtual uint32_t GetWidth() const = 0;
+        [[nodiscard]] virtual uint32_t GetHeight() const = 0;
+        [[nodiscard]] virtual uint32_t GetRendererID() const = 0;
+
+        virtual void SetData(void* data, uint32_t size, DataFormat format = DataFormat::UNSIGNED_BYTE) {};
+
+        virtual void Bind(uint32_t slot = 0) const = 0;
+        virtual void UnBind() const = 0;
+
+        virtual bool IsLoaded() const { return false; };
+
+        virtual bool operator==(const Texture& other) const = 0;
     };
 
     class Texture2D : public Texture

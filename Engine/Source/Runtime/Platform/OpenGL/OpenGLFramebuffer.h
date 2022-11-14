@@ -34,6 +34,8 @@ namespace X
         
         virtual void BindColorTex2D(uint32_t slot, uint32_t attachmentIndex = 0) override;
         virtual void UnbindColorTex2D(uint32_t slot) override;
+        virtual void BindDepthTex2D(uint32_t slot) override;
+        virtual void UnbindDepthTex2D(uint32_t slot) override;
 
         virtual void BindDepthTex3D(uint32_t slot) override;
         virtual void UnBindDepthTex3D(uint32_t slot) override;

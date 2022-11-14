@@ -15,57 +15,176 @@
 #include "Runtime/Resource/AssetManager/AssetManager.h"
 
 #include <glm/glm.hpp>
+#include <glm/gtc/random.hpp>
 
 namespace X
 {
-	Ref<Pipeline> Renderer3D::GbufferPipeline = nullptr;
+	Ref<Pipeline> Renderer3D::HBAOGbufferPipeline = nullptr;
+	Ref<Texture2D> Renderer3D::TextureConfigNoise = nullptr;
+	Ref<Pipeline> Renderer3D::HBAOPipeline = nullptr;
+	Ref<Pipeline> Renderer3D::HBAOBlurPipeline = nullptr;
+
 	Ref<Pipeline> Renderer3D::lightPipeline = nullptr;
 	Ref<Pipeline> Renderer3D::GeometryPipeline = nullptr;
 	Ref<Pipeline> Renderer3D::QuadPipeline = nullptr;
+	Ref<Pipeline> Renderer3D::HBAOQuadPipeline = nullptr;
+
+	float* generateNoise()
+	{
+		float* noise = new float[4 * 4 * 4];
+		for (int y = 0; y < 4; ++y)
+		{
+			for (int x = 0; x < 4; ++x)
+			{
+				glm::vec2 xy = glm::circularRand(1.0f);
+				float z = glm::linearRand(0.0f, 1.0f);
+				float w = glm::linearRand(0.0f, 1.0f);
+
+				int offset = 4 * (y * 4 + x);
+				noise[offset + 0] = xy[0];
+				noise[offset + 1] = xy[1];
+				noise[offset + 2] = z;
+				noise[offset + 3] = w;
+			}
+		}
+		return noise;
+	}
 
 	void Renderer3D::Init()
 	{
-		//Gbuffer pass
+		// HBAO 
 		{
-			FramebufferSpecification fbSpec;
-			fbSpec.Attachments = { FramebufferTextureFormat::RGBA8,FramebufferTextureFormat::RGBA8 ,FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::DEPTH24STENCIL8 };
-			fbSpec.Width = 1280;
-			fbSpec.Height = 720;
-			fbSpec.Samples = 1;
-			Ref<Framebuffer> GbufferFB = Framebuffer::Create(fbSpec);
+			//Gbuffer pass
+			{
+				FramebufferSpecification fbSpec;
+				fbSpec.Attachments = { FramebufferTextureFormat::RGBA8,FramebufferTextureFormat::RGBA8 ,FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::DEPTH32F_TEX2D };
+				fbSpec.Width = 1280;
+				fbSpec.Height = 720;
+				fbSpec.Samples = 1;
+				Ref<Framebuffer> GbufferFB = Framebuffer::Create(fbSpec);
 
-			RenderPassSpecification GbufferPassSpec;
-			GbufferPassSpec.DebugName = "GbufferPass";
-			GbufferPassSpec.TargetFramebuffer = GbufferFB;
+				RenderPassSpecification GbufferPassSpec;
+				GbufferPassSpec.DebugName = "HBAOGbufferPass";
+				GbufferPassSpec.TargetFramebuffer = GbufferFB;
 
-			PipelineSpecification pipelineSpec;
-			pipelineSpec.DebugName = GbufferPassSpec.DebugName;
-			pipelineSpec.Shader = Library<Shader>::GetInstance().Get("Gbuffer");
-			pipelineSpec.RenderPass = RenderPass::Create(GbufferPassSpec);
-			//pipelineSpec.RenderPass->AddPostProcessing(PostProcessingType::MSAA);
+				PipelineSpecification pipelineSpec;
+				pipelineSpec.DebugName = GbufferPassSpec.DebugName;
+				pipelineSpec.Shader = Library<Shader>::GetInstance().Get("HBAOGbuffer");
+				pipelineSpec.RenderPass = RenderPass::Create(GbufferPassSpec);
 
-			pipelineSpec.StaticLayout = {
-				{ ShaderDataType::Float3, "a_Pos"},
-				{ ShaderDataType::Float3, "a_Normal"},
-				{ ShaderDataType::Float2, "a_TexCoord"},
-				{ ShaderDataType::Float3, "a_Tangent"},
-				{ ShaderDataType::Float3, "a_Bitangent"},
-				{ ShaderDataType::Int,	  "a_EntityID"},
-			};
+				pipelineSpec.StaticLayout = {
+					{ ShaderDataType::Float3, "a_Pos"},
+					{ ShaderDataType::Float3, "a_Normal"},
+					{ ShaderDataType::Float2, "a_TexCoord"},
+					{ ShaderDataType::Float3, "a_Tangent"},
+					{ ShaderDataType::Float3, "a_Bitangent"},
+					{ ShaderDataType::Int,	  "a_EntityID"},
+				};
 
-			pipelineSpec.AnimationLayout = {
-				{ ShaderDataType::Float3, "a_Pos"},
-				{ ShaderDataType::Float3, "a_Normal"},
-				{ ShaderDataType::Float2, "a_TexCoord"},
-				{ ShaderDataType::Float3, "a_Tangent"},
-				{ ShaderDataType::Float3, "a_Bitangent"},
-				{ ShaderDataType::Int,	  "a_EntityID"},
-				{ ShaderDataType::Int4,   "a_BoneIDs"},
-				{ ShaderDataType::Float4, "a_Weights"},
-			};
+				pipelineSpec.AnimationLayout = {
+					{ ShaderDataType::Float3, "a_Pos"},
+					{ ShaderDataType::Float2, "a_TexCoord"},
+					{ ShaderDataType::Float3, "a_Tangent"},
+					{ ShaderDataType::Float3, "a_Bitangent"},
+					{ ShaderDataType::Int,	  "a_EntityID"},
+					{ ShaderDataType::Int4,   "a_BoneIDs"},
+					{ ShaderDataType::Float4, "a_Weights"},
+				};
+
+				HBAOGbufferPipeline = Pipeline::Create(pipelineSpec);
+			}
+
+			//HBAO pass
+			{
+				FramebufferSpecification fbSpec;
+				fbSpec.Attachments = { FramebufferTextureFormat::R8 };
+				fbSpec.Width = 1280;
+				fbSpec.Height = 720;
+				Ref<Framebuffer> HBAOFramebuffer = Framebuffer::Create(fbSpec);
 
 
-			GbufferPipeline = Pipeline::Create(pipelineSpec);
+
+				TextureConfigNoise = Texture2D::Create(4, 4, DataFormat::RGBA16F, DataFormat::RGBA, DataFormat::RGBA,
+					FilterType::Nearest, FilterType::Nearest, WrapType::Repeat, WrapType::Repeat);
+				float* HBAONoise = generateNoise();
+				TextureConfigNoise->SetData(HBAONoise, 4 * 4 * 4, DataFormat::FLOAT);
+
+				RenderPassSpecification HBAOSpec = { HBAOFramebuffer, "HBAO" };
+
+				PipelineSpecification pipelineSpec;
+				pipelineSpec.DebugName = HBAOSpec.DebugName;
+				pipelineSpec.Shader = Library<Shader>::GetInstance().Get("HBAO");
+
+
+				pipelineSpec.RenderPass = RenderPass::Create(HBAOSpec);
+
+				pipelineSpec.StaticLayout = {
+					{ ShaderDataType::Float3, "a_Pos"},
+				};
+
+				pipelineSpec.AnimationLayout = {
+					{ ShaderDataType::Float3, "a_Pos"},
+				};
+
+				HBAOPipeline = Pipeline::Create(pipelineSpec);
+			}
+
+
+			//HBAO blur pass
+			{
+				FramebufferSpecification fbSpec;
+				fbSpec.Attachments = { FramebufferTextureFormat::R8 };
+				fbSpec.Width = 1280;
+				fbSpec.Height = 720;
+				Ref<Framebuffer> HBAOFramebuffer = Framebuffer::Create(fbSpec);
+
+				RenderPassSpecification HBAOBlueSpec = { HBAOFramebuffer, "HBAOBlur" };
+
+				PipelineSpecification pipelineSpec;
+				pipelineSpec.DebugName = HBAOBlueSpec.DebugName;
+				pipelineSpec.Shader = Library<Shader>::GetInstance().Get("HBAOBlur");
+
+
+				pipelineSpec.RenderPass = RenderPass::Create(HBAOBlueSpec);
+
+				pipelineSpec.StaticLayout = {
+					{ ShaderDataType::Float3, "a_Pos"},
+				};
+
+				pipelineSpec.AnimationLayout = {
+					{ ShaderDataType::Float3, "a_Pos"},
+				};
+
+				HBAOBlurPipeline = Pipeline::Create(pipelineSpec);
+			}
+			
+
+			//QuadPipeline
+			{
+				FramebufferSpecification fbSpec;
+				fbSpec.Attachments = { FramebufferTextureFormat::RGBA8 };
+				fbSpec.Width = 1280;
+				fbSpec.Height = 720;
+				Ref<Framebuffer> GeoFramebuffer = Framebuffer::Create(fbSpec);
+
+				RenderPassSpecification QuadSpec = { GeoFramebuffer, "HBAOQuad" };
+
+				PipelineSpecification pipelineSpec;
+				pipelineSpec.DebugName = QuadSpec.DebugName;
+				pipelineSpec.Shader = Library<Shader>::GetInstance().Get("HBAOQuad");
+				pipelineSpec.RenderPass = RenderPass::Create(QuadSpec);
+
+				pipelineSpec.StaticLayout = {
+					{ ShaderDataType::Float3, "a_Pos"},
+				};
+
+				pipelineSpec.AnimationLayout = {
+					{ ShaderDataType::Float3, "a_Pos"},
+				};
+
+				HBAOQuadPipeline = Pipeline::Create(pipelineSpec);
+			}
+
 		}
 
 
@@ -115,7 +234,7 @@ namespace X
 		//GeometryPipeline
 		{
 			FramebufferSpecification fbSpec;
-			fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::RGBA8,  FramebufferTextureFormat::DEPTH24STENCIL8 };
+			fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::R8,  FramebufferTextureFormat::DEPTH24STENCIL8 };
 			fbSpec.Width = 1280;
 			fbSpec.Height = 720;
 			fbSpec.Samples = 4;

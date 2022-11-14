@@ -148,10 +148,10 @@ namespace X
 		mQuadVAO = VertexArray::Create();
 		float screenQuadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
 			// positions   // texCoords
-			-1.0f,  1.0f, /* 0.0f, 1.0f,*/
-			-1.0f, -1.0f, /* 0.0f, 0.0f,*/
-			 1.0f, -1.0f, /* 1.0f, 0.0f,*/
-			 1.0f,  1.0f, /* 1.0f, 1.0f*/
+			-1.0f,  1.0f,  0.0f, 1.0f,
+			-1.0f, -1.0f,  0.0f, 0.0f,
+			 1.0f, -1.0f,  1.0f, 0.0f,
+			 1.0f,  1.0f,  1.0f, 1.0f
 		};
 		uint32_t screenQuadIndices[] = {
 			0, 1, 2, 0, 2, 3
@@ -160,6 +160,7 @@ namespace X
 		Ref<VertexBuffer> ScreenQuadVBO = VertexBuffer::Create(screenQuadVertices, sizeof(screenQuadVertices));
 		ScreenQuadVBO->SetLayout({
 			{ ShaderDataType::Float2,	"a_Position" },
+			{ ShaderDataType::Float2,	"a_TextureCoord" },
 			});
 		mQuadVAO->AddVertexBuffer(ScreenQuadVBO);
 		mQuadVAO->SetIndexBuffer(ScreenQuadIBO);

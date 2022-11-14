@@ -85,7 +85,10 @@ namespace X
 	{
 		UploadUniformFloat(name, value);
 	}
-
+	void NativeOpenGLShader::SetFloat2(const std::string& name, const glm::vec2& value)
+	{
+		UploadUniformFloat2(name, value);
+	}
 	void NativeOpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value)
 	{
 		UploadUniformFloat3(name, value);

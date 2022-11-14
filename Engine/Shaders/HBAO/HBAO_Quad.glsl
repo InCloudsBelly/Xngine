@@ -20,8 +20,11 @@ in vec2 TexCoord;
 out vec4 FragColor;
 
 uniform sampler2D ComTexture;
+uniform sampler2D HBAOBlur;
 
 void main()
 {
-	FragColor = vec4(texture(ComTexture, TexCoord).rgb,1);
+    float AO = texture(HBAOBlur,TexCoord).r;
+
+	FragColor = vec4(texture(ComTexture, TexCoord).rgb * AO,1);
 }

@@ -17,7 +17,7 @@ namespace X
 			return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 		}
 
-		static void AttachColorTexture(uint32_t& id, int samples, GLenum internalFormat, GLenum format, uint32_t width, uint32_t height, int index)
+		static void AttachColorTexture(uint32_t& id, int samples, GLenum internalFormat, GLenum externalFormat, GLenum dataType, uint32_t width, uint32_t height, int index)
 		{
 			glGenTextures(1, &id);
 			bool multisampled = samples > 1;
@@ -30,7 +30,7 @@ namespace X
 			else
 			{
 				glBindTexture(GL_TEXTURE_2D, id);
-				glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, nullptr);
+				glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, externalFormat, dataType, nullptr);
 
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -62,7 +62,7 @@ namespace X
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_RENDERBUFFER, id);
 		}
 
-		static void AttachDepthTexture(uint32_t& id, int samples, GLenum format, GLenum attachmentType, uint32_t width, uint32_t height)
+		static void AttachDepthTexture(uint32_t& id, int samples, GLint internalFormat, GLint format, GLint type, uint32_t width, uint32_t height)
 		{
 			glGenTextures(1, &id);
 			bool multisampled = samples > 1;
@@ -75,17 +75,17 @@ namespace X
 			else
 			{
 				glBindTexture(GL_TEXTURE_2D, id);
-				glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
-
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+				glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, NULL);
+
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}
 
-			glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, TextureTarget(multisampled), id, 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureTarget(multisampled), id, 0);
 		}
 
 		static void AttachDepthTexture3D(uint32_t& id, GLenum format, uint32_t width, uint32_t height, int depth = 5)
@@ -130,6 +130,7 @@ namespace X
 		{
 			switch (format)
 			{
+			case X::FramebufferTextureFormat::DEPTH32F_TEX2D:
 			case X::FramebufferTextureFormat::DEPTH32F_TEX3D:
 			case X::FramebufferTextureFormat::DEPTH24STENCIL8:
 				return true;
@@ -191,7 +192,10 @@ namespace X
 				switch (mColorAttachmentSpecifications[i].TextureFormat)
 				{
 				case FramebufferTextureFormat::RGBA8:
-					Utils::AttachColorTexture(mColorAttachments[i], mSpecification.Samples, GL_RGBA8, GL_RGBA, mSpecification.Width, mSpecification.Height, i);
+					Utils::AttachColorTexture(mColorAttachments[i], mSpecification.Samples, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, mSpecification.Width, mSpecification.Height, i);
+					break;
+				case FramebufferTextureFormat::R8:
+					Utils::AttachColorTexture(mColorAttachments[i], mSpecification.Samples, GL_R8, GL_RED, GL_UNSIGNED_BYTE, mSpecification.Width, mSpecification.Height, i);
 					break;
 				case FramebufferTextureFormat::RED_INTEGER:
 					//Utils::AttachColorTexture(mColorAttachments[i], mSpecification.Samples, GL_R32I, GL_RED_INTEGER, mSpecification.Width, mSpecification.Height, i);
@@ -205,6 +209,9 @@ namespace X
 		{
 			switch (mDepthAttachmentSpecification.TextureFormat)
 			{
+			case FramebufferTextureFormat::DEPTH32F_TEX2D:
+				Utils::AttachDepthTexture(mDepthAttachment, mSpecification.Samples, GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT, GL_FLOAT, mSpecification.Width, mSpecification.Height);
+				break;
 			case FramebufferTextureFormat::DEPTH24STENCIL8:
 				Utils::AttachDepthRenderBuffer(mDepthAttachment, mSpecification.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, mSpecification.Width, mSpecification.Height);
 				break;
@@ -361,18 +368,25 @@ namespace X
 	void OpenGLFramebuffer::BindColorTex2D(uint32_t slot, uint32_t attachmentIndex)
 	{
 		glActiveTexture(GL_TEXTURE0 + slot);
-		if (this->mSpecification.Samples > 1)
-			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, mColorAttachments[attachmentIndex]);
-		else
-			glBindTexture(GL_TEXTURE_2D, mColorAttachments[attachmentIndex]);
+		glBindTexture(GL_TEXTURE_2D, mColorAttachments[attachmentIndex]);
 	}
+
 	void OpenGLFramebuffer::UnbindColorTex2D(uint32_t slot)
 	{
 		glActiveTexture(GL_TEXTURE0 + slot);
-		if (this->mSpecification.Samples > 1)
-			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-		else
-			glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	void OpenGLFramebuffer::BindDepthTex2D(uint32_t slot)
+	{
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_2D, mDepthAttachment);
+	}
+
+	void OpenGLFramebuffer::UnbindDepthTex2D(uint32_t slot)
+	{
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 
